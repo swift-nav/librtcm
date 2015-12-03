@@ -1,0 +1,6 @@
+resolver: lts-3.16
+packages:
+- '.'
+flags: {}
+extra-deps:
+- word24-1.0.7
