@@ -18,6 +18,7 @@ import qualified Data.Binary.Bits.Get as B
 import qualified Data.Binary.Bits.Put as B
 import           Data.Binary.Get
 import           Data.Binary.Put
+import           Data.ByteString.Lazy hiding ( ByteString )
 import           Data.CRC24Q
 import           Data.Word.Word24
 
@@ -44,6 +45,11 @@ instance Binary Msg where
       B.putWord16be 6 0
       B.putWord16be 10 _msgRTCM3Len
     putByteString _msgRTCM3Payload
+
+checkNum :: Msg -> Word16
+checkNum Msg {..} =
+  flip runGet (fromStrict _msgRTCM3Payload) $ B.runBitGet $
+    B.getWord16be 12
 
 checkCrc :: Msg -> Word24
 checkCrc msg =

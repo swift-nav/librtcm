@@ -17,8 +17,6 @@ module Data.RTCM3
 
 import           BasicPrelude
 import           Data.Binary
-import           Data.Binary.Get
-import qualified Data.Binary.Bits.Get as B
 import           Data.ByteString.Lazy
 import           Data.Word.Word24
 import           Data.RTCM3.Antennas
@@ -52,19 +50,17 @@ instance Binary RTCM3Msg where
       return $ decode' rtcm3 crc where
         decode' rtcm3@Msg {..} crc
           | checkCrc rtcm3 /= crc = RTCM3MsgBadCrc crc rtcm3
-          | otherwise = flip runGet (fromStrict _msgRTCM3Payload) $ B.runBitGet $ do
-              num <- B.getWord16be 12
-              return $ decode'' num where
-                decode'' num
-                  | num == msg1001 = RTCM3Msg1001 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-                  | num == msg1002 = RTCM3Msg1002 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-                  | num == msg1003 = RTCM3Msg1003 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-                  | num == msg1004 = RTCM3Msg1004 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-                  | num == msg1005 = RTCM3Msg1005 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-                  | num == msg1006 = RTCM3Msg1006 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-                  | num == msg1007 = RTCM3Msg1007 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-                  | num == msg1008 = RTCM3Msg1008 (decode $ fromStrict _msgRTCM3Payload) rtcm3
-                  | otherwise = RTCM3MsgUnknown num rtcm3
+          | otherwise = decode'' $ checkNum rtcm3 where
+            decode'' num
+              | num == msg1001 = RTCM3Msg1001 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+              | num == msg1002 = RTCM3Msg1002 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+              | num == msg1003 = RTCM3Msg1003 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+              | num == msg1004 = RTCM3Msg1004 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+              | num == msg1005 = RTCM3Msg1005 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+              | num == msg1006 = RTCM3Msg1006 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+              | num == msg1007 = RTCM3Msg1007 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+              | num == msg1008 = RTCM3Msg1008 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+              | otherwise = RTCM3MsgUnknown num rtcm3
 
   put msg = do
     putWord8 msgRTCM3Preamble
