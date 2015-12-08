@@ -15,9 +15,9 @@ import           BasicPrelude
 import           Control.Lens
 import           Data.Binary
 import qualified Data.Binary.Bits.Get as B
-import qualified Data.Binary.Bits.Put as B
 import           Data.Binary.Get
 import           Data.Binary.Put
+import           Data.ByteString.Builder
 import           Data.ByteString.Lazy hiding ( ByteString )
 import           Data.CRC24Q
 import           Data.Word.Word24
@@ -34,16 +34,12 @@ $(makeLenses ''Msg)
 
 instance Binary Msg where
   get = do
-    _msgRTCM3Len <- B.runBitGet $ do
-      _reserved <- B.getWord16be 6
-      B.getWord16be 10
+    _msgRTCM3Len     <- getWord16be
     _msgRTCM3Payload <- getByteString $ fromIntegral _msgRTCM3Len
     return Msg {..}
 
   put Msg {..} = do
-    B.runBitPut $ do
-      B.putWord16be 6 0
-      B.putWord16be 10 _msgRTCM3Len
+    putWord16be _msgRTCM3Len
     putByteString _msgRTCM3Payload
 
 checkNum :: Msg -> Word16
@@ -52,10 +48,11 @@ checkNum Msg {..} =
     B.getWord16be 12
 
 checkCrc :: Msg -> Word24
-checkCrc msg =
-  crc24q $ runPut $ do
-    putWord8 msgRTCM3Preamble
-    put msg
+checkCrc Msg {..} =
+  crc24q $ toLazyByteString $
+    word8 msgRTCM3Preamble  <>
+    word16BE _msgRTCM3Len   <>
+    byteString _msgRTCM3Payload
 
 class Binary a => ToRTCM3 a where
   toRTCM3 :: a -> Msg
