@@ -27,6 +27,7 @@ library
                      , Data.RTCM3.Antennas
                      , Data.RTCM3.Internal
                      , Data.RTCM3.Observations
+                     , Data.RTCM3.System
                      , Data.RTCM3.Types
   other-modules:       Data.RTCM3.Extras
                      , Data.RTCM3.TH
