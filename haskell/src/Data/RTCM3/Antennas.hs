@@ -152,6 +152,44 @@ instance BinaryBit ExtAntennaDescriptor where
     B.putWord8 8 _extAntennaDescriptor_n
     forM_ _extAntennaDescriptor_serialNumbers $ B.putWord8 8
 
+-- | ReceiverDescriptor.
+--
+-- Receiver description information.
+data ReceiverDescriptor = ReceiverDescriptor
+  { _receiverDescriptor_n                :: Word8
+    -- ^ Number of receiver descriptors.
+  , _receiverDescriptor_descriptors      :: [Word8]
+    -- ^ Receiver descriptors.
+  , _receiverDescriptor_m                :: Word8
+    -- ^ Number of firmware versions.
+  , _receiverDescriptor_firmwareVersions :: [Word8]
+    -- ^ Firmware versions.
+  , _receiverDescriptor_l                :: Word8
+    -- ^ Number of serial numbers.
+  , _receiverDescriptor_serialNumbers    :: [Word8]
+    -- ^ Serial numbers.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''ReceiverDescriptor)
+
+instance BinaryBit ReceiverDescriptor where
+  getBits _n = do
+    _receiverDescriptor_n                <- B.getWord8 8
+    _receiverDescriptor_descriptors      <- replicateM (fromIntegral _receiverDescriptor_n) $ B.getWord8 8
+    _receiverDescriptor_m                <- B.getWord8 8
+    _receiverDescriptor_firmwareVersions <- replicateM (fromIntegral _receiverDescriptor_m) $ B.getWord8 8
+    _receiverDescriptor_l                <- B.getWord8 8
+    _receiverDescriptor_serialNumbers    <- replicateM (fromIntegral _receiverDescriptor_l) $ B.getWord8 8
+    return ReceiverDescriptor {..}
+
+  putBits _n ReceiverDescriptor {..} = do
+    B.putWord8 8     _receiverDescriptor_n
+    forM_ _receiverDescriptor_descriptors $ B.putWord8 8
+    B.putWord8 8     _receiverDescriptor_m
+    forM_ _receiverDescriptor_firmwareVersions $ B.putWord8 8
+    B.putWord8 8     _receiverDescriptor_l
+    forM_ _receiverDescriptor_serialNumbers $ B.putWord8 8
+
 msg1005 :: Word16
 msg1005 = 1005
 
@@ -253,3 +291,37 @@ instance Binary Msg1008 where
     putBits 0 _msg1008_extDescriptor
 
 $(deriveRTCM3 ''Msg1008)
+
+msg1033 :: Word16
+msg1033 = 1033
+
+-- | Msg1033.
+--
+-- RTCMv3 message 1033.
+data Msg1033 = Msg1033
+  { _msg1033_antennaDescriptor    :: AntennaDescriptor
+    -- ^ Antenna descriptor.
+  , _msg1033_antennaExtDescriptor :: ExtAntennaDescriptor
+    -- ^ Antenna extended descriptor.
+  , _msg1033_receiverDescriptor   :: ReceiverDescriptor
+    -- ^ Antenna descriptor.
+  } deriving ( Show, Read, Eq)
+
+$(makeLenses ''Msg1033)
+
+instance Binary Msg1033 where
+  get = B.runBitGet $ do
+    _msg1033_antennaDescriptor    <- getBits 0
+    -- ^ Antenna descriptor.
+    _msg1033_antennaExtDescriptor <- getBits 0
+    -- ^ Antenna extended descriptor.
+    _msg1033_receiverDescriptor   <- getBits 0
+    -- ^ Receiver descriptor.
+    return Msg1033 {..}
+
+  put Msg1033 {..} = B.runBitPut $ do
+    putBits 0 _msg1033_antennaDescriptor
+    putBits 0 _msg1033_antennaExtDescriptor
+    putBits 0 _msg1033_receiverDescriptor
+
+$(deriveRTCM3 ''Msg1033)
