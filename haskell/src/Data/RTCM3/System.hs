@@ -60,10 +60,10 @@ instance BinaryBit MessageHeader where
 --
 -- Transmitted message.
 data Message = Message
-  { _message_num      :: Word16
+  { _message_num         :: Word16
     -- ^ Message number.
-  , _message_sync     :: Bool
-    -- ^ Sync flag.
+  , _message_synchronous :: Bool
+    -- ^ Synchronous flag.
   , _message_interval :: Word16
     -- ^ Transmission interval.
   } deriving ( Show, Read, Eq )
@@ -72,14 +72,14 @@ $(makeLenses ''Message)
 
 instance BinaryBit Message where
   getBits _n = do
-    _message_num      <- B.getWord16be 12
-    _message_sync     <- B.getBool
-    _message_interval <- B.getWord16be 16
+    _message_num         <- B.getWord16be 12
+    _message_synchronous <- B.getBool
+    _message_interval    <- B.getWord16be 16
     return Message {..}
 
   putBits _n Message {..} = do
     B.putWord16be 12 _message_num
-    B.putBool        _message_sync
+    B.putBool        _message_synchronous
     B.putWord16be 16 _message_interval
 
 msg1013 :: Word16
