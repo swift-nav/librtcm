@@ -23,25 +23,25 @@ import           Data.RTCM3.TH
 --
 -- Stationary antenna reference point information.
 data AntennaReference = AntennaReference
-  { _antennaReference_num        :: Word16
+  { _antennaReference_num          :: Word16
     -- ^ Message number.
-  , _antennaReference_station    :: Word16
+  , _antennaReference_station      :: Word16
     -- ^ Reference station id.
-  , _antennaReference_gps        :: Bool
+  , _antennaReference_gps          :: Bool
     -- ^ GPS indicator.
-  , _antennaReference_glonass    :: Bool
+  , _antennaReference_glonass      :: Bool
     -- ^ GLONASS indicator.
-  , _antennaReference_galileo    :: Bool
-    -- ^ Galileo indicator.
-  , _antennaReference_computed   :: Bool
+  , _antennaReference_computed     :: Bool
     -- ^ Reference-station non-physical indicator.
-  , _antennaReference_ecef_x     :: Int64
+  , _antennaReference_ecef_x       :: Int64
     -- ^ Antenna reference point ECEF-X.
-  , _antennaReference_oscillator :: Bool
+  , _antennaReference_oscillator   :: Bool
     -- ^ Single receiver oscillator indicator.
-  , _antennaReference_ecef_y     :: Int64
+  , _antennaReference_ecef_y       :: Int64
     -- ^ Antenna reference point ECEF-Y.
-  , _antennaReference_ecef_z     :: Int64
+  , _antennaReference_quarterCycle :: Word8
+    -- ^ Quarter cycle indicator.
+  , _antennaReference_ecef_z       :: Int64
     -- ^ Antenna reference point ECEF-Z.
   } deriving ( Show, Read, Eq )
 
@@ -49,19 +49,19 @@ $(makeLenses ''AntennaReference)
 
 instance BinaryBit AntennaReference where
   getBits _n = do
-    _antennaReference_num        <- B.getWord16be 12
-    _antennaReference_station    <- B.getWord16be 12
-    _reserved                    <- B.getWord8 6
-    _antennaReference_gps        <- B.getBool
-    _antennaReference_glonass    <- B.getBool
-    _antennaReference_galileo    <- B.getBool
-    _antennaReference_computed   <- B.getBool
-    _antennaReference_ecef_x     <- getInt64be 38
-    _antennaReference_oscillator <- B.getBool
-    _reserved                    <- B.getBool
-    _antennaReference_ecef_y     <- getInt64be 38
-    _reserved                    <- B.getWord8 2
-    _antennaReference_ecef_z     <- getInt64be 38
+    _antennaReference_num          <- B.getWord16be 12
+    _antennaReference_station      <- B.getWord16be 12
+    _reserved                      <- B.getWord8 6
+    _antennaReference_gps          <- B.getBool
+    _antennaReference_glonass      <- B.getBool
+    _reserved                      <- B.getBool
+    _antennaReference_computed     <- B.getBool
+    _antennaReference_ecef_x       <- getInt64be 38
+    _antennaReference_oscillator   <- B.getBool
+    _reserved                      <- B.getBool
+    _antennaReference_ecef_y       <- getInt64be 38
+    _antennaReference_quarterCycle <- B.getWord8 2
+    _antennaReference_ecef_z       <- getInt64be 38
     return AntennaReference {..}
 
   putBits _n AntennaReference {..} = do
@@ -70,12 +70,13 @@ instance BinaryBit AntennaReference where
     B.putWord8 6     0
     B.putBool        _antennaReference_gps
     B.putBool        _antennaReference_glonass
-    B.putBool        _antennaReference_galileo
+    B.putBool        False
     B.putBool        _antennaReference_computed
     putInt64be 38    _antennaReference_ecef_x
+    B.putBool        _antennaReference_oscillator
     B.putBool        False
     putInt64be 38    _antennaReference_ecef_y
-    B.putWord8 2     0
+    B.putWord8 2     _antennaReference_quarterCycle
     putInt64be 38    _antennaReference_ecef_z
 
 -- | ExtAntennaReference.
