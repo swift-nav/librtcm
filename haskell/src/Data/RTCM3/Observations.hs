@@ -308,6 +308,52 @@ instance BinaryBit GlonassL2ExtObservation where
   putBits _n GlonassL2ExtObservation {..} =
     B.putWord8 8 _glonassL2ExtObservation_cnr
 
+-- | GlonassBias.
+--
+-- GLONASS bias information.
+data GlonassBias = GlonassBias
+  { _glonassBias_num     :: Word16
+    -- ^ Message number.
+  , _glonassBias_station :: Word16
+    -- ^ Reference station id.
+  , _glonassBias_bias    :: Bool
+    -- ^ GLONASS Code-Phase bias indicator.
+  , _glonassBias_mask    :: Word8
+    -- ^ GLONASS FDMA signals mask.
+  , _glonassBias_l1ca    :: Word16
+    -- ^ GLONASS L1 C/A code-phase bias.
+  , _glonassBias_l1p     :: Word16
+    -- ^ GLONASS L1 P code-phase bias.
+  , _glonassBias_l2ca    :: Word16
+    -- ^ GLONASS L2 C/A code-phase bias.
+  , _glonassBias_l2p     :: Word16
+    -- ^ GLONASS L2 P code-phase bias.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GlonassBias)
+
+instance BinaryBit GlonassBias where
+  getBits _n = do
+    _glonassBias_num     <- B.getWord16be 12
+    _glonassBias_station <- B.getWord16be 12
+    _glonassBias_bias    <- B.getBool
+    _glonassBias_mask    <- B.getWord8 4
+    _glonassBias_l1ca    <- B.getWord16be 16
+    _glonassBias_l1p     <- B.getWord16be 16
+    _glonassBias_l2ca    <- B.getWord16be 16
+    _glonassBias_l2p     <- B.getWord16be 16
+    return GlonassBias {..}
+
+  putBits _n GlonassBias {..} = do
+    B.putWord16be 12 _glonassBias_num
+    B.putWord16be 12 _glonassBias_station
+    B.putBool        _glonassBias_bias
+    B.putWord8 4     _glonassBias_mask
+    B.putWord16be 16 _glonassBias_l1ca
+    B.putWord16be 16 _glonassBias_l1p
+    B.putWord16be 16 _glonassBias_l2ca
+    B.putWord16be 16 _glonassBias_l2p
+
 msg1001 :: Word16
 msg1001 = 1001
 
@@ -740,4 +786,25 @@ instance Binary Msg1012 where
 
 $(deriveRTCM3 ''Msg1012)
 
+msg1230 :: Word16
+msg1230 = 1230
 
+-- | Msg1230.
+--
+-- RTCMv3 message 1230.
+data Msg1230 = Msg1230
+  { _msg1230_bias :: GlonassBias
+    -- ^ GLONASS bias.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msg1230)
+
+instance Binary Msg1230 where
+  get = B.runBitGet $ do
+    _msg1230_bias <- getBits 0
+    return Msg1230 {..}
+
+  put Msg1230 {..} = B.runBitPut $ do
+    putBits 0 _msg1230_bias
+
+$(deriveRTCM3 ''Msg1230)
