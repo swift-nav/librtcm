@@ -1,5 +1,13 @@
 {-# OPTIONS -fno-warn-orphans #-}
 
+-- |
+-- Module:      Test.Data.RTCM3.Antennas
+-- Copyright:   (c) 2015 Mark Fine
+-- License:     BSD3
+-- Maintainer:  Mark Fine <mark@swift-nav.com>
+--
+-- Test Antennas module for RTCM3.
+
 module Test.Data.RTCM3.Antennas
   ( tests
   ) where

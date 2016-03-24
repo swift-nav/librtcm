@@ -1,5 +1,13 @@
 {-# OPTIONS -fno-warn-orphans #-}
 
+-- |
+-- Module:      Test.Data.RTCM3.Observations
+-- Copyright:   (c) 2015 Mark Fine
+-- License:     BSD3
+-- Maintainer:  Mark Fine <mark@swift-nav.com>
+--
+-- Test Observations module for RTCM3.
+
 module Test.Data.RTCM3.Observations
   ( tests
   ) where

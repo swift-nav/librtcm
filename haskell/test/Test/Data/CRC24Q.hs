@@ -1,3 +1,11 @@
+-- |
+-- Module:      Test.Data.CRC24Q
+-- Copyright:   (c) 2015 Mark Fine
+-- License:     BSD3
+-- Maintainer:  Mark Fine <mark@swift-nav.com>
+--
+-- Test module for CRC24Q.
+
 module Test.Data.CRC24Q
   ( tests
   ) where

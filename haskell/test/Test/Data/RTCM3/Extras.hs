@@ -1,6 +1,14 @@
 {-# OPTIONS -fno-warn-orphans  #-}
 {-# LANGUAGE FlexibleInstances #-}
 
+-- |
+-- Module:      Test.Data.RTCM3.Extras
+-- Copyright:   (c) 2015 Mark Fine
+-- License:     BSD3
+-- Maintainer:  Mark Fine <mark@swift-nav.com>
+--
+-- Test Extras module for RTCM3.
+
 module Test.Data.RTCM3.Extras
   ( tests
   ) where

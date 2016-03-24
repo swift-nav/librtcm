@@ -1,3 +1,11 @@
+-- |
+-- Module:      Test.Data.RTCM3.Test
+-- Copyright:   (c) 2015 Mark Fine
+-- License:     BSD3
+-- Maintainer:  Mark Fine <mark@swift-nav.com>
+--
+-- Test module for RTCM3.
+
 module Test.Data.RTCM3.Test where
 
 import BasicPrelude
