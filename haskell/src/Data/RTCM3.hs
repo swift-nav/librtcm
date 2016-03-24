@@ -12,6 +12,7 @@ module Data.RTCM3
   ( RTCM3Msg (..)
   , module Data.RTCM3.Antennas
   , module Data.RTCM3.Observations
+  , module Data.RTCM3.System
   , module Data.RTCM3.Types
   ) where
 
@@ -20,6 +21,7 @@ import Data.Binary
 import Data.ByteString.Lazy
 import Data.RTCM3.Antennas
 import Data.RTCM3.Observations
+import Data.RTCM3.System
 import Data.RTCM3.Types
 
 -- | An RTCM message ADT composed of all defined RTCM messages.
@@ -35,6 +37,13 @@ data RTCM3Msg =
    | RTCM3Msg1006 Msg1006 Msg
    | RTCM3Msg1007 Msg1007 Msg
    | RTCM3Msg1008 Msg1008 Msg
+   | RTCM3Msg1009 Msg1009 Msg
+   | RTCM3Msg1010 Msg1010 Msg
+   | RTCM3Msg1011 Msg1011 Msg
+   | RTCM3Msg1012 Msg1012 Msg
+   | RTCM3Msg1013 Msg1013 Msg
+   | RTCM3Msg1033 Msg1033 Msg
+   | RTCM3Msg1230 Msg1230 Msg
    | RTCM3MsgUnknown Word16 Msg
    | RTCM3MsgBadCrc Msg
    deriving ( Show, Read, Eq )
@@ -55,6 +64,13 @@ instance Binary RTCM3Msg where
           | num == msg1006 = RTCM3Msg1006 (decode $ fromStrict _msgRTCM3Payload) rtcm3
           | num == msg1007 = RTCM3Msg1007 (decode $ fromStrict _msgRTCM3Payload) rtcm3
           | num == msg1008 = RTCM3Msg1008 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | num == msg1009 = RTCM3Msg1009 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | num == msg1010 = RTCM3Msg1010 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | num == msg1011 = RTCM3Msg1011 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | num == msg1012 = RTCM3Msg1012 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | num == msg1013 = RTCM3Msg1013 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | num == msg1033 = RTCM3Msg1033 (decode $ fromStrict _msgRTCM3Payload) rtcm3
+          | num == msg1230 = RTCM3Msg1230 (decode $ fromStrict _msgRTCM3Payload) rtcm3
           | otherwise = RTCM3MsgUnknown num rtcm3 where
             num = checkNum _msgRTCM3Payload
 
@@ -69,5 +85,12 @@ instance Binary RTCM3Msg where
       encode' (RTCM3Msg1006 _msg rtcm3) = put rtcm3
       encode' (RTCM3Msg1007 _msg rtcm3) = put rtcm3
       encode' (RTCM3Msg1008 _msg rtcm3) = put rtcm3
+      encode' (RTCM3Msg1009 _msg rtcm3) = put rtcm3
+      encode' (RTCM3Msg1010 _msg rtcm3) = put rtcm3
+      encode' (RTCM3Msg1011 _msg rtcm3) = put rtcm3
+      encode' (RTCM3Msg1012 _msg rtcm3) = put rtcm3
+      encode' (RTCM3Msg1013 _msg rtcm3) = put rtcm3
+      encode' (RTCM3Msg1033 _msg rtcm3) = put rtcm3
+      encode' (RTCM3Msg1230 _msg rtcm3) = put rtcm3
       encode' (RTCM3MsgUnknown _num rtcm3) = put rtcm3
       encode' (RTCM3MsgBadCrc rtcm3) = put rtcm3

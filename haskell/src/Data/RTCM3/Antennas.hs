@@ -23,25 +23,25 @@ import           Data.RTCM3.TH
 --
 -- Stationary antenna reference point information.
 data AntennaReference = AntennaReference
-  { _antennaReference_num        :: Word16
+  { _antennaReference_num          :: Word16
     -- ^ Message number.
-  , _antennaReference_station    :: Word16
+  , _antennaReference_station      :: Word16
     -- ^ Reference station id.
-  , _antennaReference_gps        :: Bool
+  , _antennaReference_gps          :: Bool
     -- ^ GPS indicator.
-  , _antennaReference_glonass    :: Bool
+  , _antennaReference_glonass      :: Bool
     -- ^ GLONASS indicator.
-  , _antennaReference_galileo    :: Bool
-    -- ^ Galileo indicator.
-  , _antennaReference_computed   :: Bool
+  , _antennaReference_computed     :: Bool
     -- ^ Reference-station non-physical indicator.
-  , _antennaReference_ecef_x     :: Int64
+  , _antennaReference_ecef_x       :: Int64
     -- ^ Antenna reference point ECEF-X.
-  , _antennaReference_oscillator :: Bool
+  , _antennaReference_oscillator   :: Bool
     -- ^ Single receiver oscillator indicator.
-  , _antennaReference_ecef_y     :: Int64
+  , _antennaReference_ecef_y       :: Int64
     -- ^ Antenna reference point ECEF-Y.
-  , _antennaReference_ecef_z     :: Int64
+  , _antennaReference_quarterCycle :: Word8
+    -- ^ Quarter cycle indicator.
+  , _antennaReference_ecef_z       :: Int64
     -- ^ Antenna reference point ECEF-Z.
   } deriving ( Show, Read, Eq )
 
@@ -49,19 +49,19 @@ $(makeLenses ''AntennaReference)
 
 instance BinaryBit AntennaReference where
   getBits _n = do
-    _antennaReference_num        <- B.getWord16be 12
-    _antennaReference_station    <- B.getWord16be 12
-    _reserved                    <- B.getWord8 6
-    _antennaReference_gps        <- B.getBool
-    _antennaReference_glonass    <- B.getBool
-    _antennaReference_galileo    <- B.getBool
-    _antennaReference_computed   <- B.getBool
-    _antennaReference_ecef_x     <- getInt64be 38
-    _antennaReference_oscillator <- B.getBool
-    _reserved                    <- B.getBool
-    _antennaReference_ecef_y     <- getInt64be 38
-    _reserved                    <- B.getWord8 2
-    _antennaReference_ecef_z     <- getInt64be 38
+    _antennaReference_num          <- B.getWord16be 12
+    _antennaReference_station      <- B.getWord16be 12
+    _reserved                      <- B.getWord8 6
+    _antennaReference_gps          <- B.getBool
+    _antennaReference_glonass      <- B.getBool
+    _reserved                      <- B.getBool
+    _antennaReference_computed     <- B.getBool
+    _antennaReference_ecef_x       <- getInt64be 38
+    _antennaReference_oscillator   <- B.getBool
+    _reserved                      <- B.getBool
+    _antennaReference_ecef_y       <- getInt64be 38
+    _antennaReference_quarterCycle <- B.getWord8 2
+    _antennaReference_ecef_z       <- getInt64be 38
     return AntennaReference {..}
 
   putBits _n AntennaReference {..} = do
@@ -70,12 +70,13 @@ instance BinaryBit AntennaReference where
     B.putWord8 6     0
     B.putBool        _antennaReference_gps
     B.putBool        _antennaReference_glonass
-    B.putBool        _antennaReference_galileo
+    B.putBool        False
     B.putBool        _antennaReference_computed
     putInt64be 38    _antennaReference_ecef_x
+    B.putBool        _antennaReference_oscillator
     B.putBool        False
     putInt64be 38    _antennaReference_ecef_y
-    B.putWord8 2     0
+    B.putWord8 2     _antennaReference_quarterCycle
     putInt64be 38    _antennaReference_ecef_z
 
 -- | ExtAntennaReference.
@@ -151,6 +152,44 @@ instance BinaryBit ExtAntennaDescriptor where
   putBits _n ExtAntennaDescriptor {..} = do
     B.putWord8 8 _extAntennaDescriptor_n
     forM_ _extAntennaDescriptor_serialNumbers $ B.putWord8 8
+
+-- | ReceiverDescriptor.
+--
+-- Receiver description information.
+data ReceiverDescriptor = ReceiverDescriptor
+  { _receiverDescriptor_n                :: Word8
+    -- ^ Number of receiver descriptors.
+  , _receiverDescriptor_descriptors      :: [Word8]
+    -- ^ Receiver descriptors.
+  , _receiverDescriptor_m                :: Word8
+    -- ^ Number of firmware versions.
+  , _receiverDescriptor_firmwareVersions :: [Word8]
+    -- ^ Firmware versions.
+  , _receiverDescriptor_l                :: Word8
+    -- ^ Number of serial numbers.
+  , _receiverDescriptor_serialNumbers    :: [Word8]
+    -- ^ Serial numbers.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''ReceiverDescriptor)
+
+instance BinaryBit ReceiverDescriptor where
+  getBits _n = do
+    _receiverDescriptor_n                <- B.getWord8 8
+    _receiverDescriptor_descriptors      <- replicateM (fromIntegral _receiverDescriptor_n) $ B.getWord8 8
+    _receiverDescriptor_m                <- B.getWord8 8
+    _receiverDescriptor_firmwareVersions <- replicateM (fromIntegral _receiverDescriptor_m) $ B.getWord8 8
+    _receiverDescriptor_l                <- B.getWord8 8
+    _receiverDescriptor_serialNumbers    <- replicateM (fromIntegral _receiverDescriptor_l) $ B.getWord8 8
+    return ReceiverDescriptor {..}
+
+  putBits _n ReceiverDescriptor {..} = do
+    B.putWord8 8     _receiverDescriptor_n
+    forM_ _receiverDescriptor_descriptors $ B.putWord8 8
+    B.putWord8 8     _receiverDescriptor_m
+    forM_ _receiverDescriptor_firmwareVersions $ B.putWord8 8
+    B.putWord8 8     _receiverDescriptor_l
+    forM_ _receiverDescriptor_serialNumbers $ B.putWord8 8
 
 msg1005 :: Word16
 msg1005 = 1005
@@ -253,3 +292,37 @@ instance Binary Msg1008 where
     putBits 0 _msg1008_extDescriptor
 
 $(deriveRTCM3 ''Msg1008)
+
+msg1033 :: Word16
+msg1033 = 1033
+
+-- | Msg1033.
+--
+-- RTCMv3 message 1033.
+data Msg1033 = Msg1033
+  { _msg1033_antennaDescriptor    :: AntennaDescriptor
+    -- ^ Antenna descriptor.
+  , _msg1033_antennaExtDescriptor :: ExtAntennaDescriptor
+    -- ^ Antenna extended descriptor.
+  , _msg1033_receiverDescriptor   :: ReceiverDescriptor
+    -- ^ Antenna descriptor.
+  } deriving ( Show, Read, Eq)
+
+$(makeLenses ''Msg1033)
+
+instance Binary Msg1033 where
+  get = B.runBitGet $ do
+    _msg1033_antennaDescriptor    <- getBits 0
+    -- ^ Antenna descriptor.
+    _msg1033_antennaExtDescriptor <- getBits 0
+    -- ^ Antenna extended descriptor.
+    _msg1033_receiverDescriptor   <- getBits 0
+    -- ^ Receiver descriptor.
+    return Msg1033 {..}
+
+  put Msg1033 {..} = B.runBitPut $ do
+    putBits 0 _msg1033_antennaDescriptor
+    putBits 0 _msg1033_antennaExtDescriptor
+    putBits 0 _msg1033_receiverDescriptor
+
+$(deriveRTCM3 ''Msg1033)
