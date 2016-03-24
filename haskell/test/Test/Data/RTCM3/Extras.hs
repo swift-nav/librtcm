@@ -1,25 +1,45 @@
-{-# OPTIONS -fno-warn-orphans #-}
+{-# OPTIONS -fno-warn-orphans  #-}
 {-# LANGUAGE FlexibleInstances #-}
 
 module Test.Data.RTCM3.Extras
   ( tests
   ) where
 
-import           BasicPrelude
+import           BasicPrelude         hiding (ByteString)
 import           Data.Binary
-import           Data.Binary.Bits
 import qualified Data.Binary.Bits.Get as B
 import qualified Data.Binary.Bits.Put as B
 import           Data.Binary.Get
 import           Data.Binary.Put
 import           Data.Bits
-import qualified Data.ByteString.Lazy as B
+import           Data.ByteString.Lazy
 import           Data.Int
 import           Data.RTCM3.Internal
 import           Data.Word.Word24
 import           Test.Tasty
 import           Test.Tasty.QuickCheck
 import           System.Random
+
+data TestInt a = TestInt Int a deriving ( Show, Read, Eq )
+
+arbitraryTestInt :: (Integral a, Bits a, Random a) => Int -> Gen (TestInt a)
+arbitraryTestInt b = do
+  n <- choose (1, b-1)
+  let m = (1 `shiftL` (n - 1)) - 1
+  i <- choose (-m, m)
+  return $ TestInt n i
+
+instance Arbitrary (TestInt Int8) where
+  arbitrary = arbitraryTestInt 8
+
+instance Arbitrary (TestInt Int16) where
+  arbitrary = arbitraryTestInt 16
+
+instance Arbitrary (TestInt Int32) where
+  arbitrary = arbitraryTestInt 32
+
+instance Arbitrary (TestInt Int64) where
+  arbitrary = arbitraryTestInt 64
 
 instance Binary Word24 where
   get = getWord24be
@@ -29,35 +49,10 @@ instance Arbitrary Word24 where
   arbitrary = arbitrarySizedBoundedIntegral
   shrink    = shrinkIntegral
 
-instance BinaryBit Int64 where
-  getBits = getInt64be
-  putBits = putInt64be
-
-data TestInt a = TestInt Int a deriving ( Show, Read, Eq )
-
-arbitraryInt :: (Integral a, Bits a, Random a) => Int -> Gen (TestInt a)
-arbitraryInt b = do
-  n <- choose (1, b-1)
-  let m = (1 `shiftL` (n - 1)) - 1
-  i <- choose (-m, m)
-  return $ TestInt n i
-
-instance Arbitrary (TestInt Int8) where
-  arbitrary = arbitraryInt 8
-
-instance Arbitrary (TestInt Int16) where
-  arbitrary = arbitraryInt 16
-
-instance Arbitrary (TestInt Int32) where
-  arbitrary = arbitraryInt 32
-
-instance Arbitrary (TestInt Int64) where
-  arbitrary = arbitraryInt 64
-
-decodeBits :: B.BitGet a -> B.ByteString -> a
+decodeBits :: B.BitGet a -> ByteString -> a
 decodeBits = runGet . B.runBitGet
 
-encodeBits :: B.BitPut () -> B.ByteString
+encodeBits :: B.BitPut () -> ByteString
 encodeBits = runPut . B.runBitPut
 
 testInt8 :: TestTree

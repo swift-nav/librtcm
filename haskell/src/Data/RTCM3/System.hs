@@ -64,7 +64,7 @@ data Message = Message
     -- ^ Message number.
   , _message_synchronous :: Bool
     -- ^ Synchronous flag.
-  , _message_interval :: Word16
+  , _message_interval    :: Word16
     -- ^ Transmission interval.
   } deriving ( Show, Read, Eq )
 
