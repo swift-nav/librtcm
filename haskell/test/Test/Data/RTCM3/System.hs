@@ -14,7 +14,7 @@ import Test.Tasty.QuickCheck
 
 instance Arbitrary MessageHeader where
   arbitrary = do
-    let _messageHeader_num = msg1013
+    _messageHeader_num         <- arbitraryWord 12
     _messageHeader_station     <- arbitraryWord 12
     _messageHeader_mjd         <- arbitraryWord 16
     _messageHeader_seconds     <- arbitraryWord 17

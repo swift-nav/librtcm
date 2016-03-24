@@ -16,6 +16,7 @@ import           Data.ByteString.Lazy
 import           Data.Int
 import           Data.RTCM3.Internal
 import           Data.Word.Word24
+import           Test.Data.RTCM3.Test
 import           Test.Tasty
 import           Test.Tasty.QuickCheck
 import           System.Random
@@ -25,8 +26,7 @@ data TestInt a = TestInt Int a deriving ( Show, Read, Eq )
 arbitraryTestInt :: (Integral a, Bits a, Random a) => Int -> Gen (TestInt a)
 arbitraryTestInt b = do
   n <- choose (1, b-1)
-  let m = (1 `shiftL` (n - 1)) - 1
-  i <- choose (-m, m)
+  i <- arbitraryInt n
   return $ TestInt n i
 
 instance Arbitrary (TestInt Int8) where
