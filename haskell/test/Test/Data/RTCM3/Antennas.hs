@@ -47,7 +47,7 @@ instance Arbitrary ExtAntennaDescriptor where
 
 instance Arbitrary ReceiverDescriptor where
   arbitrary = do
-    _receiverDescriptor_n <- arbitraryWord 8
+    _receiverDescriptor_n                <- arbitraryWord 8
     _receiverDescriptor_descriptors      <- replicateM (fromIntegral _receiverDescriptor_n) $ arbitraryWord 8
     _receiverDescriptor_m                <- arbitraryWord 8
     _receiverDescriptor_firmwareVersions <- replicateM (fromIntegral _receiverDescriptor_m) $ arbitraryWord 8
@@ -97,7 +97,7 @@ testMsg1033 =
 
 tests :: TestTree
 tests =
-  testGroup "System tests"
+  testGroup "Antennas tests"
     [ testMsg1005
     , testMsg1006
     , testMsg1007

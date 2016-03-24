@@ -54,6 +54,7 @@ test-suite test
   other-modules:       Test.Data.CRC24Q
                      , Test.Data.RTCM3.Antennas
                      , Test.Data.RTCM3.Extras
+                     , Test.Data.RTCM3.Observations
                      , Test.Data.RTCM3.System
                      , Test.Data.RTCM3.Test
   build-depends:       base
