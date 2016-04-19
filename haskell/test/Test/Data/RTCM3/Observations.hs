@@ -186,48 +186,48 @@ instance Arbitrary Msg1230 where
 
 testMsg1001 :: TestTree
 testMsg1001 =
-  testProperty "Roundtrip Msg1001" $ \msg ->
-    (decode $ encode msg) == (msg :: Msg1001)
+  testProperty "Roundtrip Msg1001" $ \m ->
+    (decode $ encode m) == (m :: Msg1001)
 
 testMsg1002 :: TestTree
 testMsg1002 =
-  testProperty "Roundtrip Msg1002" $ \msg ->
-    (decode $ encode msg) == (msg :: Msg1002)
+  testProperty "Roundtrip Msg1002" $ \m ->
+    (decode $ encode m) == (m :: Msg1002)
 
 testMsg1003 :: TestTree
 testMsg1003 =
-  testProperty "Roundtrip Msg1003" $ \msg ->
-    (decode $ encode msg) == (msg :: Msg1003)
+  testProperty "Roundtrip Msg1003" $ \m ->
+    (decode $ encode m) == (m :: Msg1003)
 
 testMsg1004 :: TestTree
 testMsg1004 =
-  testProperty "Roundtrip Msg1004" $ \msg ->
-    (decode $ encode msg) == (msg :: Msg1004)
+  testProperty "Roundtrip Msg1004" $ \m ->
+    (decode $ encode m) == (m :: Msg1004)
 
 testMsg1009 :: TestTree
 testMsg1009 =
-  testProperty "Roundtrip Msg1009" $ \msg ->
-    (decode $ encode msg) == (msg :: Msg1009)
+  testProperty "Roundtrip Msg1009" $ \m ->
+    (decode $ encode m) == (m :: Msg1009)
 
 testMsg1010 :: TestTree
 testMsg1010 =
-  testProperty "Roundtrip Msg1010" $ \msg ->
-    (decode $ encode msg) == (msg :: Msg1010)
+  testProperty "Roundtrip Msg1010" $ \m ->
+    (decode $ encode m) == (m :: Msg1010)
 
 testMsg1011 :: TestTree
 testMsg1011 =
-  testProperty "Roundtrip Msg1011" $ \msg ->
-    (decode $ encode msg) == (msg :: Msg1011)
+  testProperty "Roundtrip Msg1011" $ \m ->
+    (decode $ encode m) == (m :: Msg1011)
 
 testMsg1012 :: TestTree
 testMsg1012 =
-  testProperty "Roundtrip Msg1012" $ \msg ->
-    (decode $ encode msg) == (msg :: Msg1012)
+  testProperty "Roundtrip Msg1012" $ \m ->
+    (decode $ encode m) == (m :: Msg1012)
 
 testMsg1230 :: TestTree
 testMsg1230 =
-  testProperty "Roundtrip Msg1230" $ \msg ->
-    (decode $ encode msg) == (msg :: Msg1230)
+  testProperty "Roundtrip Msg1230" $ \m ->
+    (decode $ encode m) == (m :: Msg1230)
 
 tests :: TestTree
 tests =

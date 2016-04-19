@@ -22,8 +22,8 @@ import Language.Haskell.TH
 deriveRTCM3 :: Name -> Q [Dec]
 deriveRTCM3 name =
   [d|instance ToRTCM3 $(conT name) where
-       toRTCM3 msg = Msg len payload crc where
-         payload = toStrict $ encode msg
-         len     = fromIntegral $ length payload
-         crc     = checkCrc len payload
+       toRTCM3 n = Msg len pay crc where
+         pay = toStrict $ encode n
+         len = fromIntegral $ length pay
+         crc = checkCrc len pay
     |]

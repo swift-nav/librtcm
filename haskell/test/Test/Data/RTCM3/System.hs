@@ -45,8 +45,8 @@ instance Arbitrary Msg1013 where
 
 testMsg1013 :: TestTree
 testMsg1013 =
-  testProperty "Roundtrip Msg1013" $ \msg ->
-    (decode $ encode msg) == (msg :: Msg1013)
+  testProperty "Roundtrip Msg1013" $ \m ->
+    (decode $ encode m) == (m :: Msg1013)
 
 tests :: TestTree
 tests =
