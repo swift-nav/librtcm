@@ -32,7 +32,7 @@ data Msg = Msg
   , _msgRTCM3Crc     :: Word24
   } deriving ( Show, Read, Eq )
 
-$(makeLenses ''Msg)
+$(makeClassy ''Msg)
 
 instance Binary Msg where
   get = do
@@ -42,14 +42,9 @@ instance Binary Msg where
     return Msg {..}
 
   put Msg {..} = do
-    putWord16be _msgRTCM3Len
+    putWord16be   _msgRTCM3Len
     putByteString _msgRTCM3Payload
-    putWord24be _msgRTCM3Crc
-
-checkNum :: ByteString -> Word16
-checkNum payload =
-  flip runGet (fromStrict payload) $ B.runBitGet $
-    B.getWord16be 12
+    putWord24be   _msgRTCM3Crc
 
 checkCrc :: Word16 -> ByteString -> Word24
 checkCrc len payload =
@@ -58,5 +53,14 @@ checkCrc len payload =
     word16BE len            <>
     byteString payload
 
+checkNum :: ByteString -> Word16
+checkNum payload =
+  flip runGet (fromStrict payload) $ B.runBitGet $
+    B.getWord16be 12
+
+msgRTCM3Num :: HasMsg m => m -> Word16
+msgRTCM3Num = checkNum . (^. msgRTCM3Payload)
+
 class Binary a => ToRTCM3 a where
   toRTCM3 :: a -> Msg
+
