@@ -11,6 +11,7 @@ import qualified Test.Data.CRC24Q             as CRC24Q
 import qualified Test.Data.RTCM3.Antennas     as Antennas
 import qualified Test.Data.RTCM3.Extras       as Extras
 import qualified Test.Data.RTCM3.Observations as Observations
+import qualified Test.Data.RTCM3.SSR          as SSR
 import qualified Test.Data.RTCM3.System       as System
 import           Test.Tasty
 
@@ -21,6 +22,7 @@ tests =
     , Antennas.tests
     , Extras.tests
     , Observations.tests
+    , SSR.tests
     , System.tests
     ]
 

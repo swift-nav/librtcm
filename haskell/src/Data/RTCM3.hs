@@ -12,6 +12,7 @@ module Data.RTCM3
   ( RTCM3Msg (..)
   , module Data.RTCM3.Antennas
   , module Data.RTCM3.Observations
+  , module Data.RTCM3.SSR
   , module Data.RTCM3.System
   , module Data.RTCM3.Types
   ) where
@@ -22,6 +23,7 @@ import Data.Binary
 import Data.ByteString.Lazy
 import Data.RTCM3.Antennas
 import Data.RTCM3.Observations
+import Data.RTCM3.SSR
 import Data.RTCM3.System
 import Data.RTCM3.Types
 
@@ -44,6 +46,7 @@ data RTCM3Msg =
    | RTCM3Msg1012    Msg1012 Msg
    | RTCM3Msg1013    Msg1013 Msg
    | RTCM3Msg1033    Msg1033 Msg
+   | RTCM3Msg1057    Msg1057 Msg
    | RTCM3Msg1230    Msg1230 Msg
    | RTCM3MsgUnknown         Msg
    | RTCM3MsgBadCrc          Msg
@@ -72,6 +75,7 @@ instance Binary RTCM3Msg where
           | num == msg1012 = RTCM3Msg1012 (decode $ fromStrict _msgRTCM3Payload) m
           | num == msg1013 = RTCM3Msg1013 (decode $ fromStrict _msgRTCM3Payload) m
           | num == msg1033 = RTCM3Msg1033 (decode $ fromStrict _msgRTCM3Payload) m
+          | num == msg1057 = RTCM3Msg1057 (decode $ fromStrict _msgRTCM3Payload) m
           | num == msg1230 = RTCM3Msg1230 (decode $ fromStrict _msgRTCM3Payload) m
           | otherwise = RTCM3MsgUnknown m where
             crc = checkCrc _msgRTCM3Len _msgRTCM3Payload
@@ -94,6 +98,7 @@ instance Binary RTCM3Msg where
       encode' (RTCM3Msg1012    _n m) = put m
       encode' (RTCM3Msg1013    _n m) = put m
       encode' (RTCM3Msg1033    _n m) = put m
+      encode' (RTCM3Msg1057    _n m) = put m
       encode' (RTCM3Msg1230    _n m) = put m
       encode' (RTCM3MsgUnknown    m) = put m
       encode' (RTCM3MsgBadCrc     m) = put m
@@ -113,6 +118,7 @@ instance HasMsg RTCM3Msg where
   msg f (RTCM3Msg1012    n m) = RTCM3Msg1012    n <$> f m
   msg f (RTCM3Msg1013    n m) = RTCM3Msg1013    n <$> f m
   msg f (RTCM3Msg1033    n m) = RTCM3Msg1033    n <$> f m
+  msg f (RTCM3Msg1057    n m) = RTCM3Msg1057    n <$> f m
   msg f (RTCM3Msg1230    n m) = RTCM3Msg1230    n <$> f m
   msg f (RTCM3MsgUnknown   m) = RTCM3MsgUnknown   <$> f m
   msg f (RTCM3MsgBadCrc    m) = RTCM3MsgBadCrc    <$> f m
