@@ -48,6 +48,8 @@ data RTCM3Msg =
    | RTCM3Msg1033    Msg1033 Msg
    | RTCM3Msg1057    Msg1057 Msg
    | RTCM3Msg1058    Msg1058 Msg
+   | RTCM3Msg1063    Msg1063 Msg
+   | RTCM3Msg1064    Msg1064 Msg
    | RTCM3Msg1230    Msg1230 Msg
    | RTCM3MsgUnknown         Msg
    | RTCM3MsgBadCrc          Msg
@@ -77,6 +79,9 @@ instance Binary RTCM3Msg where
           | num == msg1013 = RTCM3Msg1013 (decode $ fromStrict _msgRTCM3Payload) m
           | num == msg1033 = RTCM3Msg1033 (decode $ fromStrict _msgRTCM3Payload) m
           | num == msg1057 = RTCM3Msg1057 (decode $ fromStrict _msgRTCM3Payload) m
+          | num == msg1058 = RTCM3Msg1058 (decode $ fromStrict _msgRTCM3Payload) m
+          | num == msg1063 = RTCM3Msg1063 (decode $ fromStrict _msgRTCM3Payload) m
+          | num == msg1064 = RTCM3Msg1064 (decode $ fromStrict _msgRTCM3Payload) m
           | num == msg1230 = RTCM3Msg1230 (decode $ fromStrict _msgRTCM3Payload) m
           | otherwise = RTCM3MsgUnknown m where
             crc = checkCrc _msgRTCM3Len _msgRTCM3Payload
@@ -101,6 +106,8 @@ instance Binary RTCM3Msg where
       encode' (RTCM3Msg1033    _n m) = put m
       encode' (RTCM3Msg1057    _n m) = put m
       encode' (RTCM3Msg1058    _n m) = put m
+      encode' (RTCM3Msg1063    _n m) = put m
+      encode' (RTCM3Msg1064    _n m) = put m
       encode' (RTCM3Msg1230    _n m) = put m
       encode' (RTCM3MsgUnknown    m) = put m
       encode' (RTCM3MsgBadCrc     m) = put m
@@ -122,6 +129,8 @@ instance HasMsg RTCM3Msg where
   msg f (RTCM3Msg1033    n m) = RTCM3Msg1033    n <$> f m
   msg f (RTCM3Msg1057    n m) = RTCM3Msg1057    n <$> f m
   msg f (RTCM3Msg1058    n m) = RTCM3Msg1058    n <$> f m
+  msg f (RTCM3Msg1063    n m) = RTCM3Msg1063    n <$> f m
+  msg f (RTCM3Msg1064    n m) = RTCM3Msg1064    n <$> f m
   msg f (RTCM3Msg1230    n m) = RTCM3Msg1230    n <$> f m
   msg f (RTCM3MsgUnknown   m) = RTCM3MsgUnknown   <$> f m
   msg f (RTCM3MsgBadCrc    m) = RTCM3MsgBadCrc    <$> f m
