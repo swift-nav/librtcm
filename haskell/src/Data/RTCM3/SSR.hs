@@ -112,6 +112,79 @@ instance BinaryBit GpsOrbitCorrection where
     putInt32be 19 _gpsOrbitCorrection_dotDeltaAlongTrack
     putInt32be 19 _gpsOrbitCorrection_dotDeltaCrossTrack
 
+-- | GpsClockCorrectionHeader.
+--
+-- GPS clock correction message.
+data GpsClockCorrectionHeader = GpsClockCorrectionHeader
+  { _gpsClockCorrectionHeader_num            :: Word16
+    -- ^ Message number.
+  , _gpsClockCorrectionHeader_epochs         :: Word32
+    -- ^ GPS epoch time.
+  , _gpsClockCorrectionHeader_updateInterval :: Word8
+    -- ^ SSR update interval.
+  , _gpsClockCorrectionHeader_multiple       :: Bool
+    -- ^ Multiple message indicator.
+  , _gpsClockCorrectionHeader_iod            :: Word8
+    -- ^ IOD SSR.
+  , _gpsClockCorrectionHeader_provider       :: Word16
+    -- ^ SSR provider id.
+  , _gpsClockCorrectionHeader_solution       :: Word8
+    -- ^ SSR solution id.
+  , _gpsClockCorrectionHeader_n              :: Word8
+    -- ^ Number of satellites.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GpsClockCorrectionHeader)
+
+instance BinaryBit GpsClockCorrectionHeader where
+  getBits _n = do
+    _gpsClockCorrectionHeader_num            <- B.getWord16be 12
+    _gpsClockCorrectionHeader_epochs         <- B.getWord32be 20
+    _gpsClockCorrectionHeader_updateInterval <- B.getWord8 4
+    _gpsClockCorrectionHeader_multiple       <- B.getBool
+    _gpsClockCorrectionHeader_iod            <- B.getWord8 4
+    _gpsClockCorrectionHeader_provider       <- B.getWord16be 16
+    _gpsClockCorrectionHeader_solution       <- B.getWord8 4
+    _gpsClockCorrectionHeader_n              <- B.getWord8 6
+    return GpsClockCorrectionHeader {..}
+
+  putBits _n GpsClockCorrectionHeader {..} = do
+    B.putWord16be 12 _gpsClockCorrectionHeader_num
+    B.putWord32be 20 _gpsClockCorrectionHeader_epochs
+    B.putWord8 4     _gpsClockCorrectionHeader_updateInterval
+    B.putBool        _gpsClockCorrectionHeader_multiple
+    B.putWord8 4     _gpsClockCorrectionHeader_iod
+    B.putWord16be 16 _gpsClockCorrectionHeader_provider
+    B.putWord8 4     _gpsClockCorrectionHeader_solution
+    B.putWord8 6     _gpsClockCorrectionHeader_n
+
+data GpsClockCorrection = GpsClockCorrection
+  { _gpsClockCorrection_sat          :: Word8
+    -- ^ GPS satellite id.
+  , _gpsClockCorrection_deltaClockC0 :: Int32
+    -- ^ Delta clock C0.
+  , _gpsClockCorrection_deltaClockC1 :: Int32
+    -- ^ Delta clock C1.
+  , _gpsClockCorrection_deltaClockC2 :: Int32
+    -- ^ Delta clock C2.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GpsClockCorrection)
+
+instance BinaryBit GpsClockCorrection where
+  getBits _n = do
+    _gpsClockCorrection_sat          <- B.getWord8 6
+    _gpsClockCorrection_deltaClockC0 <- getInt32be 22
+    _gpsClockCorrection_deltaClockC1 <- getInt32be 21
+    _gpsClockCorrection_deltaClockC2 <- getInt32be 27
+    return GpsClockCorrection {..}
+
+  putBits _n GpsClockCorrection {..} = do
+    B.putWord8 6  _gpsClockCorrection_sat
+    putInt32be 22 _gpsClockCorrection_deltaClockC0
+    putInt32be 21 _gpsClockCorrection_deltaClockC1
+    putInt32be 27 _gpsClockCorrection_deltaClockC2
+
 msg1057 :: Word16
 msg1057 = 1057
 
@@ -138,3 +211,30 @@ instance Binary Msg1057 where
     forM_ _msg1057_corrections $ putBits 0
 
 $(deriveRTCM3 ''Msg1057)
+
+msg1058 :: Word16
+msg1058 = 1058
+
+-- | Msg 1058.
+--
+-- RTCMv3 message 1058.
+data Msg1058 = Msg1058
+  { _msg1058_header :: GpsClockCorrectionHeader
+    -- ^ GPS clock correction header.
+  , _msg1058_corrections :: [GpsClockCorrection]
+    -- ^ GPS clock corrections.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msg1058)
+
+instance Binary Msg1058 where
+  get = B.runBitGet $ do
+    _msg1058_header      <- getBits 0
+    _msg1058_corrections <- replicateM (fromIntegral $ _msg1058_header ^. gpsClockCorrectionHeader_n) $ getBits 0
+    return Msg1058 {..}
+
+  put Msg1058 {..} = B.runBitPut $ do
+    putBits 0 _msg1058_header
+    forM_ _msg1058_corrections $ putBits 0
+
+$(deriveRTCM3 ''Msg1058)
