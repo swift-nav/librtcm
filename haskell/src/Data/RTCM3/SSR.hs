@@ -12,6 +12,7 @@ module Data.RTCM3.SSR where
 
 import           BasicPrelude
 import           Control.Lens
+import           Data.Aeson.TH
 import           Data.Binary
 import           Data.Binary.Bits
 import qualified Data.Binary.Bits.Get as B
@@ -44,6 +45,7 @@ data GpsOrbitCorrectionHeader = GpsOrbitCorrectionHeader
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsOrbitCorrectionHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsOrbitCorrectionHeader_" . stripPrefix "_gpsOrbitCorrectionHeader_"} ''GpsOrbitCorrectionHeader)
 
 instance BinaryBit GpsOrbitCorrectionHeader where
   getBits _n = do
@@ -92,6 +94,7 @@ data GpsOrbitCorrection = GpsOrbitCorrection
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsOrbitCorrection)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsOrbitCorrection_" . stripPrefix "_gpsOrbitCorrection_"} ''GpsOrbitCorrection)
 
 instance BinaryBit GpsOrbitCorrection where
   getBits _n = do
@@ -138,6 +141,7 @@ data GpsClockCorrectionHeader = GpsClockCorrectionHeader
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsClockCorrectionHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsClockCorrectionHeader_" . stripPrefix "_gpsClockCorrectionHeader_"} ''GpsClockCorrectionHeader)
 
 instance BinaryBit GpsClockCorrectionHeader where
   getBits _n = do
@@ -176,6 +180,7 @@ data GpsClockCorrection = GpsClockCorrection
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsClockCorrection)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsClockCorrection_" . stripPrefix "_gpsClockCorrection_"} ''GpsClockCorrection)
 
 instance BinaryBit GpsClockCorrection where
   getBits _n = do
@@ -216,6 +221,7 @@ data GlonassOrbitCorrectionHeader = GlonassOrbitCorrectionHeader
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassOrbitCorrectionHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassOrbitCorrectionHeader_" . stripPrefix "_glonassOrbitCorrectionHeader_"} ''GlonassOrbitCorrectionHeader)
 
 instance BinaryBit GlonassOrbitCorrectionHeader where
   getBits _n = do
@@ -264,6 +270,7 @@ data GlonassOrbitCorrection = GlonassOrbitCorrection
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassOrbitCorrection)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassOrbitCorrection_" . stripPrefix "_glonassOrbitCorrection_"} ''GlonassOrbitCorrection)
 
 instance BinaryBit GlonassOrbitCorrection where
   getBits _n = do
@@ -310,6 +317,7 @@ data GlonassClockCorrectionHeader = GlonassClockCorrectionHeader
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassClockCorrectionHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassClockCorrectionHeader_" . stripPrefix "_glonassClockCorrectionHeader_"} ''GlonassClockCorrectionHeader)
 
 instance BinaryBit GlonassClockCorrectionHeader where
   getBits _n = do
@@ -348,6 +356,7 @@ data GlonassClockCorrection = GlonassClockCorrection
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassClockCorrection)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassClockCorrection_" . stripPrefix "_glonassClockCorrection_"} ''GlonassClockCorrection)
 
 instance BinaryBit GlonassClockCorrection where
   getBits _n = do
@@ -377,6 +386,7 @@ data Msg1057 = Msg1057
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1057)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1057_" . stripPrefix "_msg1057_"} ''Msg1057)
 
 instance Binary Msg1057 where
   get = B.runBitGet $ do
@@ -404,6 +414,7 @@ data Msg1058 = Msg1058
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1058)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1058_" . stripPrefix "_msg1058_"} ''Msg1058)
 
 instance Binary Msg1058 where
   get = B.runBitGet $ do
@@ -431,6 +442,7 @@ data Msg1063 = Msg1063
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1063)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1063_" . stripPrefix "_msg1063_"} ''Msg1063)
 
 instance Binary Msg1063 where
   get = B.runBitGet $ do
@@ -458,6 +470,7 @@ data Msg1064 = Msg1064
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1064)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1064_" . stripPrefix "_msg1064_"} ''Msg1064)
 
 instance Binary Msg1064 where
   get = B.runBitGet $ do

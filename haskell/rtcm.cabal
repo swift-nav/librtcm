@@ -30,17 +30,21 @@ library
                      , Data.RTCM3.SSR
                      , Data.RTCM3.System
                      , Data.RTCM3.Types
-  other-modules:       Data.RTCM3.Extras
+  other-modules:       Data.RTCM3.Aeson
+                     , Data.RTCM3.Extras
                      , Data.RTCM3.TH
   ghc-options:         -Wall
-  build-depends:       array
+  build-depends:       aeson
+                     , array
                      , base >= 4.7 && < 5
+                     , base64-bytestring
                      , basic-prelude
                      , binary
                      , binary-bits
                      , bytestring
                      , lens
                      , template-haskell
+                     , text
                      , word24
   default-language:    Haskell2010
   default-extensions:  NoImplicitPrelude

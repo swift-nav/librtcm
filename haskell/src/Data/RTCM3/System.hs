@@ -12,6 +12,7 @@ module Data.RTCM3.System where
 
 import           BasicPrelude
 import           Control.Lens
+import           Data.Aeson.TH
 import           Data.Binary
 import           Data.Binary.Bits
 import qualified Data.Binary.Bits.Get as B
@@ -37,6 +38,7 @@ data MessageHeader = MessageHeader
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''MessageHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_messageHeader_" . stripPrefix "_messageHeader_"} ''MessageHeader)
 
 instance BinaryBit MessageHeader where
   getBits _n = do
@@ -69,6 +71,7 @@ data Message = Message
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Message)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_message_" . stripPrefix "_message_"} ''Message)
 
 instance BinaryBit Message where
   getBits _n = do
@@ -96,6 +99,7 @@ data Msg1013 = Msg1013
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1013)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1013_" . stripPrefix "_msg1013_"} ''Msg1013)
 
 instance Binary Msg1013 where
   get = B.runBitGet $ do
