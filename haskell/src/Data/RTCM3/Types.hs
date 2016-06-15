@@ -36,13 +36,6 @@ data Msg = Msg
 
 $(makeClassy ''Msg)
 
-instance FromJSON Msg where
-  parseJSON (Object v) = do
-    Msg <$> v .: "len"
-        <*> v .: "payload"
-        <*> v .: "crc"
-  parseJSON _ = mzero
-
 instance ToJSON Msg where
   toJSON Msg {..} = object
     [ "len"     .= _msgRTCM3Len
@@ -53,7 +46,7 @@ instance ToJSON Msg where
 instance Binary Msg where
   get = do
     _msgRTCM3Len     <- getWord16be
-    _msgRTCM3Payload <- if _msgRTCM3Len == 0 then return mempty else getByteString $ fromIntegral _msgRTCM3Len
+    _msgRTCM3Payload <- getByteString $ fromIntegral _msgRTCM3Len
     _msgRTCM3Crc     <- getWord24be
     return Msg {..}
 
