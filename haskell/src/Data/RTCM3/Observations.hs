@@ -12,6 +12,7 @@ module Data.RTCM3.Observations where
 
 import           BasicPrelude
 import           Control.Lens
+import           Data.Aeson.TH
 import           Data.Binary
 import           Data.Binary.Bits
 import qualified Data.Binary.Bits.Get as B
@@ -41,6 +42,7 @@ data GpsObservationHeader = GpsObservationHeader
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsObservationHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsObservationHeader_" . stripPrefix "_gpsObservationHeader_"} ''GpsObservationHeader)
 
 instance BinaryBit GpsObservationHeader where
   getBits _n = do
@@ -77,6 +79,7 @@ data GpsL1Observation = GpsL1Observation
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsL1Observation)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsL1Observation_" . stripPrefix "_gpsL1Observation_"} ''GpsL1Observation)
 
 instance BinaryBit GpsL1Observation where
   getBits _n = do
@@ -103,6 +106,7 @@ data GpsL1ExtObservation = GpsL1ExtObservation
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsL1ExtObservation)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsL1ExtObservation_" . stripPrefix "_gpsL1ExtObservation_"} ''GpsL1ExtObservation)
 
 instance BinaryBit GpsL1ExtObservation where
   getBits _n = do
@@ -129,6 +133,7 @@ data GpsL2Observation = GpsL2Observation
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsL2Observation)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsL2Observation_" . stripPrefix "_gpsL2Observation_"} ''GpsL2Observation)
 
 instance BinaryBit GpsL2Observation where
   getBits _n = do
@@ -153,6 +158,7 @@ data GpsL2ExtObservation = GpsL2ExtObservation
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GpsL2ExtObservation)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsL2ExtObservation_" . stripPrefix "_gpsL2ExtObservation_"} ''GpsL2ExtObservation)
 
 instance BinaryBit GpsL2ExtObservation where
   getBits _n = do
@@ -183,6 +189,7 @@ data GlonassObservationHeader = GlonassObservationHeader
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassObservationHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassObservationHeader_" . stripPrefix "_glonassObservationHeader_"} ''GlonassObservationHeader)
 
 instance BinaryBit GlonassObservationHeader where
   getBits _n = do
@@ -221,6 +228,7 @@ data GlonassL1Observation = GlonassL1Observation
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassL1Observation)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassL1Observation_" . stripPrefix "_glonassL1Observation_"} ''GlonassL1Observation)
 
 instance BinaryBit GlonassL1Observation where
   getBits _n = do
@@ -249,6 +257,7 @@ data GlonassL1ExtObservation = GlonassL1ExtObservation
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassL1ExtObservation)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassL1ExtObservation_" . stripPrefix "_glonassL1ExtObservation_"} ''GlonassL1ExtObservation)
 
 instance BinaryBit GlonassL1ExtObservation where
   getBits _n = do
@@ -275,6 +284,7 @@ data GlonassL2Observation = GlonassL2Observation
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassL2Observation)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassL2Observation_" . stripPrefix "_glonassL2Observation_"} ''GlonassL2Observation)
 
 instance BinaryBit GlonassL2Observation where
   getBits _n = do
@@ -299,6 +309,7 @@ data GlonassL2ExtObservation = GlonassL2ExtObservation
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassL2ExtObservation)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassL2ExtObservation_" . stripPrefix "_glonassL2ExtObservation_"} ''GlonassL2ExtObservation)
 
 instance BinaryBit GlonassL2ExtObservation where
   getBits _n = do
@@ -331,6 +342,7 @@ data GlonassBias = GlonassBias
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassBias)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassBias_" . stripPrefix "_glonassBias_"} ''GlonassBias)
 
 instance BinaryBit GlonassBias where
   getBits _n = do
@@ -368,6 +380,7 @@ data Observation1001 = Observation1001
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Observation1001)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_observation1001_" . stripPrefix "_observation1001_"} ''Observation1001)
 
 instance BinaryBit Observation1001 where
   getBits n = do
@@ -390,6 +403,7 @@ data Msg1001 = Msg1001
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1001)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1001_" . stripPrefix "_msg1001_"} ''Msg1001)
 
 instance Binary Msg1001 where
   get = B.runBitGet $ do
@@ -419,6 +433,7 @@ data Observation1002 = Observation1002
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Observation1002)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_observation1002_" . stripPrefix "_observation1002_"} ''Observation1002)
 
 instance BinaryBit Observation1002 where
   getBits n = do
@@ -443,6 +458,7 @@ data Msg1002 = Msg1002
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1002)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1002_" . stripPrefix "_msg1002_"} ''Msg1002)
 
 instance Binary Msg1002 where
   get = B.runBitGet $ do
@@ -472,6 +488,7 @@ data Observation1003 = Observation1003
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Observation1003)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_observation1003_" . stripPrefix "_observation1003_"} ''Observation1003)
 
 instance BinaryBit Observation1003 where
   getBits n = do
@@ -496,6 +513,7 @@ data Msg1003 = Msg1003
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1003)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1003_" . stripPrefix "_msg1003_"} ''Msg1003)
 
 instance Binary Msg1003 where
   get = B.runBitGet $ do
@@ -529,6 +547,7 @@ data Observation1004 = Observation1004
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Observation1004)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_observation1004_" . stripPrefix "_observation1004_"} ''Observation1004)
 
 instance BinaryBit Observation1004 where
   getBits n = do
@@ -557,6 +576,7 @@ data Msg1004 = Msg1004
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1004)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1004_" . stripPrefix "_msg1004_"} ''Msg1004)
 
 instance Binary Msg1004 where
   get = B.runBitGet $ do
@@ -584,6 +604,7 @@ data Observation1009 = Observation1009
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Observation1009)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_observation1009_" . stripPrefix "_observation1009_"} ''Observation1009)
 
 instance BinaryBit Observation1009 where
   getBits n = do
@@ -606,6 +627,7 @@ data Msg1009 = Msg1009
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1009)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1009_" . stripPrefix "_msg1009_"} ''Msg1009)
 
 instance Binary Msg1009 where
   get = B.runBitGet $ do
@@ -635,6 +657,7 @@ data Observation1010 = Observation1010
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Observation1010)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_observation1010_" . stripPrefix "_observation1010_"} ''Observation1010)
 
 instance BinaryBit Observation1010 where
   getBits n = do
@@ -659,6 +682,7 @@ data Msg1010 = Msg1010
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1010)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1010_" . stripPrefix "_msg1010_"} ''Msg1010)
 
 instance Binary Msg1010 where
   get = B.runBitGet $ do
@@ -688,6 +712,7 @@ data Observation1011 = Observation1011
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Observation1011)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_observation1011_" . stripPrefix "_observation1011_"} ''Observation1011)
 
 instance BinaryBit Observation1011 where
   getBits n = do
@@ -712,6 +737,7 @@ data Msg1011 = Msg1011
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1011)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1011_" . stripPrefix "_msg1011_"} ''Msg1011)
 
 instance Binary Msg1011 where
   get = B.runBitGet $ do
@@ -745,6 +771,7 @@ data Observation1012 = Observation1012
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Observation1012)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_observation1012_" . stripPrefix "_observation1012_"} ''Observation1012)
 
 instance BinaryBit Observation1012 where
   getBits n = do
@@ -773,6 +800,7 @@ data Msg1012 = Msg1012
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1012)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1012_" . stripPrefix "_msg1012_"} ''Msg1012)
 
 instance Binary Msg1012 where
   get = B.runBitGet $ do
@@ -798,6 +826,7 @@ data Msg1230 = Msg1230
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1230)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1230_" . stripPrefix "_msg1230_"} ''Msg1230)
 
 instance Binary Msg1230 where
   get = B.runBitGet $ do

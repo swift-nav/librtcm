@@ -12,7 +12,8 @@
 module Data.RTCM3.Types where
 
 import           BasicPrelude
-import           Control.Lens
+import           Control.Lens hiding ((.=))
+import           Data.Aeson
 import           Data.Binary
 import qualified Data.Binary.Bits.Get as B
 import           Data.Binary.Get
@@ -20,6 +21,7 @@ import           Data.Binary.Put
 import           Data.ByteString.Builder
 import           Data.ByteString.Lazy hiding ( ByteString )
 import           Data.CRC24Q
+import           Data.RTCM3.Aeson ()
 import           Data.RTCM3.Extras
 import           Data.Word.Word24
 
@@ -34,10 +36,17 @@ data Msg = Msg
 
 $(makeClassy ''Msg)
 
+instance ToJSON Msg where
+  toJSON Msg {..} = object
+    [ "len"     .= _msgRTCM3Len
+    , "payload" .= _msgRTCM3Payload
+    , "crc"     .= _msgRTCM3Crc
+    ]
+
 instance Binary Msg where
   get = do
     _msgRTCM3Len     <- getWord16be
-    _msgRTCM3Payload <- if _msgRTCM3Len == 0 then return mempty else getByteString $ fromIntegral _msgRTCM3Len
+    _msgRTCM3Payload <- getByteString $ fromIntegral _msgRTCM3Len
     _msgRTCM3Crc     <- getWord24be
     return Msg {..}
 

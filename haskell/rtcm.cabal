@@ -30,23 +30,45 @@ library
                      , Data.RTCM3.SSR
                      , Data.RTCM3.System
                      , Data.RTCM3.Types
-  other-modules:       Data.RTCM3.Extras
+  other-modules:       Data.RTCM3.Aeson
+                     , Data.RTCM3.Extras
                      , Data.RTCM3.TH
   ghc-options:         -Wall
-  build-depends:       array
+  build-depends:       aeson
+                     , array
                      , base >= 4.7 && < 5
+                     , base64-bytestring
                      , basic-prelude
                      , binary
                      , binary-bits
                      , bytestring
                      , lens
                      , template-haskell
+                     , text
                      , word24
   default-language:    Haskell2010
   default-extensions:  NoImplicitPrelude
                        OverloadedStrings
                        RecordWildCards
                        TemplateHaskell
+
+executable rtcm32json
+  hs-source-dirs:      main
+  main-is:             rtcm32json.hs
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
+  build-depends:       aeson
+                     , base
+                     , basic-prelude
+                     , binary-conduit
+                     , bytestring
+                     , conduit
+                     , conduit-combinators
+                     , conduit-extra
+                     , resourcet
+                     , rtcm
+  default-language:    Haskell2010
+  default-extensions:  NoImplicitPrelude
+                       OverloadedStrings
 
 test-suite test
   type:                exitcode-stdio-1.0

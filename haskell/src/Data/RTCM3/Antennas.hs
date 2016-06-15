@@ -12,6 +12,7 @@ module Data.RTCM3.Antennas where
 
 import           BasicPrelude
 import           Control.Lens
+import           Data.Aeson.TH
 import           Data.Binary
 import           Data.Binary.Bits
 import qualified Data.Binary.Bits.Get as B
@@ -46,6 +47,7 @@ data AntennaReference = AntennaReference
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''AntennaReference)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_antennaReference_" . stripPrefix "_antennaReference_"} ''AntennaReference)
 
 instance BinaryBit AntennaReference where
   getBits _n = do
@@ -88,6 +90,7 @@ data ExtAntennaReference = ExtAntennaReference
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''ExtAntennaReference)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_extAntennaReference_" . stripPrefix "_extAntennaReference_"} ''ExtAntennaReference)
 
 instance BinaryBit ExtAntennaReference where
   getBits _n = do
@@ -114,6 +117,7 @@ data AntennaDescriptor = AntennaDescriptor
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''AntennaDescriptor)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_antennaDescriptor_" . stripPrefix "_antennaDescriptor_"} ''AntennaDescriptor)
 
 instance BinaryBit AntennaDescriptor where
   getBits _n = do
@@ -142,6 +146,7 @@ data ExtAntennaDescriptor = ExtAntennaDescriptor
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''ExtAntennaDescriptor)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_extAntennaDescriptor_" . stripPrefix "_extAntennaDescriptor_"} ''ExtAntennaDescriptor)
 
 instance BinaryBit ExtAntennaDescriptor where
   getBits _n = do
@@ -172,6 +177,7 @@ data ReceiverDescriptor = ReceiverDescriptor
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''ReceiverDescriptor)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_receiverDescriptor_" . stripPrefix "_receiverDescriptor_"} ''ReceiverDescriptor)
 
 instance BinaryBit ReceiverDescriptor where
   getBits _n = do
@@ -203,6 +209,7 @@ data Msg1005 = Msg1005
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1005)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1005_" . stripPrefix "_msg1005_"} ''Msg1005)
 
 instance Binary Msg1005 where
   get = B.runBitGet $ do
@@ -228,6 +235,7 @@ data Msg1006 = Msg1006
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1006)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1006_" . stripPrefix "_msg1006_"} ''Msg1006)
 
 instance Binary Msg1006 where
   get = B.runBitGet $ do
@@ -253,6 +261,7 @@ data Msg1007 = Msg1007
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1007)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1007_" . stripPrefix "_msg1007_"} ''Msg1007)
 
 instance Binary Msg1007 where
   get = B.runBitGet $ do
@@ -278,6 +287,7 @@ data Msg1008 = Msg1008
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1008)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1008_" . stripPrefix "_msg1008_"} ''Msg1008)
 
 instance Binary Msg1008 where
   get = B.runBitGet $ do
@@ -309,6 +319,7 @@ data Msg1033 = Msg1033
   } deriving ( Show, Read, Eq)
 
 $(makeLenses ''Msg1033)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1033_" . stripPrefix "_msg1033_"} ''Msg1033)
 
 instance Binary Msg1033 where
   get = B.runBitGet $ do

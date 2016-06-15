@@ -19,6 +19,7 @@ module Data.RTCM3
 
 import BasicPrelude
 import Control.Lens
+import Data.Aeson hiding (decode, decode')
 import Data.Binary
 import Data.ByteString.Lazy
 import Data.RTCM3.Antennas
@@ -135,3 +136,31 @@ instance HasMsg RTCM3Msg where
   msg f (RTCM3MsgUnknown   m) = RTCM3MsgUnknown   <$> f m
   msg f (RTCM3MsgBadCrc    m) = RTCM3MsgBadCrc    <$> f m
 
+mergeValues :: Value -> Value -> Value
+mergeValues (Object a) (Object b) = Object (a <> b)
+mergeValues (Object a) _          = Object a
+mergeValues _          (Object b) = Object b
+mergeValues _          v          = v
+
+instance ToJSON RTCM3Msg where
+  toJSON (RTCM3Msg1001    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1002    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1003    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1004    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1005    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1006    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1007    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1008    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1009    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1010    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1011    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1012    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1013    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1033    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1057    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1058    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1063    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1064    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3Msg1230    n m) = toJSON n `mergeValues` toJSON m
+  toJSON (RTCM3MsgUnknown   m) = toJSON m
+  toJSON (RTCM3MsgBadCrc    m) = toJSON m
