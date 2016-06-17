@@ -54,6 +54,7 @@ data RTCM3Msg =
    | RTCM3Msg1230    Msg1230 Msg
    | RTCM3MsgUnknown         Msg
    | RTCM3MsgBadCrc          Msg
+   | RTCM3MsgEmpty           Msg
    deriving ( Show, Read, Eq )
 
 $(makePrisms ''RTCM3Msg)
@@ -65,6 +66,7 @@ instance Binary RTCM3Msg where
       decode' <$> get where
         decode' m@Msg {..}
           | crc /= _msgRTCM3Crc = RTCM3MsgBadCrc m
+          | 0 == _msgRTCM3Len = RTCM3MsgEmpty m
           | num == msg1001 = RTCM3Msg1001 (decode $ fromStrict _msgRTCM3Payload) m
           | num == msg1002 = RTCM3Msg1002 (decode $ fromStrict _msgRTCM3Payload) m
           | num == msg1003 = RTCM3Msg1003 (decode $ fromStrict _msgRTCM3Payload) m
@@ -112,6 +114,7 @@ instance Binary RTCM3Msg where
       encode' (RTCM3Msg1230    _n m) = put m
       encode' (RTCM3MsgUnknown    m) = put m
       encode' (RTCM3MsgBadCrc     m) = put m
+      encode' (RTCM3MsgEmpty      m) = put m
 
 instance HasMsg RTCM3Msg where
   msg f (RTCM3Msg1001    n m) = RTCM3Msg1001    n <$> f m
@@ -135,6 +138,7 @@ instance HasMsg RTCM3Msg where
   msg f (RTCM3Msg1230    n m) = RTCM3Msg1230    n <$> f m
   msg f (RTCM3MsgUnknown   m) = RTCM3MsgUnknown   <$> f m
   msg f (RTCM3MsgBadCrc    m) = RTCM3MsgBadCrc    <$> f m
+  msg f (RTCM3MsgEmpty     m) = RTCM3MsgEmpty     <$> f m
 
 mergeValues :: Value -> Value -> Value
 mergeValues (Object a) (Object b) = Object (a <> b)
@@ -164,3 +168,4 @@ instance ToJSON RTCM3Msg where
   toJSON (RTCM3Msg1230    n m) = toJSON n `mergeValues` toJSON m
   toJSON (RTCM3MsgUnknown   m) = toJSON m
   toJSON (RTCM3MsgBadCrc    m) = toJSON m
+  toJSON (RTCM3MsgEmpty     m) = toJSON m
