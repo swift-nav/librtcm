@@ -4,9 +4,9 @@ synopsis:              RTCM Library.
 description:           Haskell bindings for RTCM.
 homepage:              http://github.com/swift-nav/librtcm
 license:               BSD3
-author:                Swift Navigation Inc.
-maintainer:            Mark Fine <dev@swiftnav.com>
-copyright:             Copyright (C) 2015 Swift Navigation, Inc.
+author:                Mark Fine <mark@swift-nav.com>, Joshua Gross <josh@swift-nav.com>
+maintainer:            Swift Navigation <engineering@swift-nav.com>
+copyright:             Copyright (C) 2015-2017 Swift Navigation, Inc.
 category:              Network
 build-type:            Simple
 cabal-version:         >= 1.10
@@ -25,6 +25,7 @@ library
   exposed-modules:     Data.CRC24Q
                      , Data.RTCM3
                      , Data.RTCM3.Antennas
+                     , Data.RTCM3.Ephemeris
                      , Data.RTCM3.Internal
                      , Data.RTCM3.Observations
                      , Data.RTCM3.SSR

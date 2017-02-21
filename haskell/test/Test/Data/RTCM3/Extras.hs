@@ -3,9 +3,9 @@
 
 -- |
 -- Module:      Test.Data.RTCM3.Extras
--- Copyright:   (c) 2015 Mark Fine
+-- Copyright:   (c) 2015 Swift Navigation
 -- License:     BSD3
--- Maintainer:  Mark Fine <mark@swift-nav.com>
+-- Maintainer:  Swift Navigation <dev@swiftnav.com>
 --
 -- Test Extras module for RTCM3.
 
@@ -13,10 +13,10 @@ module Test.Data.RTCM3.Extras
   ( tests
   ) where
 
-import           BasicPrelude         hiding (ByteString)
+import           BasicPrelude          hiding (ByteString)
 import           Data.Binary
-import qualified Data.Binary.Bits.Get as B
-import qualified Data.Binary.Bits.Put as B
+import qualified Data.Binary.Bits.Get  as B
+import qualified Data.Binary.Bits.Put  as B
 import           Data.Binary.Get
 import           Data.Binary.Put
 import           Data.Bits
@@ -24,10 +24,10 @@ import           Data.ByteString.Lazy
 import           Data.Int
 import           Data.RTCM3.Internal
 import           Data.Word.Word24
+import           System.Random
 import           Test.Data.RTCM3.Test
 import           Test.Tasty
 import           Test.Tasty.QuickCheck
-import           System.Random
 
 data TestInt a = TestInt Int a deriving ( Show, Read, Eq )
 

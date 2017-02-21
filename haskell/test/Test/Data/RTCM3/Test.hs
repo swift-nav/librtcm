@@ -1,8 +1,8 @@
 -- |
 -- Module:      Test.Data.RTCM3.Test
--- Copyright:   (c) 2015 Mark Fine
+-- Copyright:   (c) 2015 Swift Navigation
 -- License:     BSD3
--- Maintainer:  Mark Fine <mark@swift-nav.com>
+-- Maintainer:  Swift Navigation <dev@swiftnav.com>
 --
 -- Test module for RTCM3.
 
@@ -10,8 +10,8 @@ module Test.Data.RTCM3.Test where
 
 import BasicPrelude
 import Data.Bits
-import Test.Tasty.QuickCheck
 import System.Random
+import Test.Tasty.QuickCheck
 
 arbitraryWord :: (Integral a, Bits a, Random a) => Int -> Gen a
 arbitraryWord b = do

@@ -2,7 +2,7 @@
 -- Module:      Data.RTCM3.Types
 -- Copyright:   Copyright (C) 2015 Swift Navigation, Inc.
 -- License:     LGPL-3
--- Maintainer:  Mark Fine <dev@swiftnav.com>
+-- Maintainer:  Swift Navigation <dev@swiftnav.com>
 -- Stability:   experimental
 -- Portability: portable
 --
@@ -12,14 +12,14 @@
 module Data.RTCM3.Types where
 
 import           BasicPrelude
-import           Control.Lens hiding ((.=))
+import           Control.Lens            hiding ((.=))
 import           Data.Aeson
 import           Data.Binary
-import qualified Data.Binary.Bits.Get as B
+import qualified Data.Binary.Bits.Get    as B
 import           Data.Binary.Get
 import           Data.Binary.Put
 import           Data.ByteString.Builder
-import           Data.ByteString.Lazy hiding ( ByteString )
+import           Data.ByteString.Lazy    hiding ( ByteString )
 import           Data.CRC24Q
 import           Data.RTCM3.Aeson ()
 import           Data.RTCM3.Extras

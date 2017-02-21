@@ -2,7 +2,7 @@
 -- Module:      Data.RTCM3.TH
 -- Copyright:   Copyright (C) 2015 Swift Navigation, Inc.
 -- License:     LGPL-3
--- Maintainer:  Mark Fine <dev@swiftnav.com>
+-- Maintainer:  Swift Navigation <dev@swiftnav.com>
 -- Stability:   experimental
 -- Portability: portable
 --
@@ -10,7 +10,7 @@
 
 module Data.RTCM3.TH where
 
-import BasicPrelude hiding ( length )
+import BasicPrelude         hiding ( length )
 import Data.Binary
 import Data.ByteString
 import Data.ByteString.Lazy hiding ( length )

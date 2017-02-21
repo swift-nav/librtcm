@@ -2,9 +2,9 @@
 
 -- |
 -- Module:      Test.Data.RTCM3.SSR
--- Copyright:   (c) 2015 Mark Fine
+-- Copyright:   (c) 2015 Swift Navigation
 -- License:     BSD3
--- Maintainer:  Mark Fine <mark@swift-nav.com>
+-- Maintainer:  Swift Navigation <dev@swiftnav.com>
 --
 -- Test SSR module for RTCM3.
 
