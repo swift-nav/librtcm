@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 {-# OPTIONS -fno-warn-orphans #-}
 -- |
 -- Module:      Data.RTCM3.Extras

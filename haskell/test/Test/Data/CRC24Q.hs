@@ -1,3 +1,6 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Test.Data.CRC24Q
 -- Copyright:   (c) 2015 Swift Navigation

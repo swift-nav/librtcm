@@ -1,5 +1,6 @@
-{-# OPTIONS -fno-warn-orphans  #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS -fno-warn-orphans  #-}
 
 -- |
 -- Module:      Test.Data.RTCM3.Extras

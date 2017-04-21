@@ -1,3 +1,8 @@
+{-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Data.RTCM3
 -- Copyright:   (c) 2015 Mark Fine

@@ -1,3 +1,7 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Data.RTCM3.Ephemeris
 -- Copyright:   Copyright (C) 2017 Swift Navigation, Inc.

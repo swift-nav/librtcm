@@ -1,3 +1,6 @@
+{-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Test
 -- Copyright:   (c) 2015 Swift Navigation

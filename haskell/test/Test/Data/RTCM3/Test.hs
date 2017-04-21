@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Test.Data.RTCM3.Test
 -- Copyright:   (c) 2015 Swift Navigation

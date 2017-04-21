@@ -1,3 +1,6 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Data.RTCM3.TH
 -- Copyright:   Copyright (C) 2015 Swift Navigation, Inc.

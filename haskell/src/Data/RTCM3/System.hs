@@ -1,3 +1,7 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Data.RTCM3.System
 -- Copyright:   Copyright (C) 2015 Swift Navigation, Inc.

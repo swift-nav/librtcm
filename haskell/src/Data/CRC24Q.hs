@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Data.CRC24Q
 -- Copyright:   Copyright (C) 2015 Swift Navigation, Inc.

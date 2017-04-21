@@ -1,3 +1,8 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Data.RTCM3.Observations
 -- Copyright:   Copyright (C) 2015 Swift Navigation, Inc.

@@ -1,3 +1,8 @@
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Data.RTCM3.Types
 -- Copyright:   Copyright (C) 2015 Swift Navigation, Inc.
@@ -72,4 +77,3 @@ msgRTCM3Num = checkNum . (^. msgRTCM3Payload)
 
 class Binary a => ToRTCM3 a where
   toRTCM3 :: a -> Msg
-

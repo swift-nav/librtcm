@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Data.RTCM3.Extras
 -- Copyright:   Copyright (C) 2015 Swift Navigation, Inc.

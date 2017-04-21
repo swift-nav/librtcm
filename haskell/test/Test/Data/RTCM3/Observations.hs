@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE RecordWildCards #-}
 {-# OPTIONS -fno-warn-orphans #-}
 
 -- |

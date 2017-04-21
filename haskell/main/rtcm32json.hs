@@ -1,3 +1,7 @@
+{-# OPTIONS_GHC -Wall #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 -- |
 -- Module:      Main
 -- Copyright:   Copyright (C) 2015 Swift Navigation, Inc.
