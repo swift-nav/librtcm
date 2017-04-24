@@ -138,8 +138,8 @@ instance BinaryBit GpsEphemeris where
     _gpsEphemeris_omegadot    <- getInt32be    24
     _gpsEphemeris_tgd         <- getInt8       8
     _gpsEphemeris_svHealth    <- B.getWord8    6
-    _gpsEphemeris_l2pFlag     <- getBits 1
-    _gpsEphemeris_fitInterval <- getBits 1
+    _gpsEphemeris_l2pFlag     <- B.getBool
+    _gpsEphemeris_fitInterval <- B.getBool
     return GpsEphemeris {..}
 
   putBits _n GpsEphemeris {..} = do
