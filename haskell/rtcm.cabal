@@ -1,5 +1,5 @@
 name:                  rtcm
-version:               0.1.10
+version:               0.1.11
 synopsis:              RTCM Library.
 description:           Haskell bindings for RTCM.
 homepage:              http://github.com/swift-nav/librtcm
