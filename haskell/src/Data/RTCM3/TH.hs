@@ -1,5 +1,5 @@
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 -- |
 -- Module:      Data.RTCM3.TH
@@ -13,10 +13,10 @@
 
 module Data.RTCM3.TH where
 
-import BasicPrelude         hiding ( length )
+import BasicPrelude         hiding (length)
 import Data.Binary
 import Data.ByteString
-import Data.ByteString.Lazy hiding ( length )
+import Data.ByteString.Lazy hiding (length)
 import Data.RTCM3.Types
 import Language.Haskell.TH
 

@@ -1,7 +1,7 @@
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
 -- |
 -- Module:      Data.RTCM3.Types
@@ -24,9 +24,9 @@ import qualified Data.Binary.Bits.Get    as B
 import           Data.Binary.Get
 import           Data.Binary.Put
 import           Data.ByteString.Builder
-import           Data.ByteString.Lazy    hiding ( ByteString )
+import           Data.ByteString.Lazy    hiding (ByteString)
 import           Data.CRC24Q
-import           Data.RTCM3.Aeson ()
+import           Data.RTCM3.Aeson        ()
 import           Data.RTCM3.Extras
 import           Data.Word.Word24
 
