@@ -3,16 +3,16 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 -- |
--- Module:      Data.RTCM3.Ephemeris
+-- Module:      Data.RTCM3.Ephemerides
 -- Copyright:   Copyright (C) 2017 Swift Navigation, Inc.
 -- License:     LGPL-3
 -- Maintainer:  Swift Navigation <dev@swiftnav.com>
 -- Stability:   experimental
 -- Portability: portable
 --
--- RTCMv3 Ephemeris messages
+-- RTCMv3 Ephemerides messages
 
-module Data.RTCM3.Ephemeris where
+module Data.RTCM3.Ephemerides where
 
 import           BasicPrelude
 import           Control.Lens
@@ -352,12 +352,13 @@ instance BinaryBit GlonassEphemeris where
     _glonassEphemeris_mln5               <- B.getBool
     _glonassEphemeris_reserved           <- B.getWord8 7
     return GlonassEphemeris{..}
+
   putBits _n GlonassEphemeris{..} = do
-    B.putBool         _glonassEphemeris_almanacHealth
-    B.putBool         _glonassEphemeris_healthAvailability
-    B.putWord8    2   _glonassEphemeris_p1
-    B.putWord16be 12  _glonassEphemeris_tk
-    B.putBool         _glonassEphemeris_bn_msb
+    B.putBool        _glonassEphemeris_almanacHealth
+    B.putBool        _glonassEphemeris_healthAvailability
+    B.putWord8    2  _glonassEphemeris_p1
+    B.putWord16be 12 _glonassEphemeris_tk
+    B.putBool        _glonassEphemeris_bn_msb
     B.putBool        _glonassEphemeris_p2
     B.putWord8    7  _glonassEphemeris_tb
     putInt32be    24 _glonassEphemeris_xndot

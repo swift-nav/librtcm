@@ -24,7 +24,7 @@ import Data.Aeson              hiding (decode, decode')
 import Data.Binary
 import Data.ByteString.Lazy
 import Data.RTCM3.Antennas     as Export
-import Data.RTCM3.Ephemeris    as Export
+import Data.RTCM3.Ephemerides  as Export
 import Data.RTCM3.Observations as Export
 import Data.RTCM3.SSR          as Export
 import Data.RTCM3.System       as Export

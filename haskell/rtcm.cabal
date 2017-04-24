@@ -25,7 +25,7 @@ library
   exposed-modules:     Data.CRC24Q
                      , Data.RTCM3
                      , Data.RTCM3.Antennas
-                     , Data.RTCM3.Ephemeris
+                     , Data.RTCM3.Ephemerides
                      , Data.RTCM3.Internal
                      , Data.RTCM3.Observations
                      , Data.RTCM3.SSR
@@ -71,7 +71,7 @@ test-suite test
   main-is:             Test.hs
   other-modules:       Test.Data.CRC24Q
                      , Test.Data.RTCM3.Antennas
-                     , Test.Data.RTCM3.Ephemeris
+                     , Test.Data.RTCM3.Ephemerides
                      , Test.Data.RTCM3.Extras
                      , Test.Data.RTCM3.Observations
                      , Test.Data.RTCM3.SSR
