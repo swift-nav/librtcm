@@ -296,9 +296,7 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1008_" . stripP
 instance Binary Msg1008 where
   get = B.runBitGet $ do
     _msg1008_descriptor    <- getBits 0
-    -- ^ Antenna descriptor.
     _msg1008_extDescriptor <- getBits 0
-    -- ^ Antenna extended descriptor.
     return Msg1008 {..}
 
   put Msg1008 {..} = B.runBitPut $ do
@@ -328,11 +326,8 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1033_" . stripP
 instance Binary Msg1033 where
   get = B.runBitGet $ do
     _msg1033_antennaDescriptor    <- getBits 0
-    -- ^ Antenna descriptor.
     _msg1033_antennaExtDescriptor <- getBits 0
-    -- ^ Antenna extended descriptor.
     _msg1033_receiverDescriptor   <- getBits 0
-    -- ^ Receiver descriptor.
     return Msg1033 {..}
 
   put Msg1033 {..} = B.runBitPut $ do
