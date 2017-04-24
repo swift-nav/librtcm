@@ -113,7 +113,7 @@ instance Arbitrary GlonassEphemeris where
     _glonassEphemeris_mn4                <- arbitraryWord 5
     _glonassEphemeris_mTauGps            <- arbitraryInt 22
     _glonassEphemeris_mln5               <- arbitrary
-    _glonassEphemeris_reserved           <- arbitrary
+    _glonassEphemeris_reserved           <- arbitraryWord 7
     return GlonassEphemeris{..}
 
 instance Arbitrary Msg1020 where
