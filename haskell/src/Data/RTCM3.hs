@@ -1,7 +1,7 @@
-{-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 -- |
 -- Module:      Data.RTCM3
@@ -19,7 +19,7 @@ module Data.RTCM3
   ) where
 
 import BasicPrelude
-import Control.Lens
+import Control.Lens            hiding ((.=))
 import Data.Aeson              hiding (decode, decode')
 import Data.Binary
 import Data.ByteString.Lazy
@@ -55,7 +55,7 @@ data RTCM3Msg =
    | RTCM3Msg1063    Msg1063 Msg
    | RTCM3Msg1064    Msg1064 Msg
    | RTCM3Msg1230    Msg1230 Msg
-   | RTCM3MsgUnknown         Msg
+   | RTCM3MsgUnknown Word16  Msg
    | RTCM3MsgBadCrc          Msg
    | RTCM3MsgEmpty           Msg
    deriving ( Show, Read, Eq )
@@ -90,7 +90,7 @@ instance Binary RTCM3Msg where
           | num == msg1063 = RTCM3Msg1063 (decode $ fromStrict _msgRTCM3Payload) m
           | num == msg1064 = RTCM3Msg1064 (decode $ fromStrict _msgRTCM3Payload) m
           | num == msg1230 = RTCM3Msg1230 (decode $ fromStrict _msgRTCM3Payload) m
-          | otherwise = RTCM3MsgUnknown m where
+          | otherwise = RTCM3MsgUnknown num m where
             crc = checkCrc _msgRTCM3Len _msgRTCM3Payload
             num = checkNum _msgRTCM3Payload
 
@@ -117,7 +117,7 @@ instance Binary RTCM3Msg where
       encode' (RTCM3Msg1063    _n m) = put m
       encode' (RTCM3Msg1064    _n m) = put m
       encode' (RTCM3Msg1230    _n m) = put m
-      encode' (RTCM3MsgUnknown    m) = put m
+      encode' (RTCM3MsgUnknown _n m) = put m
       encode' (RTCM3MsgBadCrc     m) = put m
       encode' (RTCM3MsgEmpty      m) = put m
 
@@ -142,7 +142,7 @@ instance HasMsg RTCM3Msg where
   msg f (RTCM3Msg1063    n m) = RTCM3Msg1063    n <$> f m
   msg f (RTCM3Msg1064    n m) = RTCM3Msg1064    n <$> f m
   msg f (RTCM3Msg1230    n m) = RTCM3Msg1230    n <$> f m
-  msg f (RTCM3MsgUnknown   m) = RTCM3MsgUnknown   <$> f m
+  msg f (RTCM3MsgUnknown n m) = RTCM3MsgUnknown n <$> f m
   msg f (RTCM3MsgBadCrc    m) = RTCM3MsgBadCrc    <$> f m
   msg f (RTCM3MsgEmpty     m) = RTCM3MsgEmpty     <$> f m
 
@@ -173,6 +173,6 @@ instance ToJSON RTCM3Msg where
   toJSON (RTCM3Msg1063    n m) = toJSON n `mergeValues` toJSON m
   toJSON (RTCM3Msg1064    n m) = toJSON n `mergeValues` toJSON m
   toJSON (RTCM3Msg1230    n m) = toJSON n `mergeValues` toJSON m
-  toJSON (RTCM3MsgUnknown   m) = toJSON m
+  toJSON (RTCM3MsgUnknown n m) = object [ "num" .= n ] `mergeValues` toJSON m
   toJSON (RTCM3MsgBadCrc    m) = toJSON m
   toJSON (RTCM3MsgEmpty     m) = toJSON m
