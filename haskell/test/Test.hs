@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wall #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 -- |
@@ -12,7 +11,7 @@
 import           BasicPrelude
 import qualified Test.Data.CRC24Q             as CRC24Q
 import qualified Test.Data.RTCM3.Antennas     as Antennas
-import qualified Test.Data.RTCM3.Ephemeris    as Ephemeris
+import qualified Test.Data.RTCM3.Ephemerides  as Ephemerides
 import qualified Test.Data.RTCM3.Extras       as Extras
 import qualified Test.Data.RTCM3.Observations as Observations
 import qualified Test.Data.RTCM3.SSR          as SSR
@@ -24,7 +23,7 @@ tests =
   testGroup "Tests"
     [ CRC24Q.tests
     , Antennas.tests
-    , Ephemeris.tests
+    , Ephemerides.tests
     , Extras.tests
     , Observations.tests
     , SSR.tests

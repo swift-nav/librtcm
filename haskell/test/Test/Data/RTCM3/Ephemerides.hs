@@ -1,16 +1,16 @@
 {-# LANGUAGE NoImplicitPrelude #-}
-{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE RecordWildCards   #-}
 {-# OPTIONS -fno-warn-orphans #-}
 
 -- |
--- Module:      Test.Data.RTCM3.Ephemeris
+-- Module:      Test.Data.RTCM3.Ephemerides
 -- Copyright:   (c) 2017 Swift Navigation
 -- License:     BSD3
 -- Maintainer:  Swift Navigation <dev@swiftnav.com>
 --
--- Test Ephemeris module for RTCM3.
+-- Test Ephemerides module for RTCM3.
 
-module Test.Data.RTCM3.Ephemeris
+module Test.Data.RTCM3.Ephemerides
   ( tests
   ) where
 
@@ -113,6 +113,7 @@ instance Arbitrary GlonassEphemeris where
     _glonassEphemeris_mn4                <- arbitraryWord 5
     _glonassEphemeris_mTauGps            <- arbitraryInt 22
     _glonassEphemeris_mln5               <- arbitrary
+    _glonassEphemeris_reserved           <- arbitraryWord 7
     return GlonassEphemeris{..}
 
 instance Arbitrary Msg1020 where
