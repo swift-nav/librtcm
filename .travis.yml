@@ -4,8 +4,11 @@ language: c
 
 addons:
   apt:
+    sources:
+      - sourceline: 'deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-3.8 main'
+        key_url: 'http://apt.llvm.org/llvm-snapshot.gpg.key'
     packages:
-    - libgmp-dev
+      - libgmp-dev
 
 cache:
   apt: true
