@@ -14,7 +14,6 @@
 #define SWIFTNAV_RTCM3_DECODE_H
 
 #include <rtcm3_messages.h>
-#include <stdbool.h>
 
 u32 getbitu(const u8 *buff, u32 pos, u8 len);
 u64 getbitul(const u8 *buff, u32 pos, u8 len);
@@ -31,8 +30,6 @@ void setbitsl(u8 *buff, u32 pos, u32 len, s64 data);
 
 u16 rtcm3_write_header(const rtcm_obs_header *header, u8 num_sats, u8 *buff);
 u16 rtcm3_read_header(const u8 *buff, rtcm_obs_header *header);
-static u8 to_lock_ind(u32 time);
-static u32 from_lock_ind(u8 lock);
 
 u16 rtcm3_encode_1001(const rtcm_obs_message *rtcm_msg_1001, u8 *buff);
 u16 rtcm3_encode_1002(const rtcm_obs_message *rtcm_msg_1002, u8 *buff);
@@ -62,19 +59,5 @@ s8 rtcm3_decode_1008(const u8 *buff, rtcm_msg_1008 *rtcm_msg_1008);
 
 s8 rtcm3_decode_1010(const u8 *buff, rtcm_obs_message *rtcm_msg_1010);
 s8 rtcm3_decode_1012(const u8 *buff, rtcm_obs_message *rtcm_msg_1012);
-
-static s8 decode_basic_gps_l1_freq_data(const u8 *buff, u16 *bit,
-                                    rtcm_freq_data *freq_data, u32 *pr,
-                                    s32 *phr_pr_diff);
-static s8 decode_basic_glo_l1_freq_data(const u8 *buff, u16 *bit,
-                                    rtcm_freq_data *freq_data, u32 *pr,
-                                    s32 *phr_pr_diff);
-static s8 decode_basic_l2_freq_data(const u8 *buff, u16 *bit,
-                                    rtcm_freq_data *freq_data, s32 *pr,
-                                    s32 *phr_pr_diff);
-static void encode_basic_freq_data(const rtcm_freq_data *freq_data,
-                                 const double freq, const double *l1_pr, u8 *buff,
-                                 u16 *bit);
-static void init_data(rtcm_sat_data *sat_data);
 
 #endif /* SWIFTNAV_RTCM3_DECODE_H */

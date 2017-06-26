@@ -15,14 +15,14 @@
 
 #include <rtcm3_messages.h>
 
-static void test_rtcm_1001();
-static void test_rtcm_1002();
-static void test_rtcm_1003();
-static void test_rtcm_1004();
-static void test_rtcm_1005();
-static void test_rtcm_1006();
-static void test_rtcm_1007();
-static void test_rtcm_1008();
+static void test_rtcm_1001(void);
+static void test_rtcm_1002(void);
+static void test_rtcm_1003(void);
+static void test_rtcm_1004(void);
+static void test_rtcm_1005(void);
+static void test_rtcm_1006(void);
+static void test_rtcm_1007(void);
+static void test_rtcm_1008(void);
 
 bool msgobs_equals(const rtcm_obs_message *msg_in,
                    const rtcm_obs_message *msg_out);

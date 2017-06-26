@@ -16,16 +16,18 @@
 #include <rtcm3_decode.h>
 #include <string.h>
 
-int main() {
+int main(void) {
   test_rtcm_1001();
   test_rtcm_1002();
   test_rtcm_1003();
   test_rtcm_1004();
-  //test_rtcm_1005();
-  //test_rtcm_1006();
+  test_rtcm_1005();
+  test_rtcm_1006();
+  test_rtcm_1007();
+  test_rtcm_1008();
 }
 
-void test_rtcm_1001() {
+void test_rtcm_1001(void) {
   rtcm_obs_header header;
   header.msg_num = 1001;
   header.div_free = 0;
@@ -66,7 +68,7 @@ void test_rtcm_1001() {
   msg1001.sats[2].obs[0].flags.valid_lock = 0;
 
   u8 buff[1024];
-  u16 size = rtcm3_encode_1001(&msg1001, buff);
+  rtcm3_encode_1001(&msg1001, buff);
 
   rtcm_obs_message msg1001_out;
   s8 ret = rtcm3_decode_1001(buff, &msg1001_out);
@@ -74,7 +76,7 @@ void test_rtcm_1001() {
   assert(ret == 0 && msgobs_equals(&msg1001, &msg1001_out));
 }
 
-void test_rtcm_1002() {
+void test_rtcm_1002(void) {
 
   rtcm_obs_header header;
   header.msg_num = 1002;
@@ -122,7 +124,7 @@ void test_rtcm_1002() {
   msg1002.sats[2].obs[0].flags.valid_cnr = 0;
 
   u8 buff[1024];
-  u16 size = rtcm3_encode_1002(&msg1002, buff);
+  rtcm3_encode_1002(&msg1002, buff);
 
   rtcm_obs_message msg1002_out;
   s8 ret = rtcm3_decode_1002(buff, &msg1002_out);
@@ -130,7 +132,7 @@ void test_rtcm_1002() {
   assert(ret == 0 && msgobs_equals(&msg1002, &msg1002_out));
 }
 
-void test_rtcm_1003() {
+void test_rtcm_1003(void) {
 
   rtcm_obs_header header;
   header.msg_num = 1003;
@@ -185,7 +187,7 @@ void test_rtcm_1003() {
   msg1003.sats[2].obs[0].flags.valid_cnr = 0;
 
   u8 buff[1024];
-  u16 size = rtcm3_encode_1003(&msg1003, buff);
+  rtcm3_encode_1003(&msg1003, buff);
 
   rtcm_obs_message msg1003_out;
   s8 ret = rtcm3_decode_1003(buff, &msg1003_out);
@@ -193,7 +195,7 @@ void test_rtcm_1003() {
   assert(ret == 0 && msgobs_equals(&msg1003, &msg1003_out));
 }
 
-void test_rtcm_1004() {
+void test_rtcm_1004(void) {
 
   rtcm_obs_header header;
   header.msg_num = 1004;
@@ -256,7 +258,7 @@ void test_rtcm_1004() {
   msg1004.sats[2].obs[1].flags.valid_cnr = 1;
 
   u8 buff[1024];
-  u16 size = rtcm3_encode_1004(&msg1004, buff);
+  rtcm3_encode_1004(&msg1004, buff);
 
   rtcm_obs_message msg1004_out;
   s8 ret = rtcm3_decode_1004(buff, &msg1004_out);
@@ -264,7 +266,7 @@ void test_rtcm_1004() {
   assert(ret == 0 && msgobs_equals(&msg1004, &msg1004_out));
 }
 
-void test_rtcm_1005() {
+void test_rtcm_1005(void) {
   rtcm_msg_1005 msg1005;
 
   msg1005.stn_id = 5;
@@ -280,7 +282,7 @@ void test_rtcm_1005() {
   msg1005.arp_z = 2578346.6757;
 
   u8 buff[1024];
-  u16 size = rtcm3_encode_1005(&msg1005, buff);
+  rtcm3_encode_1005(&msg1005, buff);
 
   rtcm_msg_1005 msg1005_out;
   s8 ret = rtcm3_decode_1005(buff, &msg1005_out);
@@ -288,7 +290,7 @@ void test_rtcm_1005() {
   assert(ret == 0 && msg1005_equals(&msg1005, &msg1005_out));
 }
 
-void test_rtcm_1006() {
+void test_rtcm_1006(void) {
   rtcm_msg_1006 msg1006;
 
   msg1006.msg_1005.stn_id = 5;
@@ -305,7 +307,7 @@ void test_rtcm_1006() {
   msg1006.ant_height = 1.567;
 
   u8 buff[1024];
-  u16 size = rtcm3_encode_1006(&msg1006, buff);
+  rtcm3_encode_1006(&msg1006, buff);
 
   rtcm_msg_1006 msg1006_out;
   s8 ret = rtcm3_decode_1006(buff, &msg1006_out);
@@ -313,7 +315,7 @@ void test_rtcm_1006() {
   assert(ret == 0 && msg1006_equals(&msg1006, &msg1006_out));
 }
 
-void test_rtcm_1007() {
+void test_rtcm_1007(void) {
   rtcm_msg_1007 msg1007;
 
   msg1007.stn_id = 1022;
@@ -322,7 +324,7 @@ void test_rtcm_1007() {
   msg1007.ant_id = 254;
 
   u8 buff[1024];
-  u16 size = rtcm3_encode_1007(&msg1007, buff);
+  rtcm3_encode_1007(&msg1007, buff);
 
   rtcm_msg_1007 msg1007_out;
   s8 ret = rtcm3_decode_1007(buff, &msg1007_out);
@@ -330,7 +332,7 @@ void test_rtcm_1007() {
   assert(ret == 0 && msg1007_equals(&msg1007, &msg1007_out));
 }
 
-void test_rtcm_1008() {
+void test_rtcm_1008(void) {
   rtcm_msg_1008 msg1008;
 
   msg1008.msg_1007.stn_id = 22;
@@ -341,7 +343,7 @@ void test_rtcm_1008() {
   strcpy(msg1008.serial_num, "123456789");
 
   u8 buff[1024];
-  u16 size = rtcm3_encode_1008(&msg1008, buff);
+  rtcm3_encode_1008(&msg1008, buff);
 
   rtcm_msg_1008 msg1008_out;
   s8 ret = rtcm3_decode_1008(buff, &msg1008_out);
