@@ -14,28 +14,18 @@
 #define PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H
 
 #include <common.h>
-
-#define RTCM_MAX_SATS 32
+#include <constants.h>
 
 typedef enum { L1_FREQ, L2_FREQ, NUM_FREQS } freq_enum;
 
-static const double CLIGHT = 299792458.0; /* speed of light (m/s) */
-
-static const double GPS_L1_FREQ = 1.57542e9; /* GPS L1 frequency (Hz) */
-static const double GPS_L2_FREQ = 1.22760e9; /* GPS L2 Frequency */
-static const double GLO_L1_FREQ = 1.60172e9; /* GLO L1 frequency (Hz) */
-static const double GLO_L2_FREQ = 1.24578e9; /* GLO L2 Frequency */
-static const double GLO_L1_CH_OFFSET = 0.5625e9;    /* GLO L1 Channel offset */
-static const double GLO_L2_CH_OFFSET = 0.4375e9; /* GLO L2 Channel offset */
-
 typedef struct {
-  u16 msg_num;
-  u16 stn_id;
-  u32 tow;
-  u8 sync;
-  u8 n_sat;
-  u8 div_free;
-  u8 smooth;
+  u16 msg_num;      /* Msg Num DF002 uint16 12*/
+  u16 stn_id;       /* Station Id DF003 uint16 12*/
+  u32 tow;          /* GPS time of week DF004 uint32 30 */
+  u8 sync;          /* Syncronous flag DF005 bit(1) 1 */
+  u8 n_sat;         /* Number of satellites DF006 uint8 5 */
+  u8 div_free;      /* Divergance free flag DF007 bit(1) 1 */
+  u8 smooth;        /* GPS Smoothing Interval DF008 bit(3) 3 */
 } rtcm_obs_header;
 
 typedef union {
@@ -70,36 +60,36 @@ typedef struct {
 } rtcm_obs_message;
 
 typedef struct {
-  u16 stn_id;         // Reference Station ID DF003 uint12 12
-  u8 ITRF;            // Reserved for ITRF Realization Year DF021 uint6 6
-  u8 GPS_ind;         // GPS Indicator DF022 bit(1) 1
-  u8 GLO_ind;         // GLONASS Indicator DF023 bit(1) 1
-  u8 GAL_ind;         // Reserved for Galileo Indicator DF024 bit(1) 1
-  u8 ref_stn_ind;     // Reference-Station Indicator DF141 bit(1) 1
-  double arp_x;       // Antenna Reference Point ECEF-X DF025 int38 38
-  u8 osc_ind;         // Single Receiver Oscillator Indicator DF142 bit(1) 1
-  u8 reserved;        // Reserved DF001 bit(1) 1
-  double arp_y;       // Antenna Reference Point ECEF-Y DF026 int38 38
-  u8 quart_cycle_ind; // Quarter Cycle Indicator DF364 bit(2) 2
-  double arp_z;       // Antenna Reference Point ECEF-Z DF027 int38 38
+  u16 stn_id;
+  u8 ITRF;            /* Reserved for ITRF Realization Year DF021 uint6 6 */
+  u8 GPS_ind;         /* GPS Indicator DF022 bit(1) 1 */
+  u8 GLO_ind;         /* GLONASS Indicator DF023 bit(1) 1 */
+  u8 GAL_ind;         /* Reserved for Galileo Indicator DF024 bit(1) 1 */
+  u8 ref_stn_ind;     /* Reference-Station Indicator DF141 bit(1) 1 */
+  double arp_x;       /* Antenna Reference Point ECEF-X DF025 int38 38 */
+  u8 osc_ind;         /* Single Receiver Oscillator Indicator DF142 bit(1) 1 */
+  u8 reserved;        /* Reserved DF001 bit(1) 1 */
+  double arp_y;       /* Antenna Reference Point ECEF-Y DF026 int38 38 */
+  u8 quart_cycle_ind; /* Quarter Cycle Indicator DF364 bit(2) 2 */
+  double arp_z;       /* Antenna Reference Point ECEF-Z DF027 int38 38 */
 } rtcm_msg_1005;
 
 typedef struct {
   rtcm_msg_1005 msg_1005;
-  double ant_height; // Antenna Height DF028 uint16 16
+  double ant_height; /* Antenna Height DF028 uint16 16 */
 } rtcm_msg_1006;
 
 typedef struct {
-  u16 stn_id;    // Reference Station ID DF003 uint12 12
-  u8 desc_count; // Descriptor Counter N DF029 uint8 8 N <= 31
-  char desc[32]; // Antenna Descriptor DF030 char8(N) 8*N
-  u8 ant_id;     // Antenna Setup ID DF031 uint8 8
+  u16 stn_id;    /* Reference Station ID DF003 uint12 12 */
+  u8 desc_count; /* Descriptor Counter N DF029 uint8 8 N <= 31 */
+  char desc[32]; /* Antenna Descriptor DF030 char8(N) 8*N */
+  u8 ant_id;     /* Antenna Setup ID DF031 uint8 8 */
 } rtcm_msg_1007;
 
 typedef struct {
   rtcm_msg_1007 msg_1007;
-  u8 serial_count;     // Serial Number Counter M DF032 uint8 8 M <= 31
-  char serial_num[32]; // Antenna Serial Number DF033 char8(M) 8*M
+  u8 serial_count;     /* Serial Number Counter M DF032 uint8 8 M <= 31 */
+  char serial_num[32]; /* Antenna Serial Number DF033 char8(M) 8*M */
 } rtcm_msg_1008;
 
-#endif // PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H
+#endif /* PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H */
