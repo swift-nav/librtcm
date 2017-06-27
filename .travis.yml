@@ -38,4 +38,4 @@ install:
   - (cd haskell && stack build --only-dependencies)
 
 script:
-  - (cd ./c && mkdir ./build && cd ./build && cmake ../ && make -j4 && cd ../../haskell && stack build --test)
+  - bash ./travis.sh
