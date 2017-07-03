@@ -23,9 +23,13 @@ static void test_rtcm_1005(void);
 static void test_rtcm_1006(void);
 static void test_rtcm_1007(void);
 static void test_rtcm_1008(void);
+static void test_rtcm_1010(void);
+static void test_rtcm_1012(void);
 
 bool msgobs_equals(const rtcm_obs_message *msg_in,
                    const rtcm_obs_message *msg_out);
+bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
+                       const rtcm_obs_message *msg_out);
 bool msg1005_equals(const rtcm_msg_1005 *lhs, const rtcm_msg_1005 *rhs);
 bool msg1006_equals(const rtcm_msg_1006 *lhs, const rtcm_msg_1006 *rhs);
 bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs);

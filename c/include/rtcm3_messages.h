@@ -40,7 +40,6 @@ typedef union {
 
 typedef struct {
   u8 code;
-  u8 fcn;
   double pseudorange;
   double carrier_phase;
   u32 lock;
@@ -51,6 +50,7 @@ typedef struct {
 
 typedef struct {
   u8 svId;
+  u8 fcn;
   rtcm_freq_data obs[NUM_FREQS];
 } rtcm_sat_data;
 
