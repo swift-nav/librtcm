@@ -53,6 +53,48 @@ u64 getbitul(const u8 *buff, u32 pos, u8 len) {
   return bits;
 }
 
+/** Get bit field from buffer as a signed integer.
+ * Unpacks `len` bits at bit position `pos` from the start of the buffer.
+ * Maximum bit field length is 32 bits, i.e. `len <= 32`.
+ *
+ * This function sign extends the `len` bit field to a signed 32 bit integer.
+ *
+ * \param buff
+ * \param pos Position in buffer of start of bit field in bits.
+ * \param len Length of bit field in bits.
+ * \return Bit field as a signed value.
+ */
+s32 getbits(const u8 *buff, u32 pos, u8 len) {
+  s32 bits = (s32)getbitu(buff, pos, len);
+
+  /* Sign extend, taken from:
+   * http://graphics.stanford.edu/~seander/bithacks.html#VariableSignExtend
+   */
+  s32 m = 1u << (len - 1);
+  return (bits ^ m) - m;
+}
+
+/** Get bit field from buffer as a signed integer.
+ * Unpacks `len` bits at bit position `pos` from the start of the buffer.
+ * Maximum bit field length is 64 bits, i.e. `len <= 64`.
+ *
+ * This function sign extends the `len` bit field to a signed 64 bit integer.
+ *
+ * \param buff
+ * \param pos Position in buffer of start of bit field in bits.
+ * \param len Length of bit field in bits.
+ * \return Bit field as a signed value.
+ */
+s64 getbitsl(const u8 *buff, u32 pos, u8 len) {
+  s64 bits = (s64)getbitul(buff, pos, len);
+
+  /* Sign extend, taken from:
+   * http://graphics.stanford.edu/~seander/bithacks.html#VariableSignExtend
+   */
+  s64 m = ((u64)1) << (len - 1);
+  return (bits ^ m) - m;
+}
+
 void init_data(rtcm_sat_data *sat_data) {
   for (u8 freq = 0; freq < NUM_FREQS; ++freq) {
     sat_data->obs[freq].flags.data = 0;
@@ -126,73 +168,13 @@ void decode_basic_l2_freq_data(const u8 *buff, u16 *bit,
   return;
 }
 
-/** Get bit field from buffer as a signed integer.
- * Unpacks `len` bits at bit position `pos` from the start of the buffer.
- * Maximum bit field length is 32 bits, i.e. `len <= 32`.
- *
- * This function sign extends the `len` bit field to a signed 32 bit integer.
- *
- * \param buff
- * \param pos Position in buffer of start of bit field in bits.
- * \param len Length of bit field in bits.
- * \return Bit field as a signed value.
- */
-s32 getbits(const u8 *buff, u32 pos, u8 len) {
-  s32 bits = (s32)getbitu(buff, pos, len);
-
-  /* Sign extend, taken from:
-   * http://graphics.stanford.edu/~seander/bithacks.html#VariableSignExtend
-   */
-  s32 m = 1u << (len - 1);
-  return (bits ^ m) - m;
-}
-
-/** Get bit field from buffer as a signed integer.
- * Unpacks `len` bits at bit position `pos` from the start of the buffer.
- * Maximum bit field length is 64 bits, i.e. `len <= 64`.
- *
- * This function sign extends the `len` bit field to a signed 64 bit integer.
- *
- * \param buff
- * \param pos Position in buffer of start of bit field in bits.
- * \param len Length of bit field in bits.
- * \return Bit field as a signed value.
- */
-s64 getbitsl(const u8 *buff, u32 pos, u8 len) {
-  s64 bits = (s64)getbitul(buff, pos, len);
-
-  /* Sign extend, taken from:
-   * http://graphics.stanford.edu/~seander/bithacks.html#VariableSignExtend
-   */
-  s64 m = ((u64)1) << (len - 1);
-  return (bits ^ m) - m;
-}
-
-/** Read RTCM header for observation message types 1001..1004.
- *
- * The data message header will be read starting from byte zero of the
- * buffer. If the buffer also contains a frame header then be sure to pass a
- * pointer to the start of the data message rather than a pointer to the start
- * of the frame buffer. The RTCM observation header is 8 bytes (64 bits) long.
- *
- * All return values are written into the parameters passed by reference.
- *
- * \param buff A pointer to the RTCM data message buffer.
- * \param type Message type number, i.e. 1001..1004 (DF002).
- * \param id Reference station ID (DF003).
- * \param tow GPS time of week of the epoch (DF004).
- * \param sync Synchronous GNSS Flag (DF005).
- * \param n_sat Number of GPS satellites included in the message (DF006).
- * \param div_free GPS Divergence-free Smoothing Indicator (DF007).
- * \param smooth GPS Smoothing Interval indicator (DF008).
- */
 u16 rtcm3_read_header(const u8 *buff, rtcm_obs_header *header) {
   u16 bit = 0;
   header->msg_num = getbitu(buff, bit, 12);
   bit += 12;
   header->stn_id = getbitu(buff, bit, 12);
   bit += 12;
-  header->tow = getbitu(buff, bit, 30) / 1e3;
+  header->tow_ms = getbitu(buff, bit, 30);
   bit += 30;
   header->sync = getbitu(buff, bit, 1);
   bit += 1;
@@ -205,25 +187,13 @@ u16 rtcm3_read_header(const u8 *buff, rtcm_obs_header *header) {
   return bit;
 }
 
-/** Read RTCM header for observation message types 1009..1012.
- *
- * The data message header will be read starting from byte zero of the
- * buffer. If the buffer also contains a frame header then be sure to pass a
- * pointer to the start of the data message rather than a pointer to the start
- * of the frame buffer. The RTCM observation header is 8 bytes (61 bits) long.
- *
- * All return values are written into the parameters passed by reference.
- *
- * \param buff A pointer to the RTCM data message buffer.
- * \param header A pointer to the header to be completed
- */
 u16 rtcm3_read_glo_header(const u8 *buff, rtcm_obs_header *header) {
   u16 bit = 0;
   header->msg_num = getbitu(buff, bit, 12);
   bit += 12;
   header->stn_id = getbitu(buff, bit, 12);
   bit += 12;
-  header->tow = getbitu(buff, bit, 27) / 1e3;
+  header->tow_ms = getbitu(buff, bit, 27);
   bit += 27;
   header->sync = getbitu(buff, bit, 1);
   bit += 1;
@@ -236,6 +206,14 @@ u16 rtcm3_read_glo_header(const u8 *buff, rtcm_obs_header *header) {
   return bit;
 }
 
+/** Decode an RTCMv3 message type 1001 (L1-Only GPS RTK Observables)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
 s8 rtcm3_decode_1001(const u8 *buff, rtcm_obs_message *msg_1001) {
   u16 bit = 0;
   bit += rtcm3_read_header(buff, &msg_1001->header);
@@ -271,16 +249,11 @@ s8 rtcm3_decode_1001(const u8 *buff, rtcm_obs_message *msg_1001) {
 
 /** Decode an RTCMv3 message type 1002 (Extended L1-Only GPS RTK Observables)
  *
- * \param buff A pointer to the RTCM data message buffer.
- * \param id Reference station ID (DF003).
- * \param tow GPS time of week of epoch (DF004).
- * \param n_sat Number of GPS satellites included in the message (DF006).
- * \param nm Struct containing the observation.
- * \param sync Synchronous GNSS Flag (DF005).
+ * \param buff The input data buffer
+ * \param RTCM message struct
  * \return If valid then return 0.
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
- *          - `-2` : Message uses unsupported P(Y) code
  */
 s8 rtcm3_decode_1002(const u8 *buff, rtcm_obs_message *msg_1002) {
   u16 bit = 0;
@@ -321,6 +294,14 @@ s8 rtcm3_decode_1002(const u8 *buff, rtcm_obs_message *msg_1002) {
   return 0;
 }
 
+/** Decode an RTCMv3 message type 1003 (L1/L2 GPS RTK Observables)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
 s8 rtcm3_decode_1003(const u8 *buff, rtcm_obs_message *msg_1003) {
   u16 bit = 0;
   bit += rtcm3_read_header(buff, &msg_1003->header);
@@ -367,6 +348,14 @@ s8 rtcm3_decode_1003(const u8 *buff, rtcm_obs_message *msg_1003) {
   return 0;
 }
 
+/** Decode an RTCMv3 message type 1004 (Extended L1/L2 GPS RTK Observables)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
 s8 rtcm3_decode_1004(const u8 *buff, rtcm_obs_message *msg_1004) {
   u16 bit = 0;
   bit += rtcm3_read_header(buff, &msg_1004->header);
@@ -453,6 +442,14 @@ s8 rtcm3_decode_1005_base(const u8 *buff, rtcm_msg_1005 *msg_1005,
   return 0;
 }
 
+/** Decode an RTCMv3 message type 1005 (Stationary RTK Reference Station ARP)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
 s8 rtcm3_decode_1005(const u8 *buff, rtcm_msg_1005 *msg_1005) {
   u16 bit = 0;
   u16 msg_num = getbitu(buff, bit, 12);
@@ -465,6 +462,14 @@ s8 rtcm3_decode_1005(const u8 *buff, rtcm_msg_1005 *msg_1005) {
   return rtcm3_decode_1005_base(buff, msg_1005, &bit);
 }
 
+/** Decode an RTCMv3 message type 1005 (Stationary RTK Reference Station ARP with antenna height)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
 s8 rtcm3_decode_1006(const u8 *buff, rtcm_msg_1006 *msg_1006) {
   u16 bit = 0;
   u16 msg_num = getbitu(buff, bit, 12);
@@ -496,6 +501,14 @@ s8 rtcm3_decode_1007_base(const u8 *buff, rtcm_msg_1007 *msg_1007,
   return 0;
 }
 
+/** Decode an RTCMv3 message type 1007 (Antenna Descriptor)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
 s8 rtcm3_decode_1007(const u8 *buff, rtcm_msg_1007 *msg_1007) {
   u16 bit = 0;
   u16 msg_num = getbitu(buff, bit, 12);
@@ -510,6 +523,14 @@ s8 rtcm3_decode_1007(const u8 *buff, rtcm_msg_1007 *msg_1007) {
   return 0;
 }
 
+/** Decode an RTCMv3 message type 1008 (Antenna Descriptor & Serial Number)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
 s8 rtcm3_decode_1008(const u8 *buff, rtcm_msg_1008 *msg_1008) {
   u16 bit = 0;
   u16 msg_num = getbitu(buff, bit, 12);
@@ -529,6 +550,14 @@ s8 rtcm3_decode_1008(const u8 *buff, rtcm_msg_1008 *msg_1008) {
   return 0;
 }
 
+/** Decode an RTCMv3 message type 1010 (Extended L1-Only GLO RTK Observables)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
 s8 rtcm3_decode_1010(const u8 *buff, rtcm_obs_message *msg_1010) {
   u16 bit = 0;
   bit += rtcm3_read_glo_header(buff, &msg_1010->header);
@@ -568,6 +597,14 @@ s8 rtcm3_decode_1010(const u8 *buff, rtcm_obs_message *msg_1010) {
   return 0;
 }
 
+/** Decode an RTCMv3 message type 1012 (Extended L1/L2 GLO RTK Observables)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
 s8 rtcm3_decode_1012(const u8 *buff, rtcm_obs_message *msg_1012) {
   u16 bit = 0;
   bit += rtcm3_read_glo_header(buff, &msg_1012->header);

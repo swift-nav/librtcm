@@ -239,7 +239,7 @@ u16 rtcm3_write_header(const rtcm_obs_header *header, u8 num_sats, u8 *buff) {
   bit += 12;
   setbitu(buff, bit, 12, header->stn_id);
   bit += 12;
-  setbitu(buff, bit, 30, (u32)round(header->tow * 1e3));
+  setbitu(buff, bit, 30, (u32)round(header->tow_ms * 1e3));
   bit += 30;
   setbitu(buff, bit, 1, header->sync);
   bit += 1;
@@ -297,7 +297,7 @@ u16 rtcm3_write_glo_header(const rtcm_obs_header *header, u8 num_sats, u8 *buff)
   bit += 12;
   setbitu(buff, bit, 12, header->stn_id);
   bit += 12;
-  setbitu(buff, bit, 27, (u32)round(header->tow * 1e3));
+  setbitu(buff, bit, 27, (u32)round(header->tow_ms * 1e3));
   bit += 27;
   setbitu(buff, bit, 1, header->sync);
   bit += 1;
