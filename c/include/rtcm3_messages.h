@@ -21,7 +21,7 @@ typedef enum { L1_FREQ, L2_FREQ, NUM_FREQS } freq_enum;
 typedef struct {
   u16 msg_num;      /* Msg Num DF002 uint16 12*/
   u16 stn_id;       /* Station Id DF003 uint16 12*/
-  u32 tow;          /* GPS time of week DF004 uint32 30 */
+  u32 tow_ms;       /* GPS/GLO time of week DF004/DF034 uint32 30/27 */
   u8 sync;          /* Syncronous flag DF005 bit(1) 1 */
   u8 n_sat;         /* Number of satellites DF006 uint8 5 */
   u8 div_free;      /* Divergance free flag DF007 bit(1) 1 */

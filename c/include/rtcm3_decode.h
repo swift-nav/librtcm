@@ -15,13 +15,6 @@
 
 #include <rtcm3_messages.h>
 
-u32 getbitu(const u8 *buff, u32 pos, u8 len);
-u64 getbitul(const u8 *buff, u32 pos, u8 len);
-s32 getbits(const u8 *buff, u32 pos, u8 len);
-s64 getbitsl(const u8 *buff, u32 pos, u8 len);
-
-u16 rtcm3_read_header(const u8 *buff, rtcm_obs_header *header);
-
 s8 rtcm3_decode_1001(const u8 *buff, rtcm_obs_message *msg_1001);
 s8 rtcm3_decode_1002(const u8 *buff, rtcm_obs_message *msg_1002);
 s8 rtcm3_decode_1003(const u8 *buff, rtcm_obs_message *msg_1003);
