@@ -18,8 +18,8 @@ import           BasicPrelude          hiding (ByteString)
 import           Data.Binary
 import qualified Data.Binary.Bits.Get  as B
 import qualified Data.Binary.Bits.Put  as B
-import           Data.Binary.Get
-import           Data.Binary.Put
+import qualified Data.Binary.Get       as G
+import qualified Data.Binary.Put       as P
 import           Data.Bits
 import           Data.ByteString.Lazy
 import           Data.Int
@@ -59,10 +59,10 @@ instance Arbitrary Word24 where
   shrink    = shrinkIntegral
 
 decodeBits :: B.BitGet a -> ByteString -> a
-decodeBits = runGet . B.runBitGet
+decodeBits = G.runGet . B.runBitGet
 
 encodeBits :: B.BitPut () -> ByteString
-encodeBits = runPut . B.runBitPut
+encodeBits = P.runPut . B.runBitPut
 
 testInt8 :: TestTree
 testInt8 =
