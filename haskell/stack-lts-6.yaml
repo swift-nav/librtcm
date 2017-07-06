@@ -1,0 +1,7 @@
+resolver: lts-6.35
+packages:
+- .
+flags: {}
+pvp-bounds: lower
+extra-deps:
+- word24-2.0.1
