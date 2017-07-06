@@ -37,7 +37,7 @@ library
   ghc-options:         -Wall
   build-depends:       aeson
                      , array
-                     , base >= 4.7 && < 5
+                     , base >= 4.8 && < 5
                      , base64-bytestring
                      , basic-prelude
                      , binary
