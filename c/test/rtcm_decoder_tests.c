@@ -17,7 +17,8 @@
 #include <string.h>
 #include "rtcm_encoder.h"
 
-int main(void) {
+int main(void)
+{
   test_rtcm_1001();
   test_rtcm_1002();
   test_rtcm_1003();
@@ -30,7 +31,8 @@ int main(void) {
   test_rtcm_1012();
 }
 
-void test_rtcm_1001(void) {
+void test_rtcm_1001(void)
+{
   rtcm_obs_header header;
   header.msg_num = 1001;
   header.div_free = 0;
@@ -80,8 +82,8 @@ void test_rtcm_1001(void) {
   assert(ret == 0 && msgobs_equals(&msg1001, &msg1001_out));
 }
 
-void test_rtcm_1002(void) {
-
+void test_rtcm_1002(void)
+{
   rtcm_obs_header header;
   header.msg_num = 1002;
   header.div_free = 0;
@@ -137,8 +139,8 @@ void test_rtcm_1002(void) {
   assert(ret == 0 && msgobs_equals(&msg1002, &msg1002_out));
 }
 
-void test_rtcm_1003(void) {
-
+void test_rtcm_1003(void)
+{
   rtcm_obs_header header;
   header.msg_num = 1003;
   header.div_free = 0;
@@ -199,8 +201,8 @@ void test_rtcm_1003(void) {
   assert(ret == 0 && msgobs_equals(&msg1003, &msg1003_out));
 }
 
-void test_rtcm_1004(void) {
-
+void test_rtcm_1004(void)
+{
   rtcm_obs_header header;
   header.msg_num = 1004;
   header.div_free = 0;
@@ -271,7 +273,8 @@ void test_rtcm_1004(void) {
   assert(ret == 0 && msgobs_equals(&msg1004, &msg1004_out));
 }
 
-void test_rtcm_1005(void) {
+void test_rtcm_1005(void)
+{
   rtcm_msg_1005 msg1005;
 
   msg1005.stn_id = 5;
@@ -296,7 +299,8 @@ void test_rtcm_1005(void) {
   assert(ret == 0 && msg1005_equals(&msg1005, &msg1005_out));
 }
 
-void test_rtcm_1006(void) {
+void test_rtcm_1006(void)
+{
   rtcm_msg_1006 msg1006;
 
   msg1006.msg_1005.stn_id = 5;
@@ -322,7 +326,8 @@ void test_rtcm_1006(void) {
   assert(ret == 0 && msg1006_equals(&msg1006, &msg1006_out));
 }
 
-void test_rtcm_1007(void) {
+void test_rtcm_1007(void)
+{
   rtcm_msg_1007 msg1007;
 
   msg1007.stn_id = 1022;
@@ -340,7 +345,8 @@ void test_rtcm_1007(void) {
   assert(ret == 0 && msg1007_equals(&msg1007, &msg1007_out));
 }
 
-void test_rtcm_1008(void) {
+void test_rtcm_1008(void)
+{
   rtcm_msg_1008 msg1008;
 
   msg1008.msg_1007.stn_id = 22;
@@ -360,7 +366,8 @@ void test_rtcm_1008(void) {
   assert(ret == 0 && msg1008_equals(&msg1008, &msg1008_out));
 }
 
-void test_rtcm_1010(void) {
+void test_rtcm_1010(void)
+{
   rtcm_obs_header header;
   header.msg_num = 1010;
   header.div_free = 0;
@@ -419,7 +426,8 @@ void test_rtcm_1010(void) {
   assert(ret == 0 && msgobs_glo_equals(&msg1010, &msg1010_out));
 }
 
-void test_rtcm_1012(void) {
+void test_rtcm_1012(void)
+{
 
   rtcm_obs_header header;
   header.msg_num = 1012;
@@ -495,7 +503,8 @@ void test_rtcm_1012(void) {
 }
 
 bool msgobs_equals(const rtcm_obs_message *msg_in,
-                   const rtcm_obs_message *msg_out) {
+                   const rtcm_obs_message *msg_out)
+{
 
   if (msg_in->header.msg_num != msg_out->header.msg_num) {
     return false;
@@ -644,7 +653,8 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
 }
 
 bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
-                       const rtcm_obs_message *msg_out) {
+                       const rtcm_obs_message *msg_out)
+{
 
   if (msg_in->header.msg_num != msg_out->header.msg_num) {
     return false;
@@ -797,7 +807,8 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
   return true;
 }
 
-bool msg1005_equals(const rtcm_msg_1005 *lhs, const rtcm_msg_1005 *rhs) {
+bool msg1005_equals(const rtcm_msg_1005 *lhs, const rtcm_msg_1005 *rhs)
+{
   if (lhs->stn_id != rhs->stn_id) {
     return false;
   }
@@ -835,7 +846,8 @@ bool msg1005_equals(const rtcm_msg_1005 *lhs, const rtcm_msg_1005 *rhs) {
   return true;
 }
 
-bool msg1006_equals(const rtcm_msg_1006 *lhs, const rtcm_msg_1006 *rhs) {
+bool msg1006_equals(const rtcm_msg_1006 *lhs, const rtcm_msg_1006 *rhs)
+{
   if (fabs(lhs->ant_height - rhs->ant_height) > 0.00005) {
     return false;
   }
@@ -843,7 +855,8 @@ bool msg1006_equals(const rtcm_msg_1006 *lhs, const rtcm_msg_1006 *rhs) {
   return msg1005_equals(&lhs->msg_1005, &rhs->msg_1005);
 }
 
-bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs) {
+bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs)
+{
   if (lhs->stn_id != rhs->stn_id) {
     return false;
   }
@@ -862,7 +875,8 @@ bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs) {
   return true;
 }
 
-bool msg1008_equals(const rtcm_msg_1008 *lhs, const rtcm_msg_1008 *rhs) {
+bool msg1008_equals(const rtcm_msg_1008 *lhs, const rtcm_msg_1008 *rhs)
+{
   for (u8 ch = 0; ch < lhs->serial_count; ++ch) {
     if (lhs->serial_num[ch] != rhs->serial_num[ch]) {
       return false;
