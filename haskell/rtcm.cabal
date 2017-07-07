@@ -9,7 +9,7 @@ maintainer:            Swift Navigation <dev@swift-nav.com>
 copyright:             Copyright (C) 2015-2017 Swift Navigation, Inc.
 category:              Network
 build-type:            Simple
-cabal-version:         >= 1.10
+cabal-version:         >= 1.22
 description:
   Haskell bindings for Radio Technical Commission For Maritime
   Services (RTCM) standard, supporting GPS, GLONASS, Galileo and other
