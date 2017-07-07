@@ -38,7 +38,7 @@ void test_rtcm_1001(void) {
   header.smooth = 0;
   header.stn_id = 7;
   header.sync = 1;
-  header.tow_ms = 309000;
+  header.tow_ms = 309000000;
 
   rtcm_obs_message msg1001;
   memset((void *) &msg1001, 0, sizeof(msg1001));
@@ -89,7 +89,7 @@ void test_rtcm_1002(void) {
   header.smooth = 0;
   header.stn_id = 7;
   header.sync = 1;
-  header.tow_ms = 309000;
+  header.tow_ms = 309000000;
 
   rtcm_obs_message msg1002;
   memset((void *) &msg1002, 0, sizeof(msg1002));
@@ -146,7 +146,7 @@ void test_rtcm_1003(void) {
   header.smooth = 0;
   header.stn_id = 7;
   header.sync = 1;
-  header.tow_ms = 309000;
+  header.tow_ms = 309000000;
 
   rtcm_obs_message msg1003;
   memset((void *) &msg1003, 0, sizeof(msg1003));
@@ -208,7 +208,7 @@ void test_rtcm_1004(void) {
   header.smooth = 0;
   header.stn_id = 7;
   header.sync = 1;
-  header.tow_ms = 309000;
+  header.tow_ms = 309000000;
 
   rtcm_obs_message msg1004;
   memset((void *) &msg1004, 0, sizeof(msg1004));
@@ -368,7 +368,7 @@ void test_rtcm_1010(void) {
   header.smooth = 0;
   header.stn_id = 7;
   header.sync = 1;
-  header.tow_ms = 86399;
+  header.tow_ms = 86399000;
 
   rtcm_obs_message msg1010;
   memset((void *) &msg1010, 0, sizeof(msg1010));
@@ -428,7 +428,7 @@ void test_rtcm_1012(void) {
   header.smooth = 0;
   header.stn_id = 7;
   header.sync = 1;
-  header.tow_ms = 34700;
+  header.tow_ms = 34700000;
 
   rtcm_obs_message msg1012;
   memset((void *) &msg1012, 0, sizeof(msg1012));
