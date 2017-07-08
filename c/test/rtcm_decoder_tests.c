@@ -72,12 +72,12 @@ void test_rtcm_1001(void)
   msg1001.sats[2].obs[0].flags.valid_cp = 0;
   msg1001.sats[2].obs[0].flags.valid_lock = 0;
 
-  u8 buff[1024];
+  uint8_t buff[1024];
   memset(buff,0,1024);
   rtcm3_encode_1001(&msg1001, buff);
 
   rtcm_obs_message msg1001_out;
-  s8 ret = rtcm3_decode_1001(buff, &msg1001_out);
+  int8_t ret = rtcm3_decode_1001(buff, &msg1001_out);
 
   assert(ret == 0 && msgobs_equals(&msg1001, &msg1001_out));
 }
@@ -129,12 +129,12 @@ void test_rtcm_1002(void)
   msg1002.sats[2].obs[0].cnr = 50.2;
   msg1002.sats[2].obs[0].flags.valid_cnr = 0;
 
-  u8 buff[1024];
+  uint8_t buff[1024];
   memset(buff,0,1024);
   rtcm3_encode_1002(&msg1002, buff);
 
   rtcm_obs_message msg1002_out;
-  s8 ret = rtcm3_decode_1002(buff, &msg1002_out);
+  int8_t ret = rtcm3_decode_1002(buff, &msg1002_out);
 
   assert(ret == 0 && msgobs_equals(&msg1002, &msg1002_out));
 }
@@ -191,12 +191,12 @@ void test_rtcm_1003(void)
   msg1003.sats[2].obs[0].cnr = 50.2;
   msg1003.sats[2].obs[0].flags.valid_cnr = 0;
 
-  u8 buff[1024];
+  uint8_t buff[1024];
   memset(buff,0,1024);
   rtcm3_encode_1003(&msg1003, buff);
 
   rtcm_obs_message msg1003_out;
-  s8 ret = rtcm3_decode_1003(buff, &msg1003_out);
+  int8_t ret = rtcm3_decode_1003(buff, &msg1003_out);
 
   assert(ret == 0 && msgobs_equals(&msg1003, &msg1003_out));
 }
@@ -263,12 +263,12 @@ void test_rtcm_1004(void)
   msg1004.sats[2].obs[1].cnr = 54.2;
   msg1004.sats[2].obs[1].flags.valid_cnr = 1;
 
-  u8 buff[1024];
+  uint8_t buff[1024];
   memset(buff,0,1024);
   rtcm3_encode_1004(&msg1004, buff);
 
   rtcm_obs_message msg1004_out;
-  s8 ret = rtcm3_decode_1004(buff, &msg1004_out);
+  int8_t ret = rtcm3_decode_1004(buff, &msg1004_out);
 
   assert(ret == 0 && msgobs_equals(&msg1004, &msg1004_out));
 }
@@ -289,12 +289,12 @@ void test_rtcm_1005(void)
   msg1005.arp_y = -5578346.5578;
   msg1005.arp_z = 2578346.6757;
 
-  u8 buff[1024];
+  uint8_t buff[1024];
   memset(buff,0,1024);
   rtcm3_encode_1005(&msg1005, buff);
 
   rtcm_msg_1005 msg1005_out;
-  s8 ret = rtcm3_decode_1005(buff, &msg1005_out);
+  int8_t ret = rtcm3_decode_1005(buff, &msg1005_out);
 
   assert(ret == 0 && msg1005_equals(&msg1005, &msg1005_out));
 }
@@ -316,12 +316,12 @@ void test_rtcm_1006(void)
   msg1006.msg_1005.arp_z = 2578376.6757;
   msg1006.ant_height = 1.567;
 
-  u8 buff[1024];
+  uint8_t buff[1024];
   memset(buff,0,1024);
   rtcm3_encode_1006(&msg1006, buff);
 
   rtcm_msg_1006 msg1006_out;
-  s8 ret = rtcm3_decode_1006(buff, &msg1006_out);
+  int8_t ret = rtcm3_decode_1006(buff, &msg1006_out);
 
   assert(ret == 0 && msg1006_equals(&msg1006, &msg1006_out));
 }
@@ -335,12 +335,12 @@ void test_rtcm_1007(void)
   strcpy(msg1007.desc, "Something with 29 characters.");
   msg1007.ant_id = 254;
 
-  u8 buff[1024];
+  uint8_t buff[1024];
   memset(buff,0,1024);
   rtcm3_encode_1007(&msg1007, buff);
 
   rtcm_msg_1007 msg1007_out;
-  s8 ret = rtcm3_decode_1007(buff, &msg1007_out);
+  int8_t ret = rtcm3_decode_1007(buff, &msg1007_out);
 
   assert(ret == 0 && msg1007_equals(&msg1007, &msg1007_out));
 }
@@ -356,12 +356,12 @@ void test_rtcm_1008(void)
   msg1008.serial_count = 9;
   strcpy(msg1008.serial_num, "123456789");
 
-  u8 buff[1024];
+  uint8_t buff[1024];
   memset(buff,0,1024);
   rtcm3_encode_1008(&msg1008, buff);
 
   rtcm_msg_1008 msg1008_out;
-  s8 ret = rtcm3_decode_1008(buff, &msg1008_out);
+  int8_t ret = rtcm3_decode_1008(buff, &msg1008_out);
 
   assert(ret == 0 && msg1008_equals(&msg1008, &msg1008_out));
 }
@@ -416,12 +416,12 @@ void test_rtcm_1010(void)
   msg1010.sats[2].obs[0].cnr = 50.2;
   msg1010.sats[2].obs[0].flags.valid_cnr = 0;
 
-  u8 buff[1024];
+  uint8_t buff[1024];
   memset(buff,0,1024);
     rtcm3_encode_1010(&msg1010, buff);
 
   rtcm_obs_message msg1010_out;
-  s8 ret = rtcm3_decode_1010(buff, &msg1010_out);
+  int8_t ret = rtcm3_decode_1010(buff, &msg1010_out);
 
   assert(ret == 0 && msgobs_glo_equals(&msg1010, &msg1010_out));
 }
@@ -492,12 +492,12 @@ void test_rtcm_1012(void)
   msg1012.sats[2].obs[1].cnr = 54.2;
   msg1012.sats[2].obs[1].flags.valid_cnr = 1;
 
-  u8 buff[1024];
+  uint8_t buff[1024];
   memset(buff,0,1024);
   rtcm3_encode_1012(&msg1012, buff);
 
   rtcm_obs_message msg1012_out;
-  s8 ret = rtcm3_decode_1012(buff, &msg1012_out);
+  int8_t ret = rtcm3_decode_1012(buff, &msg1012_out);
 
   assert(ret == 0 && msgobs_glo_equals(&msg1012, &msg1012_out));
 }
@@ -523,8 +523,8 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
     return false;
   }
 
-  u8 num_sats = 0;
-  for (u8 i = 0; i < msg_in->header.n_sat; i++) {
+  uint8_t num_sats = 0;
+  for (uint8_t i = 0; i < msg_in->header.n_sat; i++) {
     flag_bf l1_flags = msg_in->sats[i].obs[L1_FREQ].flags;
     flag_bf l2_flags = msg_in->sats[i].obs[L2_FREQ].flags;
     if (l1_flags.valid_pr && l1_flags.valid_cp &&
@@ -542,8 +542,8 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
     return false;
   }
 
-  u8 out_sat_idx = 0;
-  for (u8 in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat; ++in_sat_idx) {
+  uint8_t out_sat_idx = 0;
+  for (uint8_t in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat; ++in_sat_idx) {
     flag_bf l1_flags = msg_in->sats[in_sat_idx].obs[L1_FREQ].flags;
     flag_bf l2_flags = msg_in->sats[in_sat_idx].obs[L2_FREQ].flags;
     if (!l1_flags.valid_pr || !l1_flags.valid_cp ||
@@ -555,14 +555,14 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
       return false;
     }
 
-    u8 amb = 0;
+    uint8_t amb = 0;
     if (msg_in->header.msg_num == 1001 || msg_in->header.msg_num == 1003) {
-      amb = (u8)roundl((msg_in->sats[in_sat_idx].obs[0].pseudorange -
+      amb = (uint8_t)roundl((msg_in->sats[in_sat_idx].obs[0].pseudorange -
                         msg_out->sats[out_sat_idx].obs[0].pseudorange) /
                        PRUNIT_GPS);
     }
 
-    for (u8 freq = 0; freq < NUM_FREQS; ++freq) {
+    for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {
       const rtcm_freq_data *in_freq = &msg_in->sats[in_sat_idx].obs[freq];
       const rtcm_freq_data *out_freq = &msg_out->sats[out_sat_idx].obs[freq];
 
@@ -673,8 +673,8 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
     return false;
   }
 
-  u8 num_sats = 0;
-  for (u8 i = 0; i < msg_in->header.n_sat; i++) {
+  uint8_t num_sats = 0;
+  for (uint8_t i = 0; i < msg_in->header.n_sat; i++) {
     flag_bf l1_flags = msg_in->sats[i].obs[L1_FREQ].flags;
     flag_bf l2_flags = msg_in->sats[i].obs[L2_FREQ].flags;
     if (l1_flags.valid_pr && l1_flags.valid_cp &&
@@ -692,8 +692,8 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
     return false;
   }
 
-  u8 out_sat_idx = 0;
-  for (u8 in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat; ++in_sat_idx) {
+  uint8_t out_sat_idx = 0;
+  for (uint8_t in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat; ++in_sat_idx) {
     flag_bf l1_flags = msg_in->sats[in_sat_idx].obs[L1_FREQ].flags;
     flag_bf l2_flags = msg_in->sats[in_sat_idx].obs[L2_FREQ].flags;
     if (!l1_flags.valid_pr || !l1_flags.valid_cp ||
@@ -709,14 +709,14 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
       return false;
     }
 
-    u8 amb = 0;
+    uint8_t amb = 0;
     if (msg_in->header.msg_num == 1009 || msg_in->header.msg_num == 1011) {
-      amb = (u8)roundl((msg_in->sats[in_sat_idx].obs[0].pseudorange -
+      amb = (uint8_t)roundl((msg_in->sats[in_sat_idx].obs[0].pseudorange -
                         msg_out->sats[out_sat_idx].obs[0].pseudorange) /
                        PRUNIT_GLO);
     }
 
-    for (u8 freq = 0; freq < NUM_FREQS; ++freq) {
+    for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {
       const rtcm_freq_data *in_freq = &msg_in->sats[in_sat_idx].obs[freq];
       const rtcm_freq_data *out_freq = &msg_out->sats[out_sat_idx].obs[freq];
 
@@ -863,7 +863,7 @@ bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs)
   if (lhs->desc_count != rhs->desc_count) {
     return false;
   }
-  for (u8 ch = 0; ch < lhs->desc_count; ++ch) {
+  for (uint8_t ch = 0; ch < lhs->desc_count; ++ch) {
     if (lhs->desc[ch] != rhs->desc[ch]) {
       return false;
     }
@@ -877,7 +877,7 @@ bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs)
 
 bool msg1008_equals(const rtcm_msg_1008 *lhs, const rtcm_msg_1008 *rhs)
 {
-  for (u8 ch = 0; ch < lhs->serial_count; ++ch) {
+  for (uint8_t ch = 0; ch < lhs->serial_count; ++ch) {
     if (lhs->serial_num[ch] != rhs->serial_num[ch]) {
       return false;
     }
