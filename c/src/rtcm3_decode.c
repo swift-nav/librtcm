@@ -24,7 +24,8 @@
  * \param len Length of bit field in bits.
  * \return Bit field as an unsigned value.
  */
-u32 getbitu(const u8 *buff, u32 pos, u8 len) {
+u32 getbitu(const u8 *buff, u32 pos, u8 len)
+{
   u32 bits = 0;
 
   for (u32 i = pos; i < pos + len; i++) {
@@ -43,7 +44,8 @@ u32 getbitu(const u8 *buff, u32 pos, u8 len) {
  * \param len Length of bit field in bits.
  * \return Bit field as an unsigned value.
  */
-u64 getbitul(const u8 *buff, u32 pos, u8 len) {
+u64 getbitul(const u8 *buff, u32 pos, u8 len)
+{
   u64 bits = 0;
 
   for (u32 i = pos; i < pos + len; i++) {
@@ -64,7 +66,8 @@ u64 getbitul(const u8 *buff, u32 pos, u8 len) {
  * \param len Length of bit field in bits.
  * \return Bit field as a signed value.
  */
-s32 getbits(const u8 *buff, u32 pos, u8 len) {
+s32 getbits(const u8 *buff, u32 pos, u8 len)
+{
   s32 bits = (s32)getbitu(buff, pos, len);
 
   /* Sign extend, taken from:
@@ -85,7 +88,8 @@ s32 getbits(const u8 *buff, u32 pos, u8 len) {
  * \param len Length of bit field in bits.
  * \return Bit field as a signed value.
  */
-s64 getbitsl(const u8 *buff, u32 pos, u8 len) {
+s64 getbitsl(const u8 *buff, u32 pos, u8 len)
+{
   s64 bits = (s64)getbitul(buff, pos, len);
 
   /* Sign extend, taken from:
@@ -95,13 +99,15 @@ s64 getbitsl(const u8 *buff, u32 pos, u8 len) {
   return (bits ^ m) - m;
 }
 
-void init_data(rtcm_sat_data *sat_data) {
+void init_data(rtcm_sat_data *sat_data)
+{
   for (u8 freq = 0; freq < NUM_FREQS; ++freq) {
     sat_data->obs[freq].flags.data = 0;
   }
 }
 
-static u32 from_lock_ind(u8 lock) {
+static u32 from_lock_ind(u8 lock)
+{
   if (lock < 24)
     return lock;
   if (lock < 48)
@@ -119,7 +125,8 @@ static u32 from_lock_ind(u8 lock) {
 
 void decode_basic_gps_l1_freq_data(const u8 *buff, u16 *bit,
                                    rtcm_freq_data *freq_data, u32 *pr,
-                                   s32 *phr_pr_diff) {
+                                   s32 *phr_pr_diff)
+{
   freq_data->code = getbitu(buff, *bit, 1);
   *bit += 1;
   *pr = getbitu(buff, *bit, 24);
@@ -136,7 +143,8 @@ void decode_basic_gps_l1_freq_data(const u8 *buff, u16 *bit,
 
 void decode_basic_glo_l1_freq_data(const u8 *buff, u16 *bit,
                                    rtcm_freq_data *freq_data, u32 *pr,
-                                   s32 *phr_pr_diff, u8 *fcn) {
+                                   s32 *phr_pr_diff, u8 *fcn)
+{
   freq_data->code = getbitu(buff, *bit, 1);
   *bit += 1;
   *fcn = getbitu(buff, *bit, 5);
@@ -153,7 +161,8 @@ void decode_basic_glo_l1_freq_data(const u8 *buff, u16 *bit,
 
 void decode_basic_l2_freq_data(const u8 *buff, u16 *bit,
                                rtcm_freq_data *freq_data, s32 *pr,
-                               s32 *phr_pr_diff) {
+                               s32 *phr_pr_diff)
+{
   freq_data->code = getbitu(buff, *bit, 2);
   *bit += 2;
   *pr = getbits(buff, *bit, 14);
@@ -168,7 +177,8 @@ void decode_basic_l2_freq_data(const u8 *buff, u16 *bit,
   return;
 }
 
-u16 rtcm3_read_header(const u8 *buff, rtcm_obs_header *header) {
+u16 rtcm3_read_header(const u8 *buff, rtcm_obs_header *header)
+{
   u16 bit = 0;
   header->msg_num = getbitu(buff, bit, 12);
   bit += 12;
@@ -187,7 +197,8 @@ u16 rtcm3_read_header(const u8 *buff, rtcm_obs_header *header) {
   return bit;
 }
 
-u16 rtcm3_read_glo_header(const u8 *buff, rtcm_obs_header *header) {
+u16 rtcm3_read_glo_header(const u8 *buff, rtcm_obs_header *header)
+{
   u16 bit = 0;
   header->msg_num = getbitu(buff, bit, 12);
   bit += 12;
@@ -214,7 +225,8 @@ u16 rtcm3_read_glo_header(const u8 *buff, rtcm_obs_header *header) {
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-s8 rtcm3_decode_1001(const u8 *buff, rtcm_obs_message *msg_1001) {
+s8 rtcm3_decode_1001(const u8 *buff, rtcm_obs_message *msg_1001)
+{
   u16 bit = 0;
   bit += rtcm3_read_header(buff, &msg_1001->header);
 
@@ -255,7 +267,8 @@ s8 rtcm3_decode_1001(const u8 *buff, rtcm_obs_message *msg_1001) {
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-s8 rtcm3_decode_1002(const u8 *buff, rtcm_obs_message *msg_1002) {
+s8 rtcm3_decode_1002(const u8 *buff, rtcm_obs_message *msg_1002)
+{
   u16 bit = 0;
   bit += rtcm3_read_header(buff, &msg_1002->header);
 
@@ -302,7 +315,8 @@ s8 rtcm3_decode_1002(const u8 *buff, rtcm_obs_message *msg_1002) {
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-s8 rtcm3_decode_1003(const u8 *buff, rtcm_obs_message *msg_1003) {
+s8 rtcm3_decode_1003(const u8 *buff, rtcm_obs_message *msg_1003)
+{
   u16 bit = 0;
   bit += rtcm3_read_header(buff, &msg_1003->header);
 
@@ -356,7 +370,8 @@ s8 rtcm3_decode_1003(const u8 *buff, rtcm_obs_message *msg_1003) {
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-s8 rtcm3_decode_1004(const u8 *buff, rtcm_obs_message *msg_1004) {
+s8 rtcm3_decode_1004(const u8 *buff, rtcm_obs_message *msg_1004)
+{
   u16 bit = 0;
   bit += rtcm3_read_header(buff, &msg_1004->header);
 
@@ -413,7 +428,8 @@ s8 rtcm3_decode_1004(const u8 *buff, rtcm_obs_message *msg_1004) {
 }
 
 s8 rtcm3_decode_1005_base(const u8 *buff, rtcm_msg_1005 *msg_1005,
-                          u16 *bit) {
+                          u16 *bit)
+{
   msg_1005->stn_id = getbitu(buff, *bit, 12);
   *bit += 12;
   msg_1005->ITRF = getbitu(buff, *bit, 6);
@@ -450,7 +466,8 @@ s8 rtcm3_decode_1005_base(const u8 *buff, rtcm_msg_1005 *msg_1005,
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-s8 rtcm3_decode_1005(const u8 *buff, rtcm_msg_1005 *msg_1005) {
+s8 rtcm3_decode_1005(const u8 *buff, rtcm_msg_1005 *msg_1005)
+{
   u16 bit = 0;
   u16 msg_num = getbitu(buff, bit, 12);
   bit += 12;
@@ -470,7 +487,8 @@ s8 rtcm3_decode_1005(const u8 *buff, rtcm_msg_1005 *msg_1005) {
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-s8 rtcm3_decode_1006(const u8 *buff, rtcm_msg_1006 *msg_1006) {
+s8 rtcm3_decode_1006(const u8 *buff, rtcm_msg_1006 *msg_1006)
+{
   u16 bit = 0;
   u16 msg_num = getbitu(buff, bit, 12);
   bit += 12;
@@ -486,7 +504,8 @@ s8 rtcm3_decode_1006(const u8 *buff, rtcm_msg_1006 *msg_1006) {
 }
 
 s8 rtcm3_decode_1007_base(const u8 *buff, rtcm_msg_1007 *msg_1007,
-                          u16 *bit) {
+                          u16 *bit)
+{
   msg_1007->stn_id = getbitu(buff, *bit, 12);
   *bit += 12;
   msg_1007->desc_count = getbitu(buff, *bit, 8);
@@ -509,7 +528,8 @@ s8 rtcm3_decode_1007_base(const u8 *buff, rtcm_msg_1007 *msg_1007,
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-s8 rtcm3_decode_1007(const u8 *buff, rtcm_msg_1007 *msg_1007) {
+s8 rtcm3_decode_1007(const u8 *buff, rtcm_msg_1007 *msg_1007)
+{
   u16 bit = 0;
   u16 msg_num = getbitu(buff, bit, 12);
   bit += 12;
@@ -531,7 +551,8 @@ s8 rtcm3_decode_1007(const u8 *buff, rtcm_msg_1007 *msg_1007) {
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-s8 rtcm3_decode_1008(const u8 *buff, rtcm_msg_1008 *msg_1008) {
+s8 rtcm3_decode_1008(const u8 *buff, rtcm_msg_1008 *msg_1008)
+{
   u16 bit = 0;
   u16 msg_num = getbitu(buff, bit, 12);
   bit += 12;
@@ -558,7 +579,8 @@ s8 rtcm3_decode_1008(const u8 *buff, rtcm_msg_1008 *msg_1008) {
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-s8 rtcm3_decode_1010(const u8 *buff, rtcm_obs_message *msg_1010) {
+s8 rtcm3_decode_1010(const u8 *buff, rtcm_obs_message *msg_1010)
+{
   u16 bit = 0;
   bit += rtcm3_read_glo_header(buff, &msg_1010->header);
 
@@ -605,7 +627,8 @@ s8 rtcm3_decode_1010(const u8 *buff, rtcm_obs_message *msg_1010) {
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-s8 rtcm3_decode_1012(const u8 *buff, rtcm_obs_message *msg_1012) {
+s8 rtcm3_decode_1012(const u8 *buff, rtcm_obs_message *msg_1012)
+{
   u16 bit = 0;
   bit += rtcm3_read_glo_header(buff, &msg_1012->header);
 

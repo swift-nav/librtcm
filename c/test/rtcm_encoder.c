@@ -22,7 +22,8 @@
  * \param len Length of bit field in bits.
  * \param data Unsigned integer to be packed into bit field.
  */
-void setbitu(u8 *buff, u32 pos, u32 len, u32 data) {
+void setbitu(u8 *buff, u32 pos, u32 len, u32 data)
+{
   u32 mask = 1u << (len - 1);
 
   if (len <= 0 || 32 < len)
@@ -45,7 +46,8 @@ void setbitu(u8 *buff, u32 pos, u32 len, u32 data) {
  * \param len Length of bit field in bits.
  * \param data Unsigned integer to be packed into bit field.
  */
-void setbitul(u8 *buff, u32 pos, u32 len, u64 data) {
+void setbitul(u8 *buff, u32 pos, u32 len, u64 data)
+{
   u64 mask = ((u64)1) << (len - 1);
 
   if (len <= 0 || 64 < len)
@@ -68,7 +70,8 @@ void setbitul(u8 *buff, u32 pos, u32 len, u64 data) {
  * \param len Length of bit field in bits.
  * \param data Signed integer to be packed into bit field.
  */
-void setbits(u8 *buff, u32 pos, u32 len, s32 data) {
+void setbits(u8 *buff, u32 pos, u32 len, s32 data)
+{
   setbitu(buff, pos, len, (u32)data);
 }
 
@@ -81,7 +84,8 @@ void setbits(u8 *buff, u32 pos, u32 len, s32 data) {
  * \param len Length of bit field in bits.
  * \param data Signed integer to be packed into bit field.
  */
-void setbitsl(u8 *buff, u32 pos, u32 len, s64 data) {
+void setbitsl(u8 *buff, u32 pos, u32 len, s64 data)
+{
   setbitul(buff, pos, len, (u64)data);
 }
 
@@ -91,7 +95,8 @@ void setbitsl(u8 *buff, u32 pos, u32 len, s64 data) {
  * \param time Lock time in seconds.
  * \return Lock Time Indicator value.
  */
-static u8 to_lock_ind(u32 time) {
+static u8 to_lock_ind(u32 time)
+{
   if (time < 24)
     return time;
   if (time < 72)
@@ -108,7 +113,8 @@ static u8 to_lock_ind(u32 time) {
 }
 
 void encode_basic_freq_data(const rtcm_freq_data *freq_data, const double freq,
-                            const double *l1_pr, u8 *buff, u16 *bit) {
+                            const double *l1_pr, u8 *buff, u16 *bit)
+{
 
   /* Calculate GPS Integer L1 Pseudorange Modulus Ambiguity (DF014). */
   u8 amb = (u8)(*l1_pr / PRUNIT_GPS);
@@ -148,8 +154,8 @@ void encode_basic_freq_data(const rtcm_freq_data *freq_data, const double freq,
 }
 
 void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data, const double freq,
-                                const double *l1_pr, const u8 fcn, u8 *buff, u16 *bit) {
-
+                                const double *l1_pr, const u8 fcn, u8 *buff, u16 *bit)
+{
   bool L1 = fabs(freq - GLO_L1_FREQ) < 0.01;
   /* Calculate GPS Integer L1 Pseudorange Modulus Ambiguity (DF044). */
   u8 amb = (u8)(*l1_pr / PRUNIT_GLO);
@@ -233,13 +239,14 @@ void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data, const double fr
  * \param num_sats number of satellites in message
  * \param buff A pointer to the RTCM data message buffer.
  */
-u16 rtcm3_write_header(const rtcm_obs_header *header, u8 num_sats, u8 *buff) {
+u16 rtcm3_write_header(const rtcm_obs_header *header, u8 num_sats, u8 *buff)
+{
   u16 bit = 0;
   setbitu(buff, bit, 12, header->msg_num);
   bit += 12;
   setbitu(buff, bit, 12, header->stn_id);
   bit += 12;
-  setbitu(buff, bit, 30, (u32)round(header->tow_ms * 1e3));
+  setbitu(buff, bit, 30, (u32)round(header->tow_ms));
   bit += 30;
   setbitu(buff, bit, 1, header->sync);
   bit += 1;
@@ -291,13 +298,14 @@ u16 rtcm3_write_header(const rtcm_obs_header *header, u8 num_sats, u8 *buff) {
  * \param num_sats number of satellites in message
  * \param buff A pointer to the RTCM data message buffer.
  */
-u16 rtcm3_write_glo_header(const rtcm_obs_header *header, u8 num_sats, u8 *buff) {
+u16 rtcm3_write_glo_header(const rtcm_obs_header *header, u8 num_sats, u8 *buff)
+{
   u16 bit = 0;
   setbitu(buff, bit, 12, header->msg_num);
   bit += 12;
   setbitu(buff, bit, 12, header->stn_id);
   bit += 12;
-  setbitu(buff, bit, 27, (u32)round(header->tow_ms * 1e3));
+  setbitu(buff, bit, 27, (u32)round(header->tow_ms));
   bit += 27;
   setbitu(buff, bit, 1, header->sync);
   bit += 1;
@@ -310,7 +318,8 @@ u16 rtcm3_write_glo_header(const rtcm_obs_header *header, u8 num_sats, u8 *buff)
   return bit;
 }
 
-u16 rtcm3_encode_1001(const rtcm_obs_message *msg_1001, u8 *buff) {
+u16 rtcm3_encode_1001(const rtcm_obs_message *msg_1001, u8 *buff)
+{
   u16 bit = 64; /* Start at end of header. */
 
   u8 num_sats = 0;
@@ -344,7 +353,8 @@ u16 rtcm3_encode_1001(const rtcm_obs_message *msg_1001, u8 *buff) {
  * \param sync Synchronous GNSS Flag (DF005).
  * \return The message length in bytes.
  */
-u16 rtcm3_encode_1002(const rtcm_obs_message *msg_1002, u8 *buff) {
+u16 rtcm3_encode_1002(const rtcm_obs_message *msg_1002, u8 *buff)
+{
   u16 bit = 64; /* Start at end of header. */
 
   u8 num_sats = 0;
@@ -376,7 +386,8 @@ u16 rtcm3_encode_1002(const rtcm_obs_message *msg_1002, u8 *buff) {
   return (bit + 7) / 8;
 }
 
-u16 rtcm3_encode_1003(const rtcm_obs_message *msg_1003, u8 *buff) {
+u16 rtcm3_encode_1003(const rtcm_obs_message *msg_1003, u8 *buff)
+{
   u16 bit = 64; /* Start at end of header. */
 
   u8 num_sats = 0;
@@ -403,7 +414,8 @@ u16 rtcm3_encode_1003(const rtcm_obs_message *msg_1003, u8 *buff) {
   return (bit + 7) / 8;
 }
 
-u16 rtcm3_encode_1004(const rtcm_obs_message *msg_1004, u8 *buff) {
+u16 rtcm3_encode_1004(const rtcm_obs_message *msg_1004, u8 *buff)
+{
   u16 bit = 64; /* Start at end of header. */
 
   u8 num_sats = 0;
@@ -445,7 +457,8 @@ u16 rtcm3_encode_1004(const rtcm_obs_message *msg_1004, u8 *buff) {
 }
 
 u16 rtcm3_encode_1005_base(const rtcm_msg_1005 *msg_1005, u8 *buff,
-                           u16 *bit) {
+                           u16 *bit)
+{
   setbitu(buff, *bit, 12, msg_1005->stn_id);
   *bit += 12;
   setbitu(buff, *bit, 6, msg_1005->ITRF);
@@ -475,14 +488,16 @@ u16 rtcm3_encode_1005_base(const rtcm_msg_1005 *msg_1005, u8 *buff,
   return (*bit + 7) / 8;
 }
 
-u16 rtcm3_encode_1005(const rtcm_msg_1005 *msg_1005, u8 *buff) {
+u16 rtcm3_encode_1005(const rtcm_msg_1005 *msg_1005, u8 *buff)
+{
   u16 bit = 0;
   setbitu(buff, bit, 12, 1005);
   bit += 12;
   return rtcm3_encode_1005_base(msg_1005, buff, &bit);
 }
 
-u16 rtcm3_encode_1006(const rtcm_msg_1006 *msg_1006, u8 *buff) {
+u16 rtcm3_encode_1006(const rtcm_msg_1006 *msg_1006, u8 *buff)
+{
   u16 bit = 0;
   setbitu(buff, bit, 12, 1006);
   bit += 12;
@@ -495,7 +510,8 @@ u16 rtcm3_encode_1006(const rtcm_msg_1006 *msg_1006, u8 *buff) {
 }
 
 u16 rtcm3_encode_1007_base(const rtcm_msg_1007 *msg_1007, u8 *buff,
-                           u16 *bit) {
+                           u16 *bit)
+{
   setbitu(buff, *bit, 12, msg_1007->stn_id);
   *bit += 12;
   setbitu(buff, *bit, 8, msg_1007->desc_count);
@@ -511,14 +527,16 @@ u16 rtcm3_encode_1007_base(const rtcm_msg_1007 *msg_1007, u8 *buff,
   return (*bit + 7) / 8;
 }
 
-u16 rtcm3_encode_1007(const rtcm_msg_1007 *msg_1007, u8 *buff) {
+u16 rtcm3_encode_1007(const rtcm_msg_1007 *msg_1007, u8 *buff)
+{
   u16 bit = 0;
   setbitu(buff, bit, 12, 1007);
   bit += 12;
   return rtcm3_encode_1007_base(msg_1007, buff, &bit);
 }
 
-u16 rtcm3_encode_1008(const rtcm_msg_1008 *msg_1008, u8 *buff) {
+u16 rtcm3_encode_1008(const rtcm_msg_1008 *msg_1008, u8 *buff)
+{
   u16 bit = 0;
   setbitu(buff, bit, 12, 1008);
   bit += 12;
@@ -534,7 +552,8 @@ u16 rtcm3_encode_1008(const rtcm_msg_1008 *msg_1008, u8 *buff) {
   return (bit + 7) / 8;
 }
 
-u16 rtcm3_encode_1010(const rtcm_obs_message *msg_1010, u8 *buff){
+u16 rtcm3_encode_1010(const rtcm_obs_message *msg_1010, u8 *buff)
+{
   u16 bit = 61; /* Start at end of header. */
 
   u8 num_sats = 0;
@@ -567,7 +586,8 @@ u16 rtcm3_encode_1010(const rtcm_obs_message *msg_1010, u8 *buff){
   return (bit + 7) / 8;
 }
 
-u16 rtcm3_encode_1012(const rtcm_obs_message *msg_1012, u8 *buff){
+u16 rtcm3_encode_1012(const rtcm_obs_message *msg_1012, u8 *buff)
+{
   u16 bit = 61; /* Start at end of header. */
 
   u8 num_sats = 0;
