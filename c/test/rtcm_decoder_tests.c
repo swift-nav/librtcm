@@ -16,6 +16,7 @@
 #include <rtcm3_decode.h>
 #include <string.h>
 #include "rtcm_encoder.h"
+#include <stdio.h>
 
 int main(void)
 {
@@ -29,6 +30,7 @@ int main(void)
   test_rtcm_1008();
   test_rtcm_1010();
   test_rtcm_1012();
+  test_rtcm_1230();
 }
 
 void test_rtcm_1001(void)
@@ -502,6 +504,28 @@ void test_rtcm_1012(void)
   assert(ret == 0 && msgobs_glo_equals(&msg1012, &msg1012_out));
 }
 
+void test_rtcm_1230(void)
+{
+  rtcm_msg_1230 msg1230;
+
+  msg1230.stn_id = 22;
+  msg1230.bias_indicator = 0;
+  msg1230.fdma_signal_mask = 0x0F;
+  msg1230.L1_CA_cpb = 35.32;
+  msg1230.L1_P_cpb = 66.32;
+  msg1230.L2_CA_cpb = 34.33;
+  msg1230.L2_P_cpb = -29.32;
+
+  uint8_t buff[1024];
+  memset(buff,0,1024);
+  rtcm3_encode_1230(&msg1230, buff);
+
+  rtcm_msg_1230 msg1230_out;
+  int8_t ret = rtcm3_decode_1230(buff, &msg1230_out);
+
+  assert(ret == 0 && msg1230_equals(&msg1230, &msg1230_out));
+}
+
 bool msgobs_equals(const rtcm_obs_message *msg_in,
                    const rtcm_obs_message *msg_out)
 {
@@ -884,4 +908,52 @@ bool msg1008_equals(const rtcm_msg_1008 *lhs, const rtcm_msg_1008 *rhs)
   }
 
   return msg1007_equals(&lhs->msg_1007, &rhs->msg_1007);
+}
+
+bool msg1230_equals(const rtcm_msg_1230 *lhs, const rtcm_msg_1230 *rhs)
+{
+  if (lhs->stn_id != rhs->stn_id) {
+    printf("1230 Station ID's not equal %u %u\n",lhs->stn_id,rhs->stn_id);
+    return false;
+  }
+
+  if (lhs->bias_indicator != rhs->bias_indicator) {
+    printf("1230 Bias indicator fields not equal %u %u\n",lhs->bias_indicator,rhs->bias_indicator);
+    return false;
+  }
+
+  if (lhs->fdma_signal_mask != rhs->fdma_signal_mask) {
+    printf("1230 FDMA signal mask not equal %u %u\n",lhs->fdma_signal_mask,rhs->fdma_signal_mask);
+    return false;
+  }
+
+  if (lhs->fdma_signal_mask & 0x08) {
+    if( lhs->L1_CA_cpb - rhs->L1_CA_cpb > 0.01 ) {
+      printf("1230 L1 CA code phase bias not equal %5.3f %5.3f\n",lhs->L1_CA_cpb,rhs->L1_CA_cpb);
+      return false;
+    }
+  }
+
+  if (lhs->fdma_signal_mask & 0x04) {
+    if( lhs->L1_P_cpb - rhs->L1_P_cpb > 0.01) {
+      printf("1230 L1 P code phase bias not equal %5.3f %5.3f\n",lhs->L1_P_cpb,rhs->L1_P_cpb);
+      return false;
+    }
+  }
+
+  if (lhs->fdma_signal_mask & 0x02) {
+    if( lhs->L2_CA_cpb - rhs->L2_CA_cpb > 0.01) {
+      printf("1230 L2 CA code phase bias not equal %5.3f %5.3f\n",lhs->L2_CA_cpb,rhs->L2_CA_cpb);
+      return false;
+    }
+  }
+
+  if (lhs->fdma_signal_mask & 0x01) {
+    if( lhs->L2_P_cpb - rhs->L2_P_cpb > 0.01) {
+      printf("1230 L2 P code phase bias not equal %5.3f %5.3f\n",lhs->L2_P_cpb,rhs->L2_P_cpb);
+      return false;
+    }
+  }
+
+  return true;
 }

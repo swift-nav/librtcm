@@ -25,5 +25,6 @@ int8_t rtcm3_decode_1007(const uint8_t *buff, rtcm_msg_1007 *msg_1007);
 int8_t rtcm3_decode_1008(const uint8_t *buff, rtcm_msg_1008 *msg_1008);
 int8_t rtcm3_decode_1010(const uint8_t *buff, rtcm_obs_message *msg_1010);
 int8_t rtcm3_decode_1012(const uint8_t *buff, rtcm_obs_message *msg_1012);
+int8_t rtcm3_decode_1230(const uint8_t *buff, rtcm_msg_1230 *msg_1230);
 
 #endif /* SWIFTNAV_RTCM3_DECODE_H */

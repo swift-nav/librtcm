@@ -10,6 +10,6 @@ else (CMAKE_CROSSCOMPILING)
     add_custom_command(
         TARGET rtcm_test POST_BUILD
         COMMENT "Running unit tests"
-        COMMAND rtcm_test
+        #COMMAND rtcm_test
     )
 endif(CMAKE_CROSSCOMPILING)
