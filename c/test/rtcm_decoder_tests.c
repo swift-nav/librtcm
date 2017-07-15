@@ -17,6 +17,7 @@
 #include <string.h>
 #include "rtcm_encoder.h"
 #include <stdio.h>
+#include <rtcm3_messages.h>
 
 int main(void)
 {
@@ -520,10 +521,19 @@ void test_rtcm_1230(void)
   memset(buff,0,1024);
   rtcm3_encode_1230(&msg1230, buff);
 
-  rtcm_msg_1230 msg1230_out;
-  int8_t ret = rtcm3_decode_1230(buff, &msg1230_out);
+  rtcm_msg_1230 msg1230_out_1;
+  int8_t ret = rtcm3_decode_1230(buff, &msg1230_out_1);
 
-  assert(ret == 0 && msg1230_equals(&msg1230, &msg1230_out));
+  assert(ret == 0 && msg1230_equals(&msg1230, &msg1230_out_1));
+
+  msg1230.fdma_signal_mask = 0x0D;
+  memset(buff,0,1024);
+  rtcm3_encode_1230(&msg1230, buff);
+
+  rtcm_msg_1230 msg1230_out_2;
+  ret = rtcm3_decode_1230(buff, &msg1230_out_2);
+
+  assert(ret == 0 && msg1230_equals(&msg1230, &msg1230_out_2));
 }
 
 bool msgobs_equals(const rtcm_obs_message *msg_in,
@@ -928,28 +938,28 @@ bool msg1230_equals(const rtcm_msg_1230 *lhs, const rtcm_msg_1230 *rhs)
   }
 
   if (lhs->fdma_signal_mask & 0x08) {
-    if( lhs->L1_CA_cpb - rhs->L1_CA_cpb > 0.01 ) {
+    if (fabs(lhs->L1_CA_cpb - rhs->L1_CA_cpb) > 0.015 ) {
       printf("1230 L1 CA code phase bias not equal %5.3f %5.3f\n",lhs->L1_CA_cpb,rhs->L1_CA_cpb);
       return false;
     }
   }
 
   if (lhs->fdma_signal_mask & 0x04) {
-    if( lhs->L1_P_cpb - rhs->L1_P_cpb > 0.01) {
+    if (fabs(lhs->L1_P_cpb - rhs->L1_P_cpb) > 0.015) {
       printf("1230 L1 P code phase bias not equal %5.3f %5.3f\n",lhs->L1_P_cpb,rhs->L1_P_cpb);
       return false;
     }
   }
 
   if (lhs->fdma_signal_mask & 0x02) {
-    if( lhs->L2_CA_cpb - rhs->L2_CA_cpb > 0.01) {
+    if (fabs(lhs->L2_CA_cpb - rhs->L2_CA_cpb) > 0.015) {
       printf("1230 L2 CA code phase bias not equal %5.3f %5.3f\n",lhs->L2_CA_cpb,rhs->L2_CA_cpb);
       return false;
     }
   }
 
   if (lhs->fdma_signal_mask & 0x01) {
-    if( lhs->L2_P_cpb - rhs->L2_P_cpb > 0.01) {
+    if (fabs(lhs->L2_P_cpb - rhs->L2_P_cpb) > 0.015) {
       printf("1230 L2 P code phase bias not equal %5.3f %5.3f\n",lhs->L2_P_cpb,rhs->L2_P_cpb);
       return false;
     }
