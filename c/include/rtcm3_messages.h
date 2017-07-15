@@ -93,4 +93,14 @@ typedef struct {
   char serial_num[32]; /* Antenna Serial Number DF033 char8(M) 8*M */
 } rtcm_msg_1008;
 
+typedef struct {
+  uint16_t stn_id;
+  uint8_t bias_indicator;
+  uint8_t fdma_signal_mask;
+  double L1_CA_cpb;
+  double L1_P_cpb;
+  double L2_CA_cpb;
+  double L2_P_cpb;
+} rtcm_msg_1230;
+
 #endif /* PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H */

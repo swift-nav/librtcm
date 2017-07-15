@@ -685,3 +685,49 @@ int8_t rtcm3_decode_1012(const uint8_t *buff, rtcm_obs_message *msg_1012)
   return 0;
 }
 
+/** Decode an RTCMv3 message type 1230 (Code-Phase Bias Message)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
+int8_t rtcm3_decode_1230(const uint8_t *buff, rtcm_msg_1230 *msg_1230)
+{
+  uint16_t bit = 0;
+  uint16_t msg_num = getbitu(buff, bit, 12);
+  bit += 12;
+
+  if (msg_num != 1230)
+    /* Unexpected message type. */
+    return -1;
+
+  msg_1230->stn_id = getbitu(buff, bit, 12);
+  bit += 12;
+  msg_1230->bias_indicator = getbitu(buff, bit, 1);
+  bit += 1;
+  /* 3 Reserved bits */
+  bit+= 3;
+  msg_1230->fdma_signal_mask = getbitu(buff, bit, 4);
+  bit += 4;
+  if(msg_1230->fdma_signal_mask & 0x08) {
+    msg_1230->L1_CA_cpb = getbits(buff, bit, 16) * 0.02;
+    bit += 16;
+  }
+  if(msg_1230->fdma_signal_mask & 0x04) {
+    msg_1230->L1_P_cpb = getbits(buff, bit, 16) * 0.02;
+    bit += 16;
+  }
+  if(msg_1230->fdma_signal_mask & 0x02) {
+    msg_1230->L2_CA_cpb = getbits(buff, bit, 16) * 0.02;
+    bit += 16;
+  }
+  if(msg_1230->fdma_signal_mask & 0x01) {
+    msg_1230->L2_P_cpb = getbits(buff, bit, 16) * 0.02;
+    bit += 16;
+  }
+
+  return 0;
+}
+
