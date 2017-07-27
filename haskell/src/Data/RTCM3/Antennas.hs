@@ -24,6 +24,8 @@ import qualified Data.Binary.Bits.Put as B
 import           Data.RTCM3.Extras
 import           Data.RTCM3.TH
 
+{-# ANN module ("HLint: ignore Use camelCase"::String) #-}
+
 -- | AntennaReference.
 --
 -- Stationary antenna reference point information.
@@ -88,7 +90,7 @@ instance BinaryBit AntennaReference where
 -- | ExtAntennaReference.
 --
 -- Extended stationary antenna reference point information.
-data ExtAntennaReference = ExtAntennaReference
+newtype ExtAntennaReference = ExtAntennaReference
   { _extAntennaReference_height :: Word16
     -- ^ Antenna height.
   } deriving ( Show, Read, Eq )
@@ -207,7 +209,7 @@ msg1005 = 1005
 -- | Msg1005.
 --
 -- RTCMv3 message 1005.
-data Msg1005 = Msg1005
+newtype Msg1005 = Msg1005
   { _msg1005_reference :: AntennaReference
     -- ^ Antenna reference.
   } deriving ( Show, Read, Eq )
@@ -259,7 +261,7 @@ msg1007 = 1007
 -- | Msg1007.
 --
 -- RTCMv3 message 1007.
-data Msg1007 = Msg1007
+newtype Msg1007 = Msg1007
   { _msg1007_descriptor :: AntennaDescriptor
     -- ^ Antenna descriptor.
   } deriving ( Show, Read, Eq )
