@@ -25,6 +25,8 @@ import           Data.Int
 import           Data.RTCM3.Extras
 import           Data.RTCM3.TH
 
+{-# ANN module ("HLint: ignore Use camelCase"::String) #-}
+
 -- | GpsEphemerisHeader.
 --
 -- GPS and Glonass Ephemeris header.

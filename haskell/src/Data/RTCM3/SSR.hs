@@ -24,6 +24,8 @@ import qualified Data.Binary.Bits.Put as B
 import           Data.RTCM3.Extras
 import           Data.RTCM3.TH
 
+{-# ANN module ("HLint: ignore Use camelCase"::String) #-}
+
 -- | GpsOrbitCorrectionHeader.
 --
 -- GPS orbit correction header.

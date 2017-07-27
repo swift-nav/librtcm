@@ -26,6 +26,8 @@ import           Data.Int
 import           Data.RTCM3.Extras
 import           Data.RTCM3.TH
 
+{-# ANN module ("HLint: ignore Use camelCase"::String) #-}
+
 -- | GpsObservationHeader.
 --
 -- GPS RTK observation header.
@@ -157,7 +159,7 @@ instance BinaryBit GpsL2Observation where
 -- | GpsL2ExtObservation.
 --
 -- GPS RTK L2 extended observation.
-data GpsL2ExtObservation = GpsL2ExtObservation
+newtype GpsL2ExtObservation = GpsL2ExtObservation
   { _gpsL2ExtObservation_cnr :: Word8
     -- ^ GPS L2 carrier-to-noise ratio.
   } deriving ( Show, Read, Eq )
@@ -308,7 +310,7 @@ instance BinaryBit GlonassL2Observation where
 -- | GlonassL2ExtObservation.
 --
 -- GLONASS RTK L2 extended observation.
-data GlonassL2ExtObservation = GlonassL2ExtObservation
+newtype GlonassL2ExtObservation = GlonassL2ExtObservation
   { _glonassL2ExtObservation_cnr :: Word8
     -- ^ GLONASS L2 carrier-to-noise ratio.
   } deriving ( Show, Read, Eq )
@@ -825,7 +827,7 @@ msg1230 = 1230
 -- | Msg1230.
 --
 -- RTCMv3 message 1230.
-data Msg1230 = Msg1230
+newtype Msg1230 = Msg1230
   { _msg1230_bias :: GlonassBias
     -- ^ GLONASS bias.
   } deriving ( Show, Read, Eq )
@@ -838,7 +840,7 @@ instance Binary Msg1230 where
     _msg1230_bias <- getBits 0
     return Msg1230 {..}
 
-  put Msg1230 {..} = B.runBitPut $ do
+  put Msg1230 {..} = B.runBitPut $
     putBits 0 _msg1230_bias
 
 $(deriveRTCM3 ''Msg1230)
