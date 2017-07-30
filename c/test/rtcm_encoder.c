@@ -608,8 +608,8 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t *buff)
       uint8_t amb =
         (uint8_t)(sat_obs->obs[L1_FREQ].pseudorange / PRUNIT_GLO);
 
-      setbitu(buff, bit, 8, amb);
-      bit += 8;
+      setbitu(buff, bit, 7, amb);
+      bit += 7;
       setbitu(buff, bit, 8,
               (uint8_t)roundl(sat_obs->obs[L1_FREQ].cnr * 4.0));
       bit += 8;
