@@ -651,8 +651,8 @@ int8_t rtcm3_decode_1012(const uint8_t *buff, rtcm_obs_message *msg_1012)
     decode_basic_glo_l1_freq_data(buff, &bit, l1_freq_data, &l1_pr,
                                   &phr_pr_diff, &msg_1012->sats[i].fcn);
 
-    uint8_t amb = getbitu(buff, bit, 8);
-    bit += 8;
+    uint8_t amb = getbitu(buff, bit, 7);
+    bit += 7;
     l1_freq_data->cnr = 0.25 * getbitu(buff, bit, 8);
     bit += 8;
     l1_freq_data->flags.valid_cnr = 1;
