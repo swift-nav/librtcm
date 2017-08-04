@@ -16,6 +16,9 @@
 #define PRUNIT_GPS 299792.458 /**< RTCM v3 Unit of GPS Pseudorange (m) */
 #define PRUNIT_GLO 599584.916 /**< RTCM v3 Unit of GLO Pseudorange (m) */
 #define RTCM_MAX_SATS 32
+#define CP_INVALID 0x80000
+#define PR_L1_INVALID 0x80000
+#define PR_L2_INVALID 0x20000
 
 static const double CLIGHT = 299792458.0; /* speed of light (m/s) */
 

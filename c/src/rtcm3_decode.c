@@ -217,6 +217,60 @@ uint16_t rtcm3_read_glo_header(const uint8_t *buff, rtcm_obs_header *header)
   return bit;
 }
 
+uint8_t construct_L1_code(rtcm_freq_data *l1_freq_data, double pr, double amb_correction)
+{
+  l1_freq_data->pseudorange = 0.02 * pr + amb_correction;
+  if(pr != PR_L1_INVALID) {
+    return 1;
+  }
+  return 0;
+}
+
+
+uint8_t construct_L1_phase(rtcm_freq_data *l1_freq_data, double phr_pr_diff, double freq)
+{
+  l1_freq_data->carrier_phase =
+    (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
+    (CLIGHT / freq);
+  if(phr_pr_diff != CP_INVALID) {
+    return 1;
+  }
+  return 0;
+}
+
+uint8_t construct_L2_code(rtcm_freq_data *l2_freq_data, const rtcm_freq_data *l1_freq_data, double pr)
+{
+  l2_freq_data->pseudorange = 0.02 * pr + l1_freq_data->pseudorange;
+  if(pr != PR_L2_INVALID) {
+    return 1;
+  }
+  return 0;
+}
+
+uint8_t construct_L2_phase(rtcm_freq_data *l2_freq_data, const rtcm_freq_data *l1_freq_data, double phr_pr_diff, double freq)
+{
+  l2_freq_data->carrier_phase =
+    (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
+    (CLIGHT / freq);
+  if(phr_pr_diff != CP_INVALID) {
+    return 1;
+  }
+  return 0;
+}
+
+uint8_t get_cnr(rtcm_freq_data *freq_data, const uint8_t *buff, uint16_t *bit)
+{
+  uint8_t cnr = getbitu(buff, *bit, 8);
+  *bit += 8;
+  if(cnr == 0) {
+    freq_data->cnr = 0.25 * cnr;
+    return 1;
+  }
+  return 0;
+}
+
+
+
 /** Decode an RTCMv3 message type 1001 (L1-Only GPS RTK Observables)
  *
  * \param buff The input data buffer
@@ -248,12 +302,8 @@ int8_t rtcm3_decode_1001(const uint8_t *buff, rtcm_obs_message *msg_1001)
     decode_basic_gps_l1_freq_data(buff, &bit, l1_freq_data, &l1_pr,
                                   &phr_pr_diff);
 
-    l1_freq_data->pseudorange = 0.02 * l1_pr;
-    l1_freq_data->flags.valid_pr = 1;
-    l1_freq_data->carrier_phase =
-        (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-        (CLIGHT / GPS_L1_FREQ);
-    l1_freq_data->flags.valid_cp = 1;
+    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, 0);
+    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
   }
 
   return 0;
@@ -292,16 +342,9 @@ int8_t rtcm3_decode_1002(const uint8_t *buff, rtcm_obs_message *msg_1002)
 
     uint8_t amb = getbitu(buff, bit, 8);
     bit += 8;
-    l1_freq_data->cnr = 0.25 * getbitu(buff, bit, 8);
-    bit += 8;
-    l1_freq_data->flags.valid_cnr = 1;
-
-    l1_freq_data->pseudorange = 0.02 * l1_pr + PRUNIT_GPS * amb;
-    l1_freq_data->flags.valid_pr = 1;
-    l1_freq_data->carrier_phase =
-        (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-        (CLIGHT / GPS_L1_FREQ);
-    l1_freq_data->flags.valid_cp = 1;
+    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data,buff,&bit);
+    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
+    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
   }
 
   return 0;
@@ -339,24 +382,16 @@ int8_t rtcm3_decode_1003(const uint8_t *buff, rtcm_obs_message *msg_1003)
     decode_basic_gps_l1_freq_data(buff, &bit, l1_freq_data, &l1_pr,
                                   &phr_pr_diff);
 
-    l1_freq_data->pseudorange = 0.02 * l1_pr;
-    l1_freq_data->flags.valid_pr = 1;
-    l1_freq_data->carrier_phase =
-        (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-        (CLIGHT / GPS_L1_FREQ);
-    l1_freq_data->flags.valid_cp = 1;
+    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, 0);
+    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
 
     rtcm_freq_data *l2_freq_data = &msg_1003->sats[i].obs[L2_FREQ];
 
     decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr,
                               &phr_pr_diff);
 
-    l2_freq_data->pseudorange = 0.02 * l2_pr + l1_freq_data->pseudorange;
-    l2_freq_data->flags.valid_pr = 1;
-    l2_freq_data->carrier_phase =
-        (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-        (CLIGHT / GPS_L2_FREQ);
-    l2_freq_data->flags.valid_cp = 1;
+    l2_freq_data->flags.valid_pr = construct_L2_code(l2_freq_data, l1_freq_data, l1_pr);
+    l2_freq_data->flags.valid_pr = construct_L2_phase(l2_freq_data, l1_freq_data, phr_pr_diff, GPS_L2_FREQ);
   }
 
   return 0;
@@ -396,32 +431,19 @@ int8_t rtcm3_decode_1004(const uint8_t *buff, rtcm_obs_message *msg_1004)
 
     uint8_t amb = getbitu(buff, bit, 8);
     bit += 8;
-    l1_freq_data->cnr = 0.25 * getbitu(buff, bit, 8);
-    bit += 8;
-    l1_freq_data->flags.valid_cnr = 1;
 
-    l1_freq_data->pseudorange = 0.02 * l1_pr + PRUNIT_GPS * amb;
-    l1_freq_data->flags.valid_pr = 1;
-    l1_freq_data->carrier_phase =
-        (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-        (CLIGHT / GPS_L1_FREQ);
-    l1_freq_data->flags.valid_cp = 1;
+    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data,buff,&bit);
+    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
+    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
 
     rtcm_freq_data *l2_freq_data = &msg_1004->sats[i].obs[L2_FREQ];
 
     decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr,
                               &phr_pr_diff);
 
-    l2_freq_data->cnr = 0.25 * getbitu(buff, bit, 8);
-    bit += 8;
-    l2_freq_data->flags.valid_cnr = 1;
-
-    l2_freq_data->pseudorange = 0.02 * l2_pr + l1_freq_data->pseudorange;
-    l2_freq_data->flags.valid_pr = 1;
-    l2_freq_data->carrier_phase =
-        (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-        (CLIGHT / GPS_L2_FREQ);
-    l2_freq_data->flags.valid_cp = 1;
+    l2_freq_data->flags.valid_cnr = get_cnr(l2_freq_data,buff,&bit);
+    l2_freq_data->flags.valid_pr = construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
+    l2_freq_data->flags.valid_cp = construct_L2_phase(l2_freq_data,l1_freq_data,phr_pr_diff, GPS_L2_FREQ);
   }
 
   return 0;
@@ -603,17 +625,12 @@ int8_t rtcm3_decode_1010(const uint8_t *buff, rtcm_obs_message *msg_1010)
 
     uint8_t amb = getbitu(buff, bit, 7);
     bit += 7;
-    l1_freq_data->cnr = 0.25 * getbitu(buff, bit, 8);
-    bit += 8;
-    l1_freq_data->flags.valid_cnr = 1;
 
-    l1_freq_data->pseudorange = 0.02 * l1_pr + PRUNIT_GLO * amb;
-    l1_freq_data->flags.valid_pr = 1;
+    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data,buff,&bit);
+
     int8_t glo_fcn = msg_1010->sats[i].fcn - 7;
-    l1_freq_data->carrier_phase =
-      (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-      (CLIGHT / (GLO_L1_FREQ + glo_fcn * GLO_L1_CH_OFFSET) );
-    l1_freq_data->flags.valid_cp = 1;
+    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data,l1_pr,PRUNIT_GLO * amb);
+    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data,phr_pr_diff,GLO_L1_FREQ + glo_fcn * GLO_L1_CH_OFFSET);
   }
 
   return 0;
@@ -653,33 +670,25 @@ int8_t rtcm3_decode_1012(const uint8_t *buff, rtcm_obs_message *msg_1012)
 
     uint8_t amb = getbitu(buff, bit, 7);
     bit += 7;
-    l1_freq_data->cnr = 0.25 * getbitu(buff, bit, 8);
-    bit += 8;
-    l1_freq_data->flags.valid_cnr = 1;
 
-    l1_freq_data->pseudorange = 0.02 * l1_pr + PRUNIT_GLO * amb;
-    l1_freq_data->flags.valid_pr = 1;
     int8_t glo_fcn = msg_1012->sats[i].fcn - 7;
-    l1_freq_data->carrier_phase =
-      (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-      (CLIGHT / (GLO_L1_FREQ + glo_fcn * GLO_L1_CH_OFFSET));
-    l1_freq_data->flags.valid_cp = 1;
+    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data,buff,&bit);
+    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GLO);
+    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data,
+                                                      phr_pr_diff,
+                                                      GLO_L1_FREQ + glo_fcn * GLO_L1_CH_OFFSET);
 
     rtcm_freq_data *l2_freq_data = &msg_1012->sats[i].obs[L2_FREQ];
 
     decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr,
                                     &phr_pr_diff);
 
-    l2_freq_data->cnr = 0.25 * getbitu(buff, bit, 8);
-    bit += 8;
-    l2_freq_data->flags.valid_cnr = 1;
-
-    l2_freq_data->pseudorange = 0.02 * l2_pr + l1_freq_data->pseudorange;
-    l2_freq_data->flags.valid_pr = 1;
-    l2_freq_data->carrier_phase =
-      (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-      (CLIGHT / (GLO_L2_FREQ + glo_fcn * GLO_L2_CH_OFFSET));
-    l2_freq_data->flags.valid_cp = 1;
+    l2_freq_data->flags.valid_cnr = get_cnr(l2_freq_data,buff,&bit);
+    l2_freq_data->flags.valid_pr = construct_L2_code(l2_freq_data,l1_freq_data,l2_pr);
+    l2_freq_data->flags.valid_cp = construct_L2_phase(l2_freq_data,
+                                                      l1_freq_data,
+                                                      phr_pr_diff,
+                                                      GLO_L2_FREQ + glo_fcn * GLO_L2_CH_OFFSET);
   }
 
   return 0;
