@@ -263,10 +263,10 @@ uint8_t get_cnr(rtcm_freq_data *freq_data, const uint8_t *buff, uint16_t *bit)
   uint8_t cnr = getbitu(buff, *bit, 8);
   *bit += 8;
   if(cnr == 0) {
-    freq_data->cnr = 0.25 * cnr;
-    return 1;
+    return 0;
   }
-  return 0;
+  freq_data->cnr = 0.25 * cnr;
+  return 1;
 }
 
 
