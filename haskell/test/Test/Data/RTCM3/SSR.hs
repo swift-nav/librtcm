@@ -115,46 +115,46 @@ instance Arbitrary GlonassClockCorrection where
 instance Arbitrary Msg1057 where
   arbitrary = do
     _msg1057_header      <- arbitrary
-    _msg1057_corrections <- replicateM (fromIntegral $ _msg1057_header ^. gpsOrbitCorrectionHeader_n) $ arbitrary
+    _msg1057_corrections <- replicateM (fromIntegral $ _msg1057_header ^. gpsOrbitCorrectionHeader_n) arbitrary
     pure Msg1057 {..}
 
 instance Arbitrary Msg1058 where
   arbitrary = do
     _msg1058_header      <- arbitrary
-    _msg1058_corrections <- replicateM (fromIntegral $ _msg1058_header ^. gpsClockCorrectionHeader_n) $ arbitrary
+    _msg1058_corrections <- replicateM (fromIntegral $ _msg1058_header ^. gpsClockCorrectionHeader_n) arbitrary
     pure Msg1058 {..}
 
 instance Arbitrary Msg1063 where
   arbitrary = do
     _msg1063_header      <- arbitrary
-    _msg1063_corrections <- replicateM (fromIntegral $ _msg1063_header ^. glonassOrbitCorrectionHeader_n) $ arbitrary
+    _msg1063_corrections <- replicateM (fromIntegral $ _msg1063_header ^. glonassOrbitCorrectionHeader_n) arbitrary
     pure Msg1063 {..}
 
 instance Arbitrary Msg1064 where
   arbitrary = do
     _msg1064_header      <- arbitrary
-    _msg1064_corrections <- replicateM (fromIntegral $ _msg1064_header ^. glonassClockCorrectionHeader_n) $ arbitrary
+    _msg1064_corrections <- replicateM (fromIntegral $ _msg1064_header ^. glonassClockCorrectionHeader_n) arbitrary
     pure Msg1064 {..}
 
 testMsg1057 :: TestTree
 testMsg1057 =
   testProperty "Roundtrip Msg1057" $ \m ->
-    (decode $ encode m) == (m :: Msg1057)
+    decode (encode m) == (m :: Msg1057)
 
 testMsg1058 :: TestTree
 testMsg1058 =
   testProperty "Roundtrip Msg1058" $ \m ->
-    (decode $ encode m) == (m :: Msg1058)
+    decode (encode m) == (m :: Msg1058)
 
 testMsg1063 :: TestTree
 testMsg1063 =
   testProperty "Roundtrip Msg1063" $ \m ->
-    (decode $ encode m) == (m :: Msg1063)
+    decode (encode m) == (m :: Msg1063)
 
 testMsg1064 :: TestTree
 testMsg1064 =
   testProperty "Roundtrip Msg1064" $ \m ->
-    (decode $ encode m) == (m :: Msg1064)
+    decode (encode m) == (m :: Msg1064)
 
 tests :: TestTree
 tests =

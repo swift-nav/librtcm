@@ -66,11 +66,6 @@ instance Arbitrary Msg1019 where
     _msg1019_ephemeris <- arbitrary
     pure Msg1019 {..}
 
-testMsg1019 :: TestTree
-testMsg1019 =
-  testProperty "Roundtrip Msg1019" $ \m ->
-    (decode $ encode m) == (m :: Msg1019)
-
 instance Arbitrary GlonassEphemerisHeader where
   arbitrary = do
     _glonassEphemerisHeader_num <- arbitraryWord 12
@@ -122,10 +117,15 @@ instance Arbitrary Msg1020 where
     _msg1020_ephemeris <- arbitrary
     pure Msg1020 {..}
 
+testMsg1019 :: TestTree
+testMsg1019 =
+  testProperty "Roundtrip Msg1019" $ \m ->
+    decode (encode m) == (m :: Msg1019)
+
 testMsg1020 :: TestTree
 testMsg1020 =
   testProperty "Roundtrip Msg1020" $ \m ->
-    (decode $ encode m) == (m :: Msg1020)
+    decode (encode m) == (m :: Msg1020)
 
 tests :: TestTree
 tests =

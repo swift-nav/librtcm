@@ -117,7 +117,7 @@ instance Arbitrary Observation1001 where
 instance Arbitrary Msg1001 where
   arbitrary = do
     _msg1001_header       <- arbitrary
-    _msg1001_observations <- replicateM (fromIntegral $ _msg1001_header ^. gpsObservationHeader_n) $ arbitrary
+    _msg1001_observations <- replicateM (fromIntegral $ _msg1001_header ^. gpsObservationHeader_n) arbitrary
     pure Msg1001 {..}
 
 instance Arbitrary Observation1002 where
@@ -126,7 +126,7 @@ instance Arbitrary Observation1002 where
 instance Arbitrary Msg1002 where
   arbitrary = do
     _msg1002_header       <- arbitrary
-    _msg1002_observations <- replicateM (fromIntegral $ _msg1002_header ^. gpsObservationHeader_n) $ arbitrary
+    _msg1002_observations <- replicateM (fromIntegral $ _msg1002_header ^. gpsObservationHeader_n) arbitrary
     pure Msg1002 {..}
 
 instance Arbitrary Observation1003 where
@@ -135,7 +135,7 @@ instance Arbitrary Observation1003 where
 instance Arbitrary Msg1003 where
   arbitrary = do
     _msg1003_header       <- arbitrary
-    _msg1003_observations <- replicateM (fromIntegral $ _msg1003_header ^. gpsObservationHeader_n) $ arbitrary
+    _msg1003_observations <- replicateM (fromIntegral $ _msg1003_header ^. gpsObservationHeader_n) arbitrary
     pure Msg1003 {..}
 
 instance Arbitrary Observation1004 where
@@ -144,7 +144,7 @@ instance Arbitrary Observation1004 where
 instance Arbitrary Msg1004 where
   arbitrary = do
     _msg1004_header       <- arbitrary
-    _msg1004_observations <- replicateM (fromIntegral $ _msg1004_header ^. gpsObservationHeader_n) $ arbitrary
+    _msg1004_observations <- replicateM (fromIntegral $ _msg1004_header ^. gpsObservationHeader_n) arbitrary
     pure Msg1004 {..}
 
 instance Arbitrary Observation1009 where
@@ -153,7 +153,7 @@ instance Arbitrary Observation1009 where
 instance Arbitrary Msg1009 where
   arbitrary = do
     _msg1009_header       <- arbitrary
-    _msg1009_observations <- replicateM (fromIntegral $ _msg1009_header ^. glonassObservationHeader_n) $ arbitrary
+    _msg1009_observations <- replicateM (fromIntegral $ _msg1009_header ^. glonassObservationHeader_n) arbitrary
     pure Msg1009 {..}
 
 instance Arbitrary Observation1010 where
@@ -162,7 +162,7 @@ instance Arbitrary Observation1010 where
 instance Arbitrary Msg1010 where
   arbitrary = do
     _msg1010_header       <- arbitrary
-    _msg1010_observations <- replicateM (fromIntegral $ _msg1010_header ^. glonassObservationHeader_n) $ arbitrary
+    _msg1010_observations <- replicateM (fromIntegral $ _msg1010_header ^. glonassObservationHeader_n) arbitrary
     pure Msg1010 {..}
 
 instance Arbitrary Observation1011 where
@@ -171,7 +171,7 @@ instance Arbitrary Observation1011 where
 instance Arbitrary Msg1011 where
   arbitrary = do
     _msg1011_header       <- arbitrary
-    _msg1011_observations <- replicateM (fromIntegral $ _msg1011_header ^. glonassObservationHeader_n) $ arbitrary
+    _msg1011_observations <- replicateM (fromIntegral $ _msg1011_header ^. glonassObservationHeader_n) arbitrary
     pure Msg1011 {..}
 
 instance Arbitrary Observation1012 where
@@ -180,7 +180,7 @@ instance Arbitrary Observation1012 where
 instance Arbitrary Msg1012 where
   arbitrary = do
     _msg1012_header       <- arbitrary
-    _msg1012_observations <- replicateM (fromIntegral $ _msg1012_header ^. glonassObservationHeader_n) $ arbitrary
+    _msg1012_observations <- replicateM (fromIntegral $ _msg1012_header ^. glonassObservationHeader_n) arbitrary
     pure Msg1012 {..}
 
 instance Arbitrary Msg1230 where
@@ -189,47 +189,47 @@ instance Arbitrary Msg1230 where
 testMsg1001 :: TestTree
 testMsg1001 =
   testProperty "Roundtrip Msg1001" $ \m ->
-    (decode $ encode m) == (m :: Msg1001)
+    decode (encode m) == (m :: Msg1001)
 
 testMsg1002 :: TestTree
 testMsg1002 =
   testProperty "Roundtrip Msg1002" $ \m ->
-    (decode $ encode m) == (m :: Msg1002)
+    decode (encode m) == (m :: Msg1002)
 
 testMsg1003 :: TestTree
 testMsg1003 =
   testProperty "Roundtrip Msg1003" $ \m ->
-    (decode $ encode m) == (m :: Msg1003)
+    decode (encode m) == (m :: Msg1003)
 
 testMsg1004 :: TestTree
 testMsg1004 =
   testProperty "Roundtrip Msg1004" $ \m ->
-    (decode $ encode m) == (m :: Msg1004)
+    decode (encode m) == (m :: Msg1004)
 
 testMsg1009 :: TestTree
 testMsg1009 =
   testProperty "Roundtrip Msg1009" $ \m ->
-    (decode $ encode m) == (m :: Msg1009)
+    decode (encode m) == (m :: Msg1009)
 
 testMsg1010 :: TestTree
 testMsg1010 =
   testProperty "Roundtrip Msg1010" $ \m ->
-    (decode $ encode m) == (m :: Msg1010)
+    decode (encode m) == (m :: Msg1010)
 
 testMsg1011 :: TestTree
 testMsg1011 =
   testProperty "Roundtrip Msg1011" $ \m ->
-    (decode $ encode m) == (m :: Msg1011)
+    decode (encode m) == (m :: Msg1011)
 
 testMsg1012 :: TestTree
 testMsg1012 =
   testProperty "Roundtrip Msg1012" $ \m ->
-    (decode $ encode m) == (m :: Msg1012)
+    decode (encode m) == (m :: Msg1012)
 
 testMsg1230 :: TestTree
 testMsg1230 =
   testProperty "Roundtrip Msg1230" $ \m ->
-    (decode $ encode m) == (m :: Msg1230)
+    decode (encode m) == (m :: Msg1230)
 
 tests :: TestTree
 tests =

@@ -83,27 +83,27 @@ instance Arbitrary Msg1033 where
 testMsg1005 :: TestTree
 testMsg1005 =
   testProperty "Roundtrip Msg1005" $ \m ->
-    (decode $ encode m) == (m :: Msg1005)
+    decode (encode m) == (m :: Msg1005)
 
 testMsg1006 :: TestTree
 testMsg1006 =
   testProperty "Roundtrip Msg1006" $ \m ->
-    (decode $ encode m) == (m :: Msg1006)
+    decode (encode m) == (m :: Msg1006)
 
 testMsg1007 :: TestTree
 testMsg1007 =
   testProperty "Roundtrip Msg1007" $ \m ->
-    (decode $ encode m) == (m :: Msg1007)
+    decode (encode m) == (m :: Msg1007)
 
 testMsg1008 :: TestTree
 testMsg1008 =
   testProperty "Roundtrip Msg1008" $ \m ->
-    (decode $ encode m) == (m :: Msg1008)
+    decode (encode m) == (m :: Msg1008)
 
 testMsg1033 :: TestTree
 testMsg1033 =
   testProperty "Roundtrip Msg1033" $ \m ->
-    (decode $ encode m) == (m :: Msg1033)
+    decode (encode m) == (m :: Msg1033)
 
 tests :: TestTree
 tests =

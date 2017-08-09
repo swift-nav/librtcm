@@ -67,27 +67,27 @@ encodeBits = P.runPut . B.runBitPut
 testInt8 :: TestTree
 testInt8 =
   testProperty "Roundtrip Int8" $ \(TestInt n i) ->
-    (decodeBits (getInt8 n) $ encodeBits (putInt8 n i)) == (i :: Int8)
+    decodeBits (getInt8 n) (encodeBits (putInt8 n i)) == (i :: Int8)
 
 testInt16be :: TestTree
 testInt16be =
   testProperty "Roundtrip Int16" $ \(TestInt n i) ->
-    (decodeBits (getInt16be n) $ encodeBits (putInt16be n i)) == (i :: Int16)
+    decodeBits (getInt16be n) (encodeBits (putInt16be n i)) == (i :: Int16)
 
 testInt32be :: TestTree
 testInt32be =
   testProperty "Roundtrip Int32" $ \(TestInt n i) ->
-    (decodeBits (getInt32be n) $ encodeBits (putInt32be n i)) == (i :: Int32)
+    decodeBits (getInt32be n) (encodeBits (putInt32be n i)) == (i :: Int32)
 
 testInt64be :: TestTree
 testInt64be =
   testProperty "Roundtrip Int64be" $ \(TestInt n i) ->
-    (decodeBits (getInt64be n) $ encodeBits (putInt64be n i)) == (i :: Int64)
+    decodeBits (getInt64be n) (encodeBits (putInt64be n i)) == (i :: Int64)
 
 testWord24be :: TestTree
 testWord24be =
   testProperty "Roundtrip Word24be" $ \i ->
-    (decode $ encode i) === (i :: Word24)
+    decode (encode i) === (i :: Word24)
 
 tests :: TestTree
 tests =
