@@ -64,7 +64,7 @@ instance BinaryBit GpsOrbitCorrectionHeader where
     _gpsOrbitCorrectionHeader_provider       <- B.getWord16be 16
     _gpsOrbitCorrectionHeader_solution       <- B.getWord8 4
     _gpsOrbitCorrectionHeader_n              <- B.getWord8 6
-    return GpsOrbitCorrectionHeader {..}
+    pure GpsOrbitCorrectionHeader {..}
 
   putBits _n GpsOrbitCorrectionHeader {..} = do
     B.putWord16be 12 _gpsOrbitCorrectionHeader_num
@@ -112,7 +112,7 @@ instance BinaryBit GpsOrbitCorrection where
     _gpsOrbitCorrection_dotDeltaRadial     <- getInt32be 21
     _gpsOrbitCorrection_dotDeltaAlongTrack <- getInt32be 19
     _gpsOrbitCorrection_dotDeltaCrossTrack <- getInt32be 19
-    return GpsOrbitCorrection {..}
+    pure GpsOrbitCorrection {..}
 
   putBits _n GpsOrbitCorrection {..} = do
     B.putWord8 6  _gpsOrbitCorrection_sat
@@ -159,7 +159,7 @@ instance BinaryBit GpsClockCorrectionHeader where
     _gpsClockCorrectionHeader_provider       <- B.getWord16be 16
     _gpsClockCorrectionHeader_solution       <- B.getWord8 4
     _gpsClockCorrectionHeader_n              <- B.getWord8 6
-    return GpsClockCorrectionHeader {..}
+    pure GpsClockCorrectionHeader {..}
 
   putBits _n GpsClockCorrectionHeader {..} = do
     B.putWord16be 12 _gpsClockCorrectionHeader_num
@@ -194,7 +194,7 @@ instance BinaryBit GpsClockCorrection where
     _gpsClockCorrection_deltaClockC0 <- getInt32be 22
     _gpsClockCorrection_deltaClockC1 <- getInt32be 21
     _gpsClockCorrection_deltaClockC2 <- getInt32be 27
-    return GpsClockCorrection {..}
+    pure GpsClockCorrection {..}
 
   putBits _n GpsClockCorrection {..} = do
     B.putWord8 6  _gpsClockCorrection_sat
@@ -240,7 +240,7 @@ instance BinaryBit GlonassOrbitCorrectionHeader where
     _glonassOrbitCorrectionHeader_provider       <- B.getWord16be 16
     _glonassOrbitCorrectionHeader_solution       <- B.getWord8 4
     _glonassOrbitCorrectionHeader_n              <- B.getWord8 6
-    return GlonassOrbitCorrectionHeader {..}
+    pure GlonassOrbitCorrectionHeader {..}
 
   putBits _n GlonassOrbitCorrectionHeader {..} = do
     B.putWord16be 12 _glonassOrbitCorrectionHeader_num
@@ -288,7 +288,7 @@ instance BinaryBit GlonassOrbitCorrection where
     _glonassOrbitCorrection_dotDeltaRadial     <- getInt32be 21
     _glonassOrbitCorrection_dotDeltaAlongTrack <- getInt32be 19
     _glonassOrbitCorrection_dotDeltaCrossTrack <- getInt32be 19
-    return GlonassOrbitCorrection {..}
+    pure GlonassOrbitCorrection {..}
 
   putBits _n GlonassOrbitCorrection {..} = do
     B.putWord8 5  _glonassOrbitCorrection_sat
@@ -335,7 +335,7 @@ instance BinaryBit GlonassClockCorrectionHeader where
     _glonassClockCorrectionHeader_provider       <- B.getWord16be 16
     _glonassClockCorrectionHeader_solution       <- B.getWord8 4
     _glonassClockCorrectionHeader_n              <- B.getWord8 6
-    return GlonassClockCorrectionHeader {..}
+    pure GlonassClockCorrectionHeader {..}
 
   putBits _n GlonassClockCorrectionHeader {..} = do
     B.putWord16be 12 _glonassClockCorrectionHeader_num
@@ -370,7 +370,7 @@ instance BinaryBit GlonassClockCorrection where
     _glonassClockCorrection_deltaClockC0 <- getInt32be 22
     _glonassClockCorrection_deltaClockC1 <- getInt32be 21
     _glonassClockCorrection_deltaClockC2 <- getInt32be 27
-    return GlonassClockCorrection {..}
+    pure GlonassClockCorrection {..}
 
   putBits _n GlonassClockCorrection {..} = do
     B.putWord8 5  _glonassClockCorrection_sat
@@ -398,7 +398,7 @@ instance Binary Msg1057 where
   get = B.runBitGet $ do
     _msg1057_header      <- getBits 0
     _msg1057_corrections <- replicateM (fromIntegral $ _msg1057_header ^. gpsOrbitCorrectionHeader_n) $ getBits 0
-    return Msg1057 {..}
+    pure Msg1057 {..}
 
   put Msg1057 {..} = B.runBitPut $ do
     putBits 0 _msg1057_header
@@ -426,7 +426,7 @@ instance Binary Msg1058 where
   get = B.runBitGet $ do
     _msg1058_header      <- getBits 0
     _msg1058_corrections <- replicateM (fromIntegral $ _msg1058_header ^. gpsClockCorrectionHeader_n) $ getBits 0
-    return Msg1058 {..}
+    pure Msg1058 {..}
 
   put Msg1058 {..} = B.runBitPut $ do
     putBits 0 _msg1058_header
@@ -454,7 +454,7 @@ instance Binary Msg1063 where
   get = B.runBitGet $ do
     _msg1063_header      <- getBits 0
     _msg1063_corrections <- replicateM (fromIntegral $ _msg1063_header ^. glonassOrbitCorrectionHeader_n) $ getBits 0
-    return Msg1063 {..}
+    pure Msg1063 {..}
 
   put Msg1063 {..} = B.runBitPut $ do
     putBits 0 _msg1063_header
@@ -482,7 +482,7 @@ instance Binary Msg1064 where
   get = B.runBitGet $ do
     _msg1064_header      <- getBits 0
     _msg1064_corrections <- replicateM (fromIntegral $ _msg1064_header ^. glonassClockCorrectionHeader_n) $ getBits 0
-    return Msg1064 {..}
+    pure Msg1064 {..}
 
   put Msg1064 {..} = B.runBitPut $ do
     putBits 0 _msg1064_header

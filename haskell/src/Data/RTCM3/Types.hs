@@ -79,7 +79,7 @@ instance Binary Msg where
     _msgRTCM3Len     <- getWord16be
     _msgRTCM3Payload <- fmap Bytes $ getByteString $ fromIntegral _msgRTCM3Len
     _msgRTCM3Crc     <- getWord24be
-    return Msg {..}
+    pure Msg {..}
 
   put Msg {..} = do
     putWord16be _msgRTCM3Len

@@ -54,7 +54,7 @@ instance BinaryBit MessageHeader where
     _messageHeader_seconds     <- B.getWord32be 17
     _messageHeader_n           <- B.getWord8 5
     _messageHeader_leapSeconds <- B.getWord8 8
-    return MessageHeader {..}
+    pure MessageHeader {..}
 
   putBits _n MessageHeader {..} = do
     B.putWord16be 12 _messageHeader_num
@@ -84,7 +84,7 @@ instance BinaryBit Message where
     _message_num         <- B.getWord16be 12
     _message_synchronous <- B.getBool
     _message_interval    <- B.getWord16be 16
-    return Message {..}
+    pure Message {..}
 
   putBits _n Message {..} = do
     B.putWord16be 12 _message_num
@@ -111,7 +111,7 @@ instance Binary Msg1013 where
   get = B.runBitGet $ do
     _msg1013_header <- getBits 0
     _msg1013_messages <- replicateM (fromIntegral $ _msg1013_header ^. messageHeader_n) $ getBits 0
-    return Msg1013 {..}
+    pure Msg1013 {..}
 
   put Msg1013 {..} = B.runBitPut $ do
     putBits 0 _msg1013_header

@@ -1,6 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# OPTIONS -fno-warn-orphans #-}
+{-# OPTIONS -fno-warn-orphans  #-}
 
 -- |
 -- Module:      Test.Data.RTCM3.Ephemerides
@@ -25,7 +25,7 @@ instance Arbitrary GpsEphemerisHeader where
   arbitrary = do
     _gpsEphemerisHeader_num <- arbitraryWord 12
     _gpsEphemerisHeader_sat <- arbitraryWord 6
-    return GpsEphemerisHeader {..}
+    pure GpsEphemerisHeader {..}
 
 instance Arbitrary GpsEphemeris where
   arbitrary = do
@@ -58,13 +58,13 @@ instance Arbitrary GpsEphemeris where
     _gpsEphemeris_svHealth    <- arbitraryWord 6
     _gpsEphemeris_l2pFlag     <- arbitrary
     _gpsEphemeris_fitInterval <- arbitrary
-    return GpsEphemeris {..}
+    pure GpsEphemeris {..}
 
 instance Arbitrary Msg1019 where
   arbitrary = do
     _msg1019_header    <- arbitrary
     _msg1019_ephemeris <- arbitrary
-    return Msg1019 {..}
+    pure Msg1019 {..}
 
 testMsg1019 :: TestTree
 testMsg1019 =
@@ -76,7 +76,7 @@ instance Arbitrary GlonassEphemerisHeader where
     _glonassEphemerisHeader_num <- arbitraryWord 12
     _glonassEphemerisHeader_sat <- arbitraryWord 6
     _glonassEphemerisHeader_channel <- arbitraryWord 5
-    return GlonassEphemerisHeader{..}
+    pure GlonassEphemerisHeader{..}
 
 instance Arbitrary GlonassEphemeris where
   arbitrary = do
@@ -114,13 +114,13 @@ instance Arbitrary GlonassEphemeris where
     _glonassEphemeris_mTauGps            <- arbitraryInt 22
     _glonassEphemeris_mln5               <- arbitrary
     _glonassEphemeris_reserved           <- arbitraryWord 7
-    return GlonassEphemeris{..}
+    pure GlonassEphemeris{..}
 
 instance Arbitrary Msg1020 where
   arbitrary = do
     _msg1020_header <- arbitrary
     _msg1020_ephemeris <- arbitrary
-    return Msg1020 {..}
+    pure Msg1020 {..}
 
 testMsg1020 :: TestTree
 testMsg1020 =

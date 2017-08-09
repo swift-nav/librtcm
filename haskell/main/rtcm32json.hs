@@ -13,7 +13,6 @@
 -- to stdout.
 
 import BasicPrelude                      hiding (map)
-import Control.Monad.Trans.Resource
 import Data.Aeson
 import Data.ByteString.Lazy              hiding (ByteString, map)
 import Data.Conduit
@@ -24,13 +23,14 @@ import Data.RTCM3
 import System.IO
 
 -- | Encode a RTCM3Msg to a line of JSON.
+--
 encodeLine :: RTCM3Msg -> ByteString
 encodeLine v = toStrict $ encode v <> "\n"
 
 main :: IO ()
 main =
-  runResourceT $
-    sourceHandle stdin  =$=
-      conduitDecode     =$=
-      map encodeLine $$
-      sinkHandle stdout
+  runConduitRes $
+    sourceHandle stdin
+      =$= conduitDecode
+      =$= map encodeLine
+      $$  sinkHandle stdout

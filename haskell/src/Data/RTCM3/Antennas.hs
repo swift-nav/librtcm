@@ -70,7 +70,7 @@ instance BinaryBit AntennaReference where
     _antennaReference_ecef_y       <- getInt64be 38
     _antennaReference_quarterCycle <- B.getWord8 2
     _antennaReference_ecef_z       <- getInt64be 38
-    return AntennaReference {..}
+    pure AntennaReference {..}
 
   putBits _n AntennaReference {..} = do
     B.putWord16be 12 _antennaReference_num
@@ -101,7 +101,7 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_extAntennaReferenc
 instance BinaryBit ExtAntennaReference where
   getBits _n = do
     _extAntennaReference_height <- B.getWord16be 16
-    return ExtAntennaReference {..}
+    pure ExtAntennaReference {..}
 
   putBits _n ExtAntennaReference {..} =
     B.putWord16be 16 _extAntennaReference_height
@@ -132,7 +132,7 @@ instance BinaryBit AntennaDescriptor where
     _antennaDescriptor_n           <- B.getWord8 8
     _antennaDescriptor_descriptors <- replicateM (fromIntegral _antennaDescriptor_n) $ B.getWord8 8
     _antennaDescriptor_setup       <- B.getWord8 8
-    return AntennaDescriptor {..}
+    pure AntennaDescriptor {..}
 
   putBits _n AntennaDescriptor {..} = do
     B.putWord16be 12 _antennaDescriptor_num
@@ -158,7 +158,7 @@ instance BinaryBit ExtAntennaDescriptor where
   getBits _n = do
     _extAntennaDescriptor_n             <- B.getWord8 8
     _extAntennaDescriptor_serialNumbers <- replicateM (fromIntegral _extAntennaDescriptor_n) $ B.getWord8 8
-    return ExtAntennaDescriptor {..}
+    pure ExtAntennaDescriptor {..}
 
   putBits _n ExtAntennaDescriptor {..} = do
     B.putWord8 8 _extAntennaDescriptor_n
@@ -193,7 +193,7 @@ instance BinaryBit ReceiverDescriptor where
     _receiverDescriptor_firmwareVersions <- replicateM (fromIntegral _receiverDescriptor_m) $ B.getWord8 8
     _receiverDescriptor_l                <- B.getWord8 8
     _receiverDescriptor_serialNumbers    <- replicateM (fromIntegral _receiverDescriptor_l) $ B.getWord8 8
-    return ReceiverDescriptor {..}
+    pure ReceiverDescriptor {..}
 
   putBits _n ReceiverDescriptor {..} = do
     B.putWord8 8     _receiverDescriptor_n
@@ -220,7 +220,7 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1005_" . stripP
 instance Binary Msg1005 where
   get = B.runBitGet $ do
     _msg1005_reference <- getBits 0
-    return Msg1005 {..}
+    pure Msg1005 {..}
 
   put Msg1005 {..} = B.runBitPut $
     putBits 0 _msg1005_reference
@@ -247,7 +247,7 @@ instance Binary Msg1006 where
   get = B.runBitGet $ do
     _msg1006_reference    <- getBits 0
     _msg1006_extReference <- getBits 0
-    return Msg1006 {..}
+    pure Msg1006 {..}
 
   put Msg1006 {..} = B.runBitPut $ do
     putBits 0 _msg1006_reference
@@ -272,7 +272,7 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1007_" . stripP
 instance Binary Msg1007 where
   get = B.runBitGet $ do
     _msg1007_descriptor <- getBits 0
-    return Msg1007 {..}
+    pure Msg1007 {..}
 
   put Msg1007 {..} = B.runBitPut $
     putBits 0 _msg1007_descriptor
@@ -299,7 +299,7 @@ instance Binary Msg1008 where
   get = B.runBitGet $ do
     _msg1008_descriptor    <- getBits 0
     _msg1008_extDescriptor <- getBits 0
-    return Msg1008 {..}
+    pure Msg1008 {..}
 
   put Msg1008 {..} = B.runBitPut $ do
     putBits 0 _msg1008_descriptor
@@ -330,7 +330,7 @@ instance Binary Msg1033 where
     _msg1033_antennaDescriptor    <- getBits 0
     _msg1033_antennaExtDescriptor <- getBits 0
     _msg1033_receiverDescriptor   <- getBits 0
-    return Msg1033 {..}
+    pure Msg1033 {..}
 
   put Msg1033 {..} = B.runBitPut $ do
     putBits 0 _msg1033_antennaDescriptor

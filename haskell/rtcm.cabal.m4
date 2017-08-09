@@ -61,7 +61,6 @@ executable rtcm32json
                      , conduit
                      , conduit-combinators
                      , conduit-extra
-                     , resourcet
                      , rtcm
   default-language:    Haskell2010
 
@@ -75,7 +74,6 @@ executable json2rtcm3
                      , binary-conduit
                      , conduit
                      , conduit-extra
-                     , resourcet
                      , rtcm
   default-language:    Haskell2010
 

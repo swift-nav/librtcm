@@ -155,7 +155,7 @@ instance HasMsg RTCM3Msg where
 (<<>>) a b = fromMaybe Null $ do
   c <- preview _Object a
   d <- preview _Object b
-  return $ review _Object $ c <> d
+  pure $ review _Object $ c <> d
 
 instance ToJSON RTCM3Msg where
   toJSON (RTCM3Msg1001    n m) = toJSON n <<>> toJSON m

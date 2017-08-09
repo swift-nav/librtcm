@@ -36,7 +36,7 @@ arbitraryTestInt :: (Integral a, Bits a, Random a) => Int -> Gen (TestInt a)
 arbitraryTestInt b = do
   n <- choose (1, b-1)
   i <- arbitraryInt n
-  return $ TestInt n i
+  pure $ TestInt n i
 
 instance Arbitrary (TestInt Int8) where
   arbitrary = arbitraryTestInt 8

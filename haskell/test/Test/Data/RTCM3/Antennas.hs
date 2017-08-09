@@ -1,6 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# OPTIONS -fno-warn-orphans #-}
+{-# OPTIONS -fno-warn-orphans  #-}
 
 -- |
 -- Module:      Test.Data.RTCM3.Antennas
@@ -33,12 +33,12 @@ instance Arbitrary AntennaReference where
     _antennaReference_ecef_y       <- arbitraryInt 38
     _antennaReference_quarterCycle <- arbitraryWord 2
     _antennaReference_ecef_z       <- arbitraryInt 38
-    return AntennaReference {..}
+    pure AntennaReference {..}
 
 instance Arbitrary ExtAntennaReference where
   arbitrary = do
     _extAntennaReference_height <- arbitraryWord 16
-    return ExtAntennaReference {..}
+    pure ExtAntennaReference {..}
 
 instance Arbitrary AntennaDescriptor where
   arbitrary = do
@@ -47,13 +47,13 @@ instance Arbitrary AntennaDescriptor where
     _antennaDescriptor_n           <- arbitraryWord 8
     _antennaDescriptor_descriptors <- replicateM (fromIntegral _antennaDescriptor_n) $ arbitraryWord 8
     _antennaDescriptor_setup       <- arbitraryWord 8
-    return AntennaDescriptor {..}
+    pure AntennaDescriptor {..}
 
 instance Arbitrary ExtAntennaDescriptor where
   arbitrary = do
     _extAntennaDescriptor_n <- arbitraryWord 8
     _extAntennaDescriptor_serialNumbers <- replicateM (fromIntegral _extAntennaDescriptor_n) $ arbitraryWord 8
-    return ExtAntennaDescriptor {..}
+    pure ExtAntennaDescriptor {..}
 
 instance Arbitrary ReceiverDescriptor where
   arbitrary = do
@@ -63,7 +63,7 @@ instance Arbitrary ReceiverDescriptor where
     _receiverDescriptor_firmwareVersions <- replicateM (fromIntegral _receiverDescriptor_m) $ arbitraryWord 8
     _receiverDescriptor_l                <- arbitraryWord 8
     _receiverDescriptor_serialNumbers    <- replicateM (fromIntegral _receiverDescriptor_l) $ arbitraryWord 8
-    return ReceiverDescriptor {..}
+    pure ReceiverDescriptor {..}
 
 instance Arbitrary Msg1005 where
   arbitrary = Msg1005 <$> arbitrary

@@ -60,7 +60,7 @@ instance BinaryBit GpsObservationHeader where
     _gpsObservationHeader_n                 <- B.getWord8 5
     _gpsObservationHeader_smoothing         <- B.getBool
     _gpsObservationHeader_smoothingInterval <- B.getWord8 3
-    return GpsObservationHeader {..}
+    pure GpsObservationHeader {..}
 
   putBits _n GpsObservationHeader {..} = do
     B.putWord16be 12 _gpsObservationHeader_num
@@ -94,7 +94,7 @@ instance BinaryBit GpsL1Observation where
     _gpsL1Observation_pseudorange      <- B.getWord32be 24
     _gpsL1Observation_carrierMinusCode <- getInt32be 20
     _gpsL1Observation_lockTime         <- B.getWord8 7
-    return GpsL1Observation {..}
+    pure GpsL1Observation {..}
 
   putBits _n GpsL1Observation {..} = do
     B.putBool        _gpsL1Observation_code
@@ -119,7 +119,7 @@ instance BinaryBit GpsL1ExtObservation where
   getBits _n = do
     _gpsL1ExtObservation_ambiguity <- B.getWord8 8
     _gpsL1ExtObservation_cnr       <- B.getWord8 8
-    return GpsL1ExtObservation {..}
+    pure GpsL1ExtObservation {..}
 
   putBits _n GpsL1ExtObservation {..} = do
     B.putWord8 8 _gpsL1ExtObservation_ambiguity
@@ -148,7 +148,7 @@ instance BinaryBit GpsL2Observation where
     _gpsL2Observation_pseudorangeDifference <- getInt16be 14
     _gpsL2Observation_carrierMinusCode      <- getInt32be 20
     _gpsL2Observation_lockTime              <- B.getWord8 7
-    return GpsL2Observation {..}
+    pure GpsL2Observation {..}
 
   putBits _n GpsL2Observation {..} = do
     B.putWord8 2  _gpsL2Observation_code
@@ -170,7 +170,7 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsL2ExtObservatio
 instance BinaryBit GpsL2ExtObservation where
   getBits _n = do
     _gpsL2ExtObservation_cnr <- B.getWord8 8
-    return GpsL2ExtObservation {..}
+    pure GpsL2ExtObservation {..}
 
   putBits _n GpsL2ExtObservation {..} =
     B.putWord8 8 _gpsL2ExtObservation_cnr
@@ -207,7 +207,7 @@ instance BinaryBit GlonassObservationHeader where
     _glonassObservationHeader_n                 <- B.getWord8 5
     _glonassObservationHeader_smoothing         <- B.getBool
     _glonassObservationHeader_smoothingInterval <- B.getWord8 3
-    return GlonassObservationHeader {..}
+    pure GlonassObservationHeader {..}
 
   putBits _n GlonassObservationHeader {..} = do
     B.putWord16be 12 _glonassObservationHeader_num
@@ -244,7 +244,7 @@ instance BinaryBit GlonassL1Observation where
     _glonassL1Observation_pseudorange      <- B.getWord32be 25
     _glonassL1Observation_carrierMinusCode <- getInt32be 20
     _glonassL1Observation_lockTime         <- B.getWord8 7
-    return GlonassL1Observation {..}
+    pure GlonassL1Observation {..}
 
   putBits _n GlonassL1Observation {..} = do
     B.putBool        _glonassL1Observation_code
@@ -270,7 +270,7 @@ instance BinaryBit GlonassL1ExtObservation where
   getBits _n = do
     _glonassL1ExtObservation_ambiguity <- B.getWord8 7
     _glonassL1ExtObservation_cnr       <- B.getWord8 8
-    return GlonassL1ExtObservation {..}
+    pure GlonassL1ExtObservation {..}
 
   putBits _n GlonassL1ExtObservation {..} = do
     B.putWord8 7 _glonassL1ExtObservation_ambiguity
@@ -299,7 +299,7 @@ instance BinaryBit GlonassL2Observation where
     _glonassL2Observation_pseudorangeDifference <- getInt16be 14
     _glonassL2Observation_carrierMinusCode      <- getInt32be 20
     _glonassL2Observation_lockTime              <- B.getWord8 7
-    return GlonassL2Observation {..}
+    pure GlonassL2Observation {..}
 
   putBits _n GlonassL2Observation {..} = do
     B.putWord8 2  _glonassL2Observation_code
@@ -321,7 +321,7 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassL2ExtObserv
 instance BinaryBit GlonassL2ExtObservation where
   getBits _n = do
     _glonassL2ExtObservation_cnr <- B.getWord8 8
-    return GlonassL2ExtObservation {..}
+    pure GlonassL2ExtObservation {..}
 
   putBits _n GlonassL2ExtObservation {..} =
     B.putWord8 8 _glonassL2ExtObservation_cnr
@@ -361,7 +361,7 @@ instance BinaryBit GlonassBias where
     _glonassBias_l1p     <- B.getWord16be 16
     _glonassBias_l2ca    <- B.getWord16be 16
     _glonassBias_l2p     <- B.getWord16be 16
-    return GlonassBias {..}
+    pure GlonassBias {..}
 
   putBits _n GlonassBias {..} = do
     B.putWord16be 12 _glonassBias_num
@@ -393,7 +393,7 @@ instance BinaryBit Observation1001 where
   getBits n = do
     _observation1001_sat <- B.getWord8 6
     _observation1001_l1  <- getBits n
-    return Observation1001 {..}
+    pure Observation1001 {..}
 
   putBits n Observation1001 {..} = do
     B.putWord8 6 _observation1001_sat
@@ -416,7 +416,7 @@ instance Binary Msg1001 where
   get = B.runBitGet $ do
     _msg1001_header       <- getBits 0
     _msg1001_observations <- replicateM (fromIntegral $ _msg1001_header ^. gpsObservationHeader_n) $ getBits 0
-    return Msg1001 {..}
+    pure Msg1001 {..}
 
   put Msg1001 {..} = B.runBitPut $ do
     putBits 0 _msg1001_header
@@ -447,7 +447,7 @@ instance BinaryBit Observation1002 where
     _observation1002_sat <- B.getWord8 6
     _observation1002_l1  <- getBits n
     _observation1002_l1e <- getBits n
-    return Observation1002 {..}
+    pure Observation1002 {..}
 
   putBits n Observation1002 {..} = do
     B.putWord8 6 _observation1002_sat
@@ -471,7 +471,7 @@ instance Binary Msg1002 where
   get = B.runBitGet $ do
     _msg1002_header       <- getBits 0
     _msg1002_observations <- replicateM (fromIntegral $ _msg1002_header ^. gpsObservationHeader_n) $ getBits 0
-    return Msg1002 {..}
+    pure Msg1002 {..}
 
   put Msg1002 {..} = B.runBitPut $ do
     putBits 0 _msg1002_header
@@ -502,7 +502,7 @@ instance BinaryBit Observation1003 where
     _observation1003_sat <- B.getWord8 6
     _observation1003_l1  <- getBits n
     _observation1003_l2  <- getBits n
-    return Observation1003 {..}
+    pure Observation1003 {..}
 
   putBits n Observation1003 {..} = do
     B.putWord8 6 _observation1003_sat
@@ -526,7 +526,7 @@ instance Binary Msg1003 where
   get = B.runBitGet $ do
     _msg1003_header       <- getBits 0
     _msg1003_observations <- replicateM (fromIntegral $ _msg1003_header ^. gpsObservationHeader_n) $ getBits 0
-    return Msg1003 {..}
+    pure Msg1003 {..}
 
   put Msg1003 {..} = B.runBitPut $ do
     putBits 0 _msg1003_header
@@ -563,7 +563,7 @@ instance BinaryBit Observation1004 where
     _observation1004_l1e <- getBits n
     _observation1004_l2  <- getBits n
     _observation1004_l2e <- getBits n
-    return Observation1004 {..}
+    pure Observation1004 {..}
 
   putBits n Observation1004 {..} = do
     B.putWord8 6 _observation1004_sat
@@ -589,7 +589,7 @@ instance Binary Msg1004 where
   get = B.runBitGet $ do
     _msg1004_header       <- getBits 0
     _msg1004_observations <- replicateM (fromIntegral $ _msg1004_header ^. gpsObservationHeader_n) $ getBits 0
-    return Msg1004 {..}
+    pure Msg1004 {..}
 
   put Msg1004 {..} = B.runBitPut $ do
     putBits 0 _msg1004_header
@@ -617,7 +617,7 @@ instance BinaryBit Observation1009 where
   getBits n = do
     _observation1009_sat <- B.getWord8 6
     _observation1009_l1  <- getBits n
-    return Observation1009 {..}
+    pure Observation1009 {..}
 
   putBits n Observation1009 {..} = do
     B.putWord8 6 _observation1009_sat
@@ -640,7 +640,7 @@ instance Binary Msg1009 where
   get = B.runBitGet $ do
     _msg1009_header       <- getBits 0
     _msg1009_observations <- replicateM (fromIntegral $ _msg1009_header ^. glonassObservationHeader_n) $ getBits 0
-    return Msg1009 {..}
+    pure Msg1009 {..}
 
   put Msg1009 {..} = B.runBitPut $ do
     putBits 0 _msg1009_header
@@ -671,7 +671,7 @@ instance BinaryBit Observation1010 where
     _observation1010_sat <- B.getWord8 6
     _observation1010_l1  <- getBits n
     _observation1010_l1e <- getBits n
-    return Observation1010 {..}
+    pure Observation1010 {..}
 
   putBits n Observation1010 {..} = do
     B.putWord8 6 _observation1010_sat
@@ -695,7 +695,7 @@ instance Binary Msg1010 where
   get = B.runBitGet $ do
     _msg1010_header       <- getBits 0
     _msg1010_observations <- replicateM (fromIntegral $ _msg1010_header ^. glonassObservationHeader_n) $ getBits 0
-    return Msg1010 {..}
+    pure Msg1010 {..}
 
   put Msg1010 {..} = B.runBitPut $ do
     putBits 0 _msg1010_header
@@ -726,7 +726,7 @@ instance BinaryBit Observation1011 where
     _observation1011_sat <- B.getWord8 6
     _observation1011_l1  <- getBits n
     _observation1011_l2  <- getBits n
-    return Observation1011 {..}
+    pure Observation1011 {..}
 
   putBits n Observation1011 {..} = do
     B.putWord8 6 _observation1011_sat
@@ -750,7 +750,7 @@ instance Binary Msg1011 where
   get = B.runBitGet $ do
     _msg1011_header       <- getBits 0
     _msg1011_observations <- replicateM (fromIntegral $ _msg1011_header ^. glonassObservationHeader_n) $ getBits 0
-    return Msg1011 {..}
+    pure Msg1011 {..}
 
   put Msg1011 {..} = B.runBitPut $ do
     putBits 0 _msg1011_header
@@ -787,7 +787,7 @@ instance BinaryBit Observation1012 where
     _observation1012_l1e <- getBits n
     _observation1012_l2  <- getBits n
     _observation1012_l2e <- getBits n
-    return Observation1012 {..}
+    pure Observation1012 {..}
 
   putBits n Observation1012 {..} = do
     B.putWord8 6 _observation1012_sat
@@ -813,7 +813,7 @@ instance Binary Msg1012 where
   get = B.runBitGet $ do
     _msg1012_header       <- getBits 0
     _msg1012_observations <- replicateM (fromIntegral $ _msg1012_header ^. glonassObservationHeader_n) $ getBits 0
-    return Msg1012 {..}
+    pure Msg1012 {..}
 
   put Msg1012 {..} = B.runBitPut $ do
     putBits 0 _msg1012_header
@@ -838,7 +838,7 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1230_" . stripP
 instance Binary Msg1230 where
   get = B.runBitGet $ do
     _msg1230_bias <- getBits 0
-    return Msg1230 {..}
+    pure Msg1230 {..}
 
   put Msg1230 {..} = B.runBitPut $
     putBits 0 _msg1230_bias

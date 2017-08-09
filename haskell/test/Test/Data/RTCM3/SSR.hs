@@ -1,6 +1,6 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# OPTIONS -fno-warn-orphans #-}
+{-# OPTIONS -fno-warn-orphans  #-}
 
 -- |
 -- Module:      Test.Data.RTCM3.SSR
@@ -33,7 +33,7 @@ instance Arbitrary GpsOrbitCorrectionHeader where
     _gpsOrbitCorrectionHeader_provider       <- arbitraryWord 16
     _gpsOrbitCorrectionHeader_solution       <- arbitraryWord 4
     _gpsOrbitCorrectionHeader_n              <- arbitraryWord 6
-    return GpsOrbitCorrectionHeader {..}
+    pure GpsOrbitCorrectionHeader {..}
 
 instance Arbitrary GpsOrbitCorrection where
   arbitrary = do
@@ -45,7 +45,7 @@ instance Arbitrary GpsOrbitCorrection where
     _gpsOrbitCorrection_dotDeltaRadial     <- arbitraryInt 21
     _gpsOrbitCorrection_dotDeltaAlongTrack <- arbitraryInt 19
     _gpsOrbitCorrection_dotDeltaCrossTrack <- arbitraryInt 19
-    return GpsOrbitCorrection {..}
+    pure GpsOrbitCorrection {..}
 
 instance Arbitrary GpsClockCorrectionHeader where
   arbitrary = do
@@ -57,7 +57,7 @@ instance Arbitrary GpsClockCorrectionHeader where
     _gpsClockCorrectionHeader_provider       <- arbitraryWord 16
     _gpsClockCorrectionHeader_solution       <- arbitraryWord 4
     _gpsClockCorrectionHeader_n              <- arbitraryWord 6
-    return GpsClockCorrectionHeader {..}
+    pure GpsClockCorrectionHeader {..}
 
 instance Arbitrary GpsClockCorrection where
   arbitrary = do
@@ -65,7 +65,7 @@ instance Arbitrary GpsClockCorrection where
     _gpsClockCorrection_deltaClockC0 <- arbitraryInt 22
     _gpsClockCorrection_deltaClockC1 <- arbitraryInt 21
     _gpsClockCorrection_deltaClockC2 <- arbitraryInt 27
-    return GpsClockCorrection {..}
+    pure GpsClockCorrection {..}
 
 instance Arbitrary GlonassOrbitCorrectionHeader where
   arbitrary = do
@@ -78,7 +78,7 @@ instance Arbitrary GlonassOrbitCorrectionHeader where
     _glonassOrbitCorrectionHeader_provider       <- arbitraryWord 16
     _glonassOrbitCorrectionHeader_solution       <- arbitraryWord 4
     _glonassOrbitCorrectionHeader_n              <- arbitraryWord 6
-    return GlonassOrbitCorrectionHeader {..}
+    pure GlonassOrbitCorrectionHeader {..}
 
 instance Arbitrary GlonassOrbitCorrection where
   arbitrary = do
@@ -90,7 +90,7 @@ instance Arbitrary GlonassOrbitCorrection where
     _glonassOrbitCorrection_dotDeltaRadial     <- arbitraryInt 21
     _glonassOrbitCorrection_dotDeltaAlongTrack <- arbitraryInt 19
     _glonassOrbitCorrection_dotDeltaCrossTrack <- arbitraryInt 19
-    return GlonassOrbitCorrection {..}
+    pure GlonassOrbitCorrection {..}
 
 instance Arbitrary GlonassClockCorrectionHeader where
   arbitrary = do
@@ -102,7 +102,7 @@ instance Arbitrary GlonassClockCorrectionHeader where
     _glonassClockCorrectionHeader_provider       <- arbitraryWord 16
     _glonassClockCorrectionHeader_solution       <- arbitraryWord 4
     _glonassClockCorrectionHeader_n              <- arbitraryWord 6
-    return GlonassClockCorrectionHeader {..}
+    pure GlonassClockCorrectionHeader {..}
 
 instance Arbitrary GlonassClockCorrection where
   arbitrary = do
@@ -110,31 +110,31 @@ instance Arbitrary GlonassClockCorrection where
     _glonassClockCorrection_deltaClockC0 <- arbitraryInt 22
     _glonassClockCorrection_deltaClockC1 <- arbitraryInt 21
     _glonassClockCorrection_deltaClockC2 <- arbitraryInt 27
-    return GlonassClockCorrection {..}
+    pure GlonassClockCorrection {..}
 
 instance Arbitrary Msg1057 where
   arbitrary = do
     _msg1057_header      <- arbitrary
     _msg1057_corrections <- replicateM (fromIntegral $ _msg1057_header ^. gpsOrbitCorrectionHeader_n) $ arbitrary
-    return Msg1057 {..}
+    pure Msg1057 {..}
 
 instance Arbitrary Msg1058 where
   arbitrary = do
     _msg1058_header      <- arbitrary
     _msg1058_corrections <- replicateM (fromIntegral $ _msg1058_header ^. gpsClockCorrectionHeader_n) $ arbitrary
-    return Msg1058 {..}
+    pure Msg1058 {..}
 
 instance Arbitrary Msg1063 where
   arbitrary = do
     _msg1063_header      <- arbitrary
     _msg1063_corrections <- replicateM (fromIntegral $ _msg1063_header ^. glonassOrbitCorrectionHeader_n) $ arbitrary
-    return Msg1063 {..}
+    pure Msg1063 {..}
 
 instance Arbitrary Msg1064 where
   arbitrary = do
     _msg1064_header      <- arbitrary
     _msg1064_corrections <- replicateM (fromIntegral $ _msg1064_header ^. glonassClockCorrectionHeader_n) $ arbitrary
-    return Msg1064 {..}
+    pure Msg1064 {..}
 
 testMsg1057 :: TestTree
 testMsg1057 =

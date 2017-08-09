@@ -1,6 +1,6 @@
+{-# OPTIONS -fno-warn-orphans  #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE RecordWildCards   #-}
-{-# OPTIONS -fno-warn-orphans #-}
 
 -- |
 -- Module:      Test.Data.RTCM3.System
@@ -30,20 +30,20 @@ instance Arbitrary MessageHeader where
     _messageHeader_seconds     <- arbitraryWord 17
     _messageHeader_n           <- arbitraryWord 5
     _messageHeader_leapSeconds <- arbitraryWord 8
-    return MessageHeader {..}
+    pure MessageHeader {..}
 
 instance Arbitrary Message where
   arbitrary = do
     _message_num         <- arbitraryWord 12
     _message_synchronous <- arbitrary
     _message_interval    <- arbitraryWord 16
-    return Message {..}
+    pure Message {..}
 
 instance Arbitrary Msg1013 where
   arbitrary = do
     header   <- arbitrary
     messages <- replicateM (fromIntegral $ header ^. messageHeader_n) arbitrary
-    return $ Msg1013 header messages
+    pure $ Msg1013 header messages
 
 testMsg1013 :: TestTree
 testMsg1013 =

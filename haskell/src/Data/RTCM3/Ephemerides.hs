@@ -44,7 +44,7 @@ instance BinaryBit GpsEphemerisHeader where
   getBits _n = do
     _gpsEphemerisHeader_num <- B.getWord16be 12
     _gpsEphemerisHeader_sat <- B.getWord8    6
-    return GpsEphemerisHeader {..}
+    pure GpsEphemerisHeader {..}
 
   putBits _n GpsEphemerisHeader {..} = do
     B.putWord16be 12 _gpsEphemerisHeader_num
@@ -142,7 +142,7 @@ instance BinaryBit GpsEphemeris where
     _gpsEphemeris_svHealth    <- B.getWord8    6
     _gpsEphemeris_l2pFlag     <- B.getBool
     _gpsEphemeris_fitInterval <- B.getBool
-    return GpsEphemeris {..}
+    pure GpsEphemeris {..}
 
   putBits _n GpsEphemeris {..} = do
     B.putWord16be 10 _gpsEphemeris_wn
@@ -200,7 +200,7 @@ instance BinaryBit GlonassEphemerisHeader where
     _glonassEphemerisHeader_num <- B.getWord16be  12
     _glonassEphemerisHeader_sat <- B.getWord8     6
     _glonassEphemerisHeader_channel <- B.getWord8 5
-    return GlonassEphemerisHeader {..}
+    pure GlonassEphemerisHeader {..}
 
   putBits _n GlonassEphemerisHeader {..} = do
     B.putWord16be 12 _glonassEphemerisHeader_num
@@ -353,7 +353,7 @@ instance BinaryBit GlonassEphemeris where
     _glonassEphemeris_mTauGps            <- getInt32be 22
     _glonassEphemeris_mln5               <- B.getBool
     _glonassEphemeris_reserved           <- B.getWord8 7
-    return GlonassEphemeris{..}
+    pure GlonassEphemeris{..}
 
   putBits _n GlonassEphemeris{..} = do
     B.putBool        _glonassEphemeris_almanacHealth
@@ -414,7 +414,7 @@ instance Binary Msg1019 where
   get = B.runBitGet $ do
     _msg1019_header    <- getBits 0
     _msg1019_ephemeris <- getBits 0
-    return Msg1019 {..}
+    pure Msg1019 {..}
 
   put Msg1019 {..} = B.runBitPut $ do
     putBits 0 _msg1019_header
@@ -447,7 +447,7 @@ instance Binary Msg1020 where
   get = B.runBitGet $ do
     _msg1020_header    <- getBits 0
     _msg1020_ephemeris <- getBits 0
-    return Msg1020 {..}
+    pure Msg1020 {..}
 
   put Msg1020 {..} = B.runBitPut $ do
     putBits 0 _msg1020_header

@@ -72,7 +72,7 @@ getWord24be = do
     b1 <- fromIntegral <$> getWord8
     b2 <- fromIntegral <$> getWord8
     b3 <- fromIntegral <$> getWord8
-    return $ fromInteger $ shiftL b1 16 .|. shiftL b2 8 .|. b3
+    pure $ fromInteger $ shiftL b1 16 .|. shiftL b2 8 .|. b3
 {-# INLINE getWord24be #-}
 
 putWord24be :: Word24 -> Put
