@@ -12,7 +12,9 @@
 --
 -- RTCMv3 messages for State Space Representation parameters.
 
-module Data.RTCM3.SSR where
+module Data.RTCM3.SSR
+  ( module Data.RTCM3.SSR
+  ) where
 
 import           BasicPrelude
 import           Control.Lens

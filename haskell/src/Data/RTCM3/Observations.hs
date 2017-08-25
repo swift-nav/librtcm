@@ -13,7 +13,9 @@
 --
 -- RTCMv3 Observations.
 
-module Data.RTCM3.Observations where
+module Data.RTCM3.Observations
+  ( module Data.RTCM3.Observations
+  ) where
 
 import           BasicPrelude
 import           Control.Lens

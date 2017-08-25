@@ -12,7 +12,9 @@
 --
 -- RTCMv3 Ephemerides messages
 
-module Data.RTCM3.Ephemerides where
+module Data.RTCM3.Ephemerides
+  ( module Data.RTCM3.Ephemerides
+  ) where
 
 import           BasicPrelude
 import           Control.Lens

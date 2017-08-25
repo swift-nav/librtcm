@@ -15,7 +15,9 @@
 -- Common RTCMv3 type requirements, containers, and serialization
 -- utilities.
 
-module Data.RTCM3.Types where
+module Data.RTCM3.Types
+  ( module Data.RTCM3.Types
+  ) where
 
 import           BasicPrelude
 import           Control.Lens             hiding ((.=))

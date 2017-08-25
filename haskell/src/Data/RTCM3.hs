@@ -14,7 +14,7 @@
 -- RTCMv3 message containers.
 
 module Data.RTCM3
-  ( RTCM3Msg (..)
+  ( module Data.RTCM3
   , module Export
   ) where
 

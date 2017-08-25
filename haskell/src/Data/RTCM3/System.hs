@@ -12,7 +12,9 @@
 --
 -- RTCMv3 System.
 
-module Data.RTCM3.System where
+module Data.RTCM3.System
+  ( module Data.RTCM3.System
+  ) where
 
 import           BasicPrelude
 import           Control.Lens

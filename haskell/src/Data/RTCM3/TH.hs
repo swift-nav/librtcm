@@ -11,7 +11,9 @@
 --
 -- Templated generation of RTCM3 interfaces.
 
-module Data.RTCM3.TH where
+module Data.RTCM3.TH
+  ( module Data.RTCM3.TH
+  ) where
 
 import BasicPrelude         hiding (length)
 import Data.Binary

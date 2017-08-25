@@ -12,7 +12,9 @@
 --
 -- RTCMv3 antenna messages for stationary references and descriptors.
 
-module Data.RTCM3.Antennas where
+module Data.RTCM3.Antennas
+  ( module Data.RTCM3.Antennas
+  ) where
 
 import           BasicPrelude
 import           Control.Lens
