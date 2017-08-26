@@ -217,42 +217,42 @@ uint16_t rtcm3_read_glo_header(const uint8_t *buff, rtcm_obs_header *header)
   return bit;
 }
 
-uint8_t construct_L1_code(rtcm_freq_data *l1_freq_data, double pr, double amb_correction)
+uint8_t construct_L1_code(rtcm_freq_data *l1_freq_data, int32_t pr, double amb_correction)
 {
   l1_freq_data->pseudorange = 0.02 * pr + amb_correction;
-  if(pr != PR_L1_INVALID) {
+  if(pr != (int)PR_L1_INVALID) {
     return 1;
   }
   return 0;
 }
 
 
-uint8_t construct_L1_phase(rtcm_freq_data *l1_freq_data, double phr_pr_diff, double freq)
+uint8_t construct_L1_phase(rtcm_freq_data *l1_freq_data, int32_t phr_pr_diff, double freq)
 {
   l1_freq_data->carrier_phase =
     (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
     (CLIGHT / freq);
-  if(phr_pr_diff != CP_INVALID) {
+  if(phr_pr_diff != (int)CP_INVALID) {
     return 1;
   }
   return 0;
 }
 
-uint8_t construct_L2_code(rtcm_freq_data *l2_freq_data, const rtcm_freq_data *l1_freq_data, double pr)
+uint8_t construct_L2_code(rtcm_freq_data *l2_freq_data, const rtcm_freq_data *l1_freq_data, int32_t pr)
 {
   l2_freq_data->pseudorange = 0.02 * pr + l1_freq_data->pseudorange;
-  if(pr != PR_L2_INVALID) {
+  if(pr != (int)PR_L2_INVALID) {
     return 1;
   }
   return 0;
 }
 
-uint8_t construct_L2_phase(rtcm_freq_data *l2_freq_data, const rtcm_freq_data *l1_freq_data, double phr_pr_diff, double freq)
+uint8_t construct_L2_phase(rtcm_freq_data *l2_freq_data, const rtcm_freq_data *l1_freq_data, int32_t phr_pr_diff, double freq)
 {
   l2_freq_data->carrier_phase =
     (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
     (CLIGHT / freq);
-  if(phr_pr_diff != CP_INVALID) {
+  if(phr_pr_diff != (int)CP_INVALID) {
     return 1;
   }
   return 0;
