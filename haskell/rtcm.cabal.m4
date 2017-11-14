@@ -59,7 +59,6 @@ executable rtcm32json
                      , binary-conduit
                      , bytestring
                      , conduit
-                     , conduit-combinators
                      , conduit-extra
                      , rtcm
   default-language:    Haskell2010
