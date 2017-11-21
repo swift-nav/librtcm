@@ -645,22 +645,22 @@ uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t *buff)
   setbitu(buff, bit, 4, msg_1230->fdma_signal_mask);
   bit += 4;
   if(msg_1230->fdma_signal_mask & 0x08) {
-    int16_t bias = round(msg_1230->L1_CA_cpb * 50);
+    int16_t bias = round(msg_1230->L1_CA_cpb_meter * 50);
     setbits(buff, bit, 16, bias);
     bit += 16;
   }
   if(msg_1230->fdma_signal_mask & 0x04) {
-    int16_t bias = round(msg_1230->L1_P_cpb * 50);
+    int16_t bias = round(msg_1230->L1_P_cpb_meter * 50);
     setbits(buff, bit, 16, bias);
     bit += 16;
   }
   if(msg_1230->fdma_signal_mask & 0x02) {
-    int16_t bias = round(msg_1230->L2_CA_cpb * 50);
+    int16_t bias = round(msg_1230->L2_CA_cpb_meter * 50);
     setbits(buff, bit, 16, bias);
     bit += 16;
   }
   if(msg_1230->fdma_signal_mask & 0x01) {
-    int16_t bias = round(msg_1230->L2_P_cpb * 50);
+    int16_t bias = round(msg_1230->L2_P_cpb_meter * 50);
     setbits(buff, bit, 16, bias);
     bit += 16;
   }

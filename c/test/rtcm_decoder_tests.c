@@ -512,10 +512,10 @@ void test_rtcm_1230(void)
   msg1230.stn_id = 22;
   msg1230.bias_indicator = 0;
   msg1230.fdma_signal_mask = 0x0F;
-  msg1230.L1_CA_cpb = 35.32;
-  msg1230.L1_P_cpb = 66.32;
-  msg1230.L2_CA_cpb = 34.33;
-  msg1230.L2_P_cpb = -29.32;
+  msg1230.L1_CA_cpb_meter = 35.32;
+  msg1230.L1_P_cpb_meter = 66.32;
+  msg1230.L2_CA_cpb_meter = 34.33;
+  msg1230.L2_P_cpb_meter = -29.32;
 
   uint8_t buff[1024];
   memset(buff,0,1024);
@@ -938,29 +938,29 @@ bool msg1230_equals(const rtcm_msg_1230 *lhs, const rtcm_msg_1230 *rhs)
   }
 
   if (lhs->fdma_signal_mask & 0x08) {
-    if (fabs(lhs->L1_CA_cpb - rhs->L1_CA_cpb) > 0.015 ) {
-      printf("1230 L1 CA code phase bias not equal %5.3f %5.3f\n",lhs->L1_CA_cpb,rhs->L1_CA_cpb);
+    if (fabs(lhs->L1_CA_cpb_meter - rhs->L1_CA_cpb_meter) > 0.015 ) {
+      printf("1230 L1 CA code phase bias not equal %5.3f %5.3f\n",lhs->L1_CA_cpb_meter,rhs->L1_CA_cpb_meter);
       return false;
     }
   }
 
   if (lhs->fdma_signal_mask & 0x04) {
-    if (fabs(lhs->L1_P_cpb - rhs->L1_P_cpb) > 0.015) {
-      printf("1230 L1 P code phase bias not equal %5.3f %5.3f\n",lhs->L1_P_cpb,rhs->L1_P_cpb);
+    if (fabs(lhs->L1_P_cpb_meter - rhs->L1_P_cpb_meter) > 0.015) {
+      printf("1230 L1 P code phase bias not equal %5.3f %5.3f\n",lhs->L1_P_cpb_meter,rhs->L1_P_cpb_meter);
       return false;
     }
   }
 
   if (lhs->fdma_signal_mask & 0x02) {
-    if (fabs(lhs->L2_CA_cpb - rhs->L2_CA_cpb) > 0.015) {
-      printf("1230 L2 CA code phase bias not equal %5.3f %5.3f\n",lhs->L2_CA_cpb,rhs->L2_CA_cpb);
+    if (fabs(lhs->L2_CA_cpb_meter - rhs->L2_CA_cpb_meter) > 0.015) {
+      printf("1230 L2 CA code phase bias not equal %5.3f %5.3f\n",lhs->L2_CA_cpb_meter,rhs->L2_CA_cpb_meter);
       return false;
     }
   }
 
   if (lhs->fdma_signal_mask & 0x01) {
-    if (fabs(lhs->L2_P_cpb - rhs->L2_P_cpb) > 0.015) {
-      printf("1230 L2 P code phase bias not equal %5.3f %5.3f\n",lhs->L2_P_cpb,rhs->L2_P_cpb);
+    if (fabs(lhs->L2_P_cpb_meter - rhs->L2_P_cpb_meter) > 0.015) {
+      printf("1230 L2 P code phase bias not equal %5.3f %5.3f\n",lhs->L2_P_cpb_meter,rhs->L2_P_cpb_meter);
       return false;
     }
   }

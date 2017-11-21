@@ -721,19 +721,19 @@ int8_t rtcm3_decode_1230(const uint8_t *buff, rtcm_msg_1230 *msg_1230)
   msg_1230->fdma_signal_mask = getbitu(buff, bit, 4);
   bit += 4;
   if(msg_1230->fdma_signal_mask & 0x08) {
-    msg_1230->L1_CA_cpb = getbits(buff, bit, 16) * 0.02;
+    msg_1230->L1_CA_cpb_meter = getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
   if(msg_1230->fdma_signal_mask & 0x04) {
-    msg_1230->L1_P_cpb = getbits(buff, bit, 16) * 0.02;
+    msg_1230->L1_P_cpb_meter = getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
   if(msg_1230->fdma_signal_mask & 0x02) {
-    msg_1230->L2_CA_cpb = getbits(buff, bit, 16) * 0.02;
+    msg_1230->L2_CA_cpb_meter = getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
   if(msg_1230->fdma_signal_mask & 0x01) {
-    msg_1230->L2_P_cpb = getbits(buff, bit, 16) * 0.02;
+    msg_1230->L2_P_cpb_meter = getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
 
