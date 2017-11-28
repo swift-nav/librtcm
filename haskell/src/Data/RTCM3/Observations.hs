@@ -340,13 +340,13 @@ data GlonassBias = GlonassBias
     -- ^ GLONASS Code-Phase bias indicator.
   , _glonassBias_mask    :: Word8
     -- ^ GLONASS FDMA signals mask.
-  , _glonassBias_l1ca    :: Word16
+  , _glonassBias_l1ca    :: Int16
     -- ^ GLONASS L1 C/A code-phase bias.
-  , _glonassBias_l1p     :: Word16
+  , _glonassBias_l1p     :: Int16
     -- ^ GLONASS L1 P code-phase bias.
-  , _glonassBias_l2ca    :: Word16
+  , _glonassBias_l2ca    :: Int16
     -- ^ GLONASS L2 C/A code-phase bias.
-  , _glonassBias_l2p     :: Word16
+  , _glonassBias_l2p     :: Int16
     -- ^ GLONASS L2 P code-phase bias.
   } deriving ( Show, Read, Eq )
 
@@ -359,10 +359,10 @@ instance BinaryBit GlonassBias where
     _glonassBias_station <- B.getWord16be 12
     _glonassBias_bias    <- B.getBool
     _glonassBias_mask    <- B.getWord8 4
-    _glonassBias_l1ca    <- B.getWord16be 16
-    _glonassBias_l1p     <- B.getWord16be 16
-    _glonassBias_l2ca    <- B.getWord16be 16
-    _glonassBias_l2p     <- B.getWord16be 16
+    _glonassBias_l1ca    <- getInt16be 16
+    _glonassBias_l1p     <- getInt16be 16
+    _glonassBias_l2ca    <- getInt16be 16
+    _glonassBias_l2p     <- getInt16be 16
     pure GlonassBias {..}
 
   putBits _n GlonassBias {..} = do
@@ -370,10 +370,10 @@ instance BinaryBit GlonassBias where
     B.putWord16be 12 _glonassBias_station
     B.putBool        _glonassBias_bias
     B.putWord8 4     _glonassBias_mask
-    B.putWord16be 16 _glonassBias_l1ca
-    B.putWord16be 16 _glonassBias_l1p
-    B.putWord16be 16 _glonassBias_l2ca
-    B.putWord16be 16 _glonassBias_l2p
+    putInt16be 16 _glonassBias_l1ca
+    putInt16be 16 _glonassBias_l1p
+    putInt16be 16 _glonassBias_l2ca
+    putInt16be 16 _glonassBias_l2p
 
 msg1001 :: Word16
 msg1001 = 1001

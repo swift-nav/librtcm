@@ -105,10 +105,10 @@ instance Arbitrary GlonassBias where
     _glonassBias_station <- arbitraryWord 12
     _glonassBias_bias    <- arbitrary
     _glonassBias_mask    <- arbitraryWord 4
-    _glonassBias_l1ca    <- arbitraryWord 16
-    _glonassBias_l1p     <- arbitraryWord 16
-    _glonassBias_l2ca    <- arbitraryWord 16
-    _glonassBias_l2p     <- arbitraryWord 16
+    _glonassBias_l1ca    <- arbitraryInt 16
+    _glonassBias_l1p     <- arbitraryInt 16
+    _glonassBias_l2ca    <- arbitraryInt 16
+    _glonassBias_l2p     <- arbitraryInt 16
     pure GlonassBias {..}
 
 instance Arbitrary Observation1001 where
