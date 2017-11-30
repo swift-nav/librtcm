@@ -17,6 +17,7 @@ module Test.Data.RTCM3.Observations
 import BasicPrelude
 import Control.Lens
 import Data.Binary
+import Data.Bits
 import Data.RTCM3
 import Test.Data.RTCM3.Test
 import Test.Tasty
@@ -105,10 +106,7 @@ instance Arbitrary GlonassBias where
     _glonassBias_station <- arbitraryWord 12
     _glonassBias_bias    <- arbitrary
     _glonassBias_mask    <- arbitraryWord 4
-    _glonassBias_l1ca    <- arbitraryInt 16
-    _glonassBias_l1p     <- arbitraryInt 16
-    _glonassBias_l2ca    <- arbitraryInt 16
-    _glonassBias_l2p     <- arbitraryInt 16
+    _glonassBias_biases  <- replicateM (popCount _glonassBias_mask) $ arbitraryInt 16
     pure GlonassBias {..}
 
 instance Arbitrary Observation1001 where
