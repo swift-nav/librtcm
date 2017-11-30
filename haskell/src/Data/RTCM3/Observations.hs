@@ -24,6 +24,7 @@ import           Data.Binary
 import           Data.Binary.Bits
 import qualified Data.Binary.Bits.Get as B
 import qualified Data.Binary.Bits.Put as B
+import           Data.Bits
 import           Data.Int
 import           Data.RTCM3.Extras
 import           Data.RTCM3.TH
@@ -340,14 +341,8 @@ data GlonassBias = GlonassBias
     -- ^ GLONASS Code-Phase bias indicator.
   , _glonassBias_mask    :: Word8
     -- ^ GLONASS FDMA signals mask.
-  , _glonassBias_l1ca    :: Int16
-    -- ^ GLONASS L1 C/A code-phase bias.
-  , _glonassBias_l1p     :: Int16
-    -- ^ GLONASS L1 P code-phase bias.
-  , _glonassBias_l2ca    :: Int16
-    -- ^ GLONASS L2 C/A code-phase bias.
-  , _glonassBias_l2p     :: Int16
-    -- ^ GLONASS L2 P code-phase bias.
+  , _glonassBias_biases  :: [Int16]
+    -- ^ GLONASS code-phase biases.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''GlonassBias)
@@ -359,10 +354,7 @@ instance BinaryBit GlonassBias where
     _glonassBias_station <- B.getWord16be 12
     _glonassBias_bias    <- B.getBool
     _glonassBias_mask    <- B.getWord8 4
-    _glonassBias_l1ca    <- getInt16be 16
-    _glonassBias_l1p     <- getInt16be 16
-    _glonassBias_l2ca    <- getInt16be 16
-    _glonassBias_l2p     <- getInt16be 16
+    _glonassBias_biases  <- replicateM (popCount _glonassBias_mask) $ getInt16be 16
     pure GlonassBias {..}
 
   putBits _n GlonassBias {..} = do
@@ -370,10 +362,7 @@ instance BinaryBit GlonassBias where
     B.putWord16be 12 _glonassBias_station
     B.putBool        _glonassBias_bias
     B.putWord8 4     _glonassBias_mask
-    putInt16be 16 _glonassBias_l1ca
-    putInt16be 16 _glonassBias_l1p
-    putInt16be 16 _glonassBias_l2ca
-    putInt16be 16 _glonassBias_l2p
+    forM_ _glonassBias_biases $ putInt16be 16
 
 msg1001 :: Word16
 msg1001 = 1001
