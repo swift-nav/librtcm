@@ -1,5 +1,0 @@
-resolver: lts-6.35
-packages:
-- .
-extra-deps:
-- word24-2.0.1
