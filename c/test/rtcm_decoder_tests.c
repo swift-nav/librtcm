@@ -32,6 +32,7 @@ int main(void)
   test_rtcm_1010();
   test_rtcm_1012();
   test_rtcm_1230();
+  test_rtcm_1033();
 }
 
 void test_rtcm_1001(void)
@@ -357,7 +358,7 @@ void test_rtcm_1008(void)
   strcpy(msg1008.msg_1007.desc, "Something without 30 chars.");
   msg1008.msg_1007.ant_id = 1;
   msg1008.serial_count = 9;
-  strcpy(msg1008.serial_num, "123456789");
+  strncpy(msg1008.serial_num, "123456789",32);
 
   uint8_t buff[1024];
   memset(buff,0,1024);
@@ -503,6 +504,32 @@ void test_rtcm_1012(void)
   int8_t ret = rtcm3_decode_1012(buff, &msg1012_out);
 
   assert(ret == 0 && msgobs_glo_equals(&msg1012, &msg1012_out));
+}
+
+void test_rtcm_1033(void) {
+  rtcm_msg_1033 msg1033;
+  msg1033.stn_id = 555;
+  msg1033.antenna_desc_counter = 5;
+  strncpy(msg1033.antenna_descriptor, "hello", 32);
+  msg1033.antenna_setup_ID = 7;
+  msg1033.antenna_serial_num_counter = 3;
+  strncpy(msg1033.antenna_serial_num, "777", 32);
+  msg1033.rcv_descriptor_counter = 9;
+  strncpy(msg1033.rcv_descriptor, "LEI - IGS", 32);
+  msg1033.rcv_fw_counter = 6;
+  strncpy(msg1033.rcv_fw_version, "1.2.14", 32);
+  msg1033.rcv_serial_num_counter = 20;
+  strncpy(msg1033.rcv_serial_num, "66666666666666666666", 32);
+
+  uint8_t buff[1024];
+  memset(buff,0,1024);
+  rtcm3_encode_1033(&msg1033, buff);
+
+  rtcm_msg_1033 msg1033_out;
+  int8_t ret = rtcm3_decode_1033(buff, &msg1033_out);
+
+  assert(ret == 0 && msg1033_equals(&msg1033, &msg1033_out));
+
 }
 
 void test_rtcm_1230(void)
@@ -918,6 +945,47 @@ bool msg1008_equals(const rtcm_msg_1008 *lhs, const rtcm_msg_1008 *rhs)
   }
 
   return msg1007_equals(&lhs->msg_1007, &rhs->msg_1007);
+}
+
+bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs)
+{
+  if (lhs->stn_id != rhs->stn_id) {
+    return false;
+  }
+  if (lhs->antenna_desc_counter != rhs->antenna_desc_counter) {
+    return false;
+  }
+  if (strncmp(lhs->antenna_descriptor, rhs->antenna_descriptor, lhs->antenna_desc_counter) != 0) {
+    return false;
+  }
+  if (lhs->antenna_setup_ID != rhs->antenna_setup_ID) {
+    return false;
+  }
+  if (lhs->antenna_serial_num != rhs->antenna_serial_num) {
+    return false;
+  }
+  if (strncmp(lhs->antenna_serial_num, rhs->antenna_serial_num, lhs->antenna_serial_num_counter) != 0) {
+    return false;
+  }
+  if (lhs->rcv_descriptor_counter != rhs->rcv_descriptor_counter) {
+    return false;
+  }
+  if (strncmp(lhs->rcv_descriptor, rhs->rcv_descriptor, lhs->rcv_descriptor_counter) != 0) {
+    return false;
+  }
+  if (lhs->rcv_fw_counter != rhs->rcv_fw_counter) {
+    return false;
+  }
+  if (strncmp(lhs->rcv_fw_version, rhs->rcv_fw_version, lhs->rcv_fw_counter) != 0) {
+    return false;
+  }
+  if (lhs->rcv_serial_num_counter != rhs->rcv_serial_num_counter) {
+    return false;
+  }
+  if (strncmp(lhs->rcv_serial_num, rhs->rcv_serial_num, lhs->rcv_serial_num_counter) != 0) {
+    return false;
+  }
+  return true;
 }
 
 bool msg1230_equals(const rtcm_msg_1230 *lhs, const rtcm_msg_1230 *rhs)
