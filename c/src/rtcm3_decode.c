@@ -694,6 +694,68 @@ int8_t rtcm3_decode_1012(const uint8_t *buff, rtcm_obs_message *msg_1012)
   return 0;
 }
 
+/** Decode an RTCMv3 message type 1033 (Rcv and Ant descriptor)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
+int8_t rtcm3_decode_1033(const uint8_t *buff, rtcm_msg_1033 *msg_1033)
+{
+  uint16_t bit = 0;
+  uint16_t msg_num = getbitu(buff, bit, 12);
+  bit += 12;
+
+  if (msg_num != 1033)
+    /* Unexpected message type. */
+    return -1;
+
+  msg_1033->stn_id = getbitu(buff, bit, 12);
+  bit += 12;
+
+  msg_1033->antenna_desc_counter = getbitu(buff, bit, 8);
+  bit += 8;
+  for (uint8_t i = 0; i < msg_1033->antenna_desc_counter; ++i) {
+    msg_1033->antenna_descriptor[i] = getbitu(buff, bit, 8);
+    bit += 8;
+  }
+
+  msg_1033->antenna_setup_ID = getbitu(buff, bit, 8);
+  bit += 8;
+
+  msg_1033->antenna_serial_num_counter = getbitu(buff, bit, 8);
+  bit += 8;
+  for (uint8_t i = 0; i < msg_1033->antenna_serial_num_counter; ++i) {
+    msg_1033->antenna_serial_num[i] = getbitu(buff, bit, 8);
+    bit += 8;
+  }
+
+  msg_1033->rcv_descriptor_counter = getbitu(buff, bit, 8);
+  bit += 8;
+  for (uint8_t i = 0; i < msg_1033->rcv_descriptor_counter; ++i) {
+    msg_1033->rcv_descriptor[i] = getbitu(buff, bit, 8);
+    bit += 8;
+  }
+
+  msg_1033->rcv_fw_counter = getbitu(buff, bit, 8);
+  bit += 8;
+  for (uint8_t i = 0; i < msg_1033->rcv_fw_counter; ++i) {
+    msg_1033->rcv_fw_version[i] = getbitu(buff, bit, 8);
+    bit += 8;
+  }
+
+  msg_1033->rcv_serial_num_counter = getbitu(buff, bit, 8);
+  bit += 8;
+  for (uint8_t i = 0; i < msg_1033->rcv_serial_num_counter; ++i) {
+    msg_1033->rcv_serial_num[i] = getbitu(buff, bit, 8);
+    bit += 8;
+  }
+
+  return 0;
+}
+
 /** Decode an RTCMv3 message type 1230 (Code-Phase Bias Message)
  *
  * \param buff The input data buffer

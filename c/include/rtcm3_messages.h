@@ -103,4 +103,19 @@ typedef struct {
   double L2_P_cpb_meter;
 } rtcm_msg_1230;
 
+typedef struct {
+  uint16_t stn_id;
+  uint8_t antenna_desc_counter;
+  char antenna_descriptor[32];
+  uint8_t antenna_setup_ID;
+  uint8_t antenna_serial_num_counter;
+  char antenna_serial_num[32];
+  uint8_t rcv_descriptor_counter;
+  char rcv_descriptor[32];
+  uint8_t rcv_fw_counter;
+  char rcv_fw_version[32];
+  uint8_t rcv_serial_num_counter;
+  char rcv_serial_num[32];
+} rtcm_msg_1033;
+
 #endif /* PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H */
