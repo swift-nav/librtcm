@@ -31,8 +31,9 @@ int main(void)
   test_rtcm_1008();
   test_rtcm_1010();
   test_rtcm_1012();
-  test_rtcm_1230();
+  test_rtcm_1029();
   test_rtcm_1033();
+  test_rtcm_1230();
 }
 
 void test_rtcm_1001(void)
@@ -506,6 +507,47 @@ void test_rtcm_1012(void)
   assert(ret == 0 && msgobs_glo_equals(&msg1012, &msg1012_out));
 }
 
+// from the RTCM3 Spec Section 3.5.10
+static const uint8_t sample_1029_raw[] = {
+  // 1029, 23, 132, 59100, 21, 30
+  0x40, 0x50, 0x17, 0x00, 0x84, 0x73, 0x6E, 0x15, 0x1E,
+  // “UTF-8”
+  0x55, 0x54, 0x46, 0x2D, 0x38,
+  // " "
+  0x20,
+  // “проверка”
+  0xD0, 0xBF, 0xD1, 0x80, 0xD0, 0xBE, 0xD0, 0xB2, 0xD0, 0xB5, 0xD1, 0x80, 0xD0, 0xBA, 0xD0, 0xB0,
+  // " "
+  0x20,
+  // “wörter”
+  0x77, 0xC3, 0xB6, 0x72, 0x74, 0x65, 0x72
+};
+
+void test_rtcm_1029(void) {
+  rtcm_msg_1029 msg1029;
+  msg1029.stn_id = 23;
+  msg1029.mjd_num = 132;
+  msg1029.utc_sec_of_day = 59100;
+  msg1029.unicode_chars = 21;
+  msg1029.utf8_code_units_n = 30;
+  memcpy(msg1029.utf8_code_units, &sample_1029_raw[9], msg1029.utf8_code_units_n);
+
+  uint8_t buff[1024];
+  memset(buff,0,1024);
+  rtcm3_encode_1029(&msg1029, buff);
+
+  for (uint16_t i = 0; i < sizeof(sample_1029_raw); i++)
+  {
+    assert(buff[i] == sample_1029_raw[i]);
+  }
+
+  rtcm_msg_1029 msg1029_out;
+  int8_t ret = rtcm3_decode_1029(buff, &msg1029_out);
+
+  assert(ret == 0 && msg1029_equals(&msg1029, &msg1029_out));
+  assert(ret == 0);
+}
+
 void test_rtcm_1033(void) {
   rtcm_msg_1033 msg1033;
   msg1033.stn_id = 555;
@@ -945,6 +987,33 @@ bool msg1008_equals(const rtcm_msg_1008 *lhs, const rtcm_msg_1008 *rhs)
   }
 
   return msg1007_equals(&lhs->msg_1007, &rhs->msg_1007);
+}
+
+bool msg1029_equals(const rtcm_msg_1029 *lhs, const rtcm_msg_1029 *rhs)
+{
+  if (lhs->stn_id != rhs->stn_id) {
+    return false;
+  }
+  if (lhs->mjd_num != rhs->mjd_num) {
+    return false;
+  }
+  if (lhs->utc_sec_of_day != rhs->utc_sec_of_day) {
+    return false;
+  }
+  if (lhs->unicode_chars != rhs->unicode_chars) {
+    return false;
+  }
+  if (lhs->utf8_code_units_n != rhs->utf8_code_units_n) {
+    return false;
+  }
+  for (uint16_t i = 0; i < sizeof(lhs->utf8_code_units_n); i++)
+  {
+    if (lhs->utf8_code_units[i] != rhs->utf8_code_units[i])
+    {
+      return false;
+    }
+  }
+  return true;
 }
 
 bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs)

@@ -93,15 +93,15 @@ typedef struct {
   char serial_num[32]; /* Antenna Serial Number DF033 char8(M) 8*M */
 } rtcm_msg_1008;
 
+#define RTCM_1029_MAX_CODE_UNITS (255u)
 typedef struct {
   uint16_t stn_id;
-  uint8_t bias_indicator;
-  uint8_t fdma_signal_mask;
-  double L1_CA_cpb_meter;
-  double L1_P_cpb_meter;
-  double L2_CA_cpb_meter;
-  double L2_P_cpb_meter;
-} rtcm_msg_1230;
+  uint16_t mjd_num;
+  uint32_t utc_sec_of_day;
+  uint8_t unicode_chars;
+  uint8_t utf8_code_units_n;
+  uint8_t utf8_code_units[RTCM_1029_MAX_CODE_UNITS];
+} rtcm_msg_1029;
 
 typedef struct {
   uint16_t stn_id;
@@ -117,5 +117,15 @@ typedef struct {
   uint8_t rcv_serial_num_counter;
   char rcv_serial_num[32];
 } rtcm_msg_1033;
+
+typedef struct {
+  uint16_t stn_id;
+  uint8_t bias_indicator;
+  uint8_t fdma_signal_mask;
+  double L1_CA_cpb_meter;
+  double L1_P_cpb_meter;
+  double L2_CA_cpb_meter;
+  double L2_P_cpb_meter;
+} rtcm_msg_1230;
 
 #endif /* PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H */

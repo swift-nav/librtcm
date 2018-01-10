@@ -37,6 +37,7 @@ uint16_t rtcm3_encode_1007(const rtcm_msg_1007 *msg_1007, uint8_t *buff);
 uint16_t rtcm3_encode_1008(const rtcm_msg_1008 *msg_1008, uint8_t *buff);
 uint16_t rtcm3_encode_1010(const rtcm_obs_message *msg_1010, uint8_t *buff);
 uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t *buff);
+uint16_t rtcm3_encode_1029(const rtcm_msg_1029 *msg_1029, uint8_t *buff);
 uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t *buff);
 uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t *buff);
 

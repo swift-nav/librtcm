@@ -630,6 +630,37 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t *buff)
   return (bit + 7) / 8;
 }
 
+uint16_t rtcm3_encode_1029(const rtcm_msg_1029 *msg_1029, uint8_t *buff)
+{
+  uint16_t bit = 0, byte = 0;
+
+  setbitu(buff, bit, 12, 1029);
+  bit += 12;
+
+  setbitu(buff, bit, 12, msg_1029->stn_id);
+  bit += 12;
+
+  setbitu(buff, bit, 16, msg_1029->mjd_num);
+  bit += 16;
+
+  setbitu(buff, bit, 17, msg_1029->utc_sec_of_day);
+  bit += 17;
+
+  setbitu(buff, bit, 7, msg_1029->unicode_chars);
+  bit += 7;
+
+  byte = bit / 8;
+
+  buff[byte++] = msg_1029->utf8_code_units_n;
+  for (uint8_t i = 0; i < msg_1029->utf8_code_units_n; i++)
+  {
+    buff[byte++] = msg_1029->utf8_code_units[i];
+  }
+
+  /* Round number of bits up to nearest whole byte. */
+  return (bit + 7) / 8;
+}
+
 uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t *buff)
 {
   uint16_t bit = 0;
