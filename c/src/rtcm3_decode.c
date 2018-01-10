@@ -694,6 +694,46 @@ int8_t rtcm3_decode_1012(const uint8_t *buff, rtcm_obs_message *msg_1012)
   return 0;
 }
 
+/** Decode an RTCMv3 message type 1029 (Unicode Text String Message)
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return If valid then return 0.
+ *         Returns a negative number if the message is invalid:
+ *          - `-1` : Message type mismatch
+ */
+int8_t rtcm3_decode_1029(const uint8_t *buff, rtcm_msg_1029 *msg_1029)
+{
+  uint16_t bit = 0;
+  uint16_t msg_num = getbitu(buff, bit, 12);
+  bit += 12;
+
+  if (msg_num != 1029)
+    /* Unexpected message type. */
+    return -1;
+
+  msg_1029->stn_id = getbitu(buff, bit, 12);
+  bit += 12;
+
+  msg_1029->mjd_num = getbitu(buff, bit, 16);
+  bit += 16;
+
+  msg_1029->utc_sec_of_day = getbitu(buff, bit, 17);
+  bit += 17;
+
+  msg_1029->unicode_chars = getbitu(buff, bit, 7);
+  bit += 7;
+
+  msg_1029->utf8_code_units_n = getbitu(buff, bit, 8);
+  bit += 8;
+  for (uint8_t i = 0; i < msg_1029->utf8_code_units_n; ++i) {
+    msg_1029->utf8_code_units[i] = getbitu(buff, bit, 8);
+    bit += 8;
+  }
+
+  return 0;
+}
+
 /** Decode an RTCMv3 message type 1033 (Rcv and Ant descriptor)
  *
  * \param buff The input data buffer
