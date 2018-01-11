@@ -84,6 +84,26 @@ testInt64be =
   testProperty "Roundtrip Int64be" $ \(TestInt n i) ->
     decodeBits (getInt64be n) (encodeBits (putInt64be n i)) == (i :: Int64)
 
+testSInt8 :: TestTree
+testSInt8 =
+  testProperty "Roundtrip SInt8" $ \(TestInt n i) ->
+    decodeBits (getSInt8 n) (encodeBits (putSInt8 n i)) == (i :: Int8)
+
+testSInt16be :: TestTree
+testSInt16be =
+  testProperty "Roundtrip SInt16" $ \(TestInt n i) ->
+    decodeBits (getSInt16be n) (encodeBits (putSInt16be n i)) == (i :: Int16)
+
+testSInt32be :: TestTree
+testSInt32be =
+  testProperty "Roundtrip SInt32" $ \(TestInt n i) ->
+    decodeBits (getSInt32be n) (encodeBits (putSInt32be n i)) == (i :: Int32)
+
+testSInt64be :: TestTree
+testSInt64be =
+  testProperty "Roundtrip SInt64be" $ \(TestInt n i) ->
+    decodeBits (getSInt64be n) (encodeBits (putSInt64be n i)) == (i :: Int64)
+
 testWord24be :: TestTree
 testWord24be =
   testProperty "Roundtrip Word24be" $ \i ->
@@ -96,5 +116,9 @@ tests =
     , testInt16be
     , testInt32be
     , testInt64be
+    , testSInt8
+    , testSInt16be
+    , testSInt32be
+    , testSInt64be
     , testWord24be
     ]
