@@ -328,21 +328,21 @@ instance BinaryBit GlonassEphemeris where
     _glonassEphemeris_bn_msb             <- B.getBool
     _glonassEphemeris_p2                 <- B.getBool
     _glonassEphemeris_tb                 <- B.getWord8 7
-    _glonassEphemeris_xndot              <- getInt32be 24
-    _glonassEphemeris_xn                 <- getInt32be 27
-    _glonassEphemeris_xndotdot           <- getInt8 5
-    _glonassEphemeris_yndot              <- getInt32be 24
-    _glonassEphemeris_yn                 <- getInt32be 27
-    _glonassEphemeris_yndotdot           <- getInt8 5
-    _glonassEphemeris_zndot              <- getInt32be 24
-    _glonassEphemeris_zn                 <- getInt32be 27
-    _glonassEphemeris_zndotdot           <- getInt8 5
+    _glonassEphemeris_xndot              <- getSInt32be 24
+    _glonassEphemeris_xn                 <- getSInt32be 27
+    _glonassEphemeris_xndotdot           <- getSInt8 5
+    _glonassEphemeris_yndot              <- getSInt32be 24
+    _glonassEphemeris_yn                 <- getSInt32be 27
+    _glonassEphemeris_yndotdot           <- getSInt8 5
+    _glonassEphemeris_zndot              <- getSInt32be 24
+    _glonassEphemeris_zn                 <- getSInt32be 27
+    _glonassEphemeris_zndotdot           <- getSInt8 5
     _glonassEphemeris_p3                 <- B.getBool
-    _glonassEphemeris_gammaN             <- getInt16be 11
+    _glonassEphemeris_gammaN             <- getSInt16be 11
     _glonassEphemeris_mp                 <- B.getWord8 2
     _glonassEphemeris_mi3                <- B.getBool
-    _glonassEphemeris_tauN               <- getInt32be 22
-    _glonassEphemeris_mdeltatau          <- getInt8 5
+    _glonassEphemeris_tauN               <- getSInt32be 22
+    _glonassEphemeris_mdeltatau          <- getSInt8 5
     _glonassEphemeris_en                 <- B.getWord8 5
     _glonassEphemeris_mp4                <- B.getBool
     _glonassEphemeris_mft                <- B.getWord8 4
@@ -350,9 +350,9 @@ instance BinaryBit GlonassEphemeris where
     _glonassEphemeris_mM                 <- B.getWord8 2
     _glonassEphemeris_additional         <- B.getBool
     _glonassEphemeris_nA                 <- B.getWord16be 11
-    _glonassEphemeris_tauC               <- getInt32be 32
+    _glonassEphemeris_tauC               <- getSInt32be 32
     _glonassEphemeris_mn4                <- B.getWord8 5
-    _glonassEphemeris_mTauGps            <- getInt32be 22
+    _glonassEphemeris_mTauGps            <- getSInt32be 22
     _glonassEphemeris_mln5               <- B.getBool
     _glonassEphemeris_reserved           <- B.getWord8 7
     pure GlonassEphemeris{..}
@@ -365,21 +365,21 @@ instance BinaryBit GlonassEphemeris where
     B.putBool        _glonassEphemeris_bn_msb
     B.putBool        _glonassEphemeris_p2
     B.putWord8    7  _glonassEphemeris_tb
-    putInt32be    24 _glonassEphemeris_xndot
-    putInt32be    27 _glonassEphemeris_xn
-    putInt8       5  _glonassEphemeris_xndotdot
-    putInt32be    24 _glonassEphemeris_yndot
-    putInt32be    27 _glonassEphemeris_yn
-    putInt8       5  _glonassEphemeris_yndotdot
-    putInt32be    24 _glonassEphemeris_zndot
-    putInt32be    27 _glonassEphemeris_zn
-    putInt8       5  _glonassEphemeris_zndotdot
+    putSInt32be   24 _glonassEphemeris_xndot
+    putSInt32be   27 _glonassEphemeris_xn
+    putSInt8      5  _glonassEphemeris_xndotdot
+    putSInt32be   24 _glonassEphemeris_yndot
+    putSInt32be   27 _glonassEphemeris_yn
+    putSInt8      5  _glonassEphemeris_yndotdot
+    putSInt32be   24 _glonassEphemeris_zndot
+    putSInt32be   27 _glonassEphemeris_zn
+    putSInt8      5  _glonassEphemeris_zndotdot
     B.putBool        _glonassEphemeris_p3
-    putInt16be    11 _glonassEphemeris_gammaN
+    putSInt16be   11 _glonassEphemeris_gammaN
     B.putWord8    2  _glonassEphemeris_mp
     B.putBool        _glonassEphemeris_mi3
-    putInt32be    22 _glonassEphemeris_tauN
-    putInt8       5  _glonassEphemeris_mdeltatau
+    putSInt32be   22 _glonassEphemeris_tauN
+    putSInt8      5  _glonassEphemeris_mdeltatau
     B.putWord8    5  _glonassEphemeris_en
     B.putBool        _glonassEphemeris_mp4
     B.putWord8    4  _glonassEphemeris_mft
@@ -387,9 +387,9 @@ instance BinaryBit GlonassEphemeris where
     B.putWord8    2  _glonassEphemeris_mM
     B.putBool        _glonassEphemeris_additional
     B.putWord16be 11 _glonassEphemeris_nA
-    putInt32be    32 _glonassEphemeris_tauC
+    putSInt32be   32 _glonassEphemeris_tauC
     B.putWord8    5  _glonassEphemeris_mn4
-    putInt32be    22 _glonassEphemeris_mTauGps
+    putSInt32be   22 _glonassEphemeris_mTauGps
     B.putBool        _glonassEphemeris_mln5
     B.putWord8    7  _glonassEphemeris_reserved
 

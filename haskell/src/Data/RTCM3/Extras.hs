@@ -19,6 +19,14 @@ module Data.RTCM3.Extras
   , putInt16be
   , putInt32be
   , putInt64be
+  , getSInt8
+  , getSInt16be
+  , getSInt32be
+  , getSInt64be
+  , putSInt8
+  , putSInt16be
+  , putSInt32be
+  , putSInt64be
   , getWord24be
   , putWord24be
   ) where
@@ -66,6 +74,46 @@ putInt32be n = B.putWord32be n . fromIntegral
 
 putInt64be :: Int -> Int64 -> B.BitPut ()
 putInt64be n = B.putWord64be n . fromIntegral
+
+getSInt8 :: Int -> B.BitGet Int8
+getSInt8 n = do
+  signed <- B.getBool
+  bool id negate signed . fromIntegral <$> B.getWord8 (n - 1)
+
+getSInt16be :: Int -> B.BitGet Int16
+getSInt16be n = do
+  signed <- B.getBool
+  bool id negate signed . fromIntegral <$> B.getWord16be (n - 1)
+
+getSInt32be :: Int -> B.BitGet Int32
+getSInt32be n = do
+  signed <- B.getBool
+  bool id negate signed . fromIntegral <$> B.getWord32be (n - 1)
+
+getSInt64be :: Int -> B.BitGet Int64
+getSInt64be n = do
+  signed <- B.getBool
+  bool id negate signed . fromIntegral <$> B.getWord64be (n - 1)
+
+putSInt8 :: Int -> Int8 -> B.BitPut ()
+putSInt8 n v = do
+  B.putBool $ v < 0
+  B.putWord8 (n - 1) $ fromIntegral (abs v)
+
+putSInt16be :: Int -> Int16 -> B.BitPut ()
+putSInt16be n v = do
+  B.putBool $ v < 0
+  B.putWord16be (n - 1) $ fromIntegral (abs v)
+
+putSInt32be :: Int -> Int32 -> B.BitPut ()
+putSInt32be n v = do
+  B.putBool $ v < 0
+  B.putWord32be (n - 1) $ fromIntegral (abs v)
+
+putSInt64be :: Int -> Int64 -> B.BitPut ()
+putSInt64be n v = do
+  B.putBool $ v < 0
+  B.putWord64be (n - 1) $ fromIntegral (abs v)
 
 getWord24be :: Get Word24
 getWord24be = do
