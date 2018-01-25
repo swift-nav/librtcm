@@ -140,6 +140,34 @@ instance Arbitrary GpsOrbitClockCorrection where
     _gpsOrbitClockCorrection_deltaClockC2       <- arbitraryInt 27
     pure GpsOrbitClockCorrection {..}
 
+instance Arbitrary GlonassOrbitClockCorrectionHeader where
+  arbitrary = do
+    _glonassOrbitClockCorrectionHeader_num            <- arbitraryWord 12
+    _glonassOrbitClockCorrectionHeader_epochs         <- arbitraryWord 17
+    _glonassOrbitClockCorrectionHeader_updateInterval <- arbitraryWord 4
+    _glonassOrbitClockCorrectionHeader_multiple       <- arbitrary
+    _glonassOrbitClockCorrectionHeader_datum          <- arbitrary
+    _glonassOrbitClockCorrectionHeader_iod            <- arbitraryWord 4
+    _glonassOrbitClockCorrectionHeader_provider       <- arbitraryWord 16
+    _glonassOrbitClockCorrectionHeader_solution       <- arbitraryWord 4
+    _glonassOrbitClockCorrectionHeader_n              <- arbitraryWord 6
+    pure GlonassOrbitClockCorrectionHeader {..}
+
+instance Arbitrary GlonassOrbitClockCorrection where
+  arbitrary = do
+    _glonassOrbitClockCorrection_sat                <- arbitraryWord 5
+    _glonassOrbitClockCorrection_iode               <- arbitraryWord 8
+    _glonassOrbitClockCorrection_deltaRadial        <- arbitraryInt 22
+    _glonassOrbitClockCorrection_deltaAlongTrack    <- arbitraryInt 20
+    _glonassOrbitClockCorrection_deltaCrossTrack    <- arbitraryInt 20
+    _glonassOrbitClockCorrection_dotDeltaRadial     <- arbitraryInt 21
+    _glonassOrbitClockCorrection_dotDeltaAlongTrack <- arbitraryInt 19
+    _glonassOrbitClockCorrection_dotDeltaCrossTrack <- arbitraryInt 19
+    _glonassOrbitClockCorrection_deltaClockC0       <- arbitraryInt 22
+    _glonassOrbitClockCorrection_deltaClockC1       <- arbitraryInt 21
+    _glonassOrbitClockCorrection_deltaClockC2       <- arbitraryInt 27
+    pure GlonassOrbitClockCorrection {..}
+
 instance Arbitrary Msg1057 where
   arbitrary = do
     _msg1057_header      <- arbitrary
@@ -170,6 +198,12 @@ instance Arbitrary Msg1060 where
     _msg1060_corrections <- replicateM (fromIntegral $ _msg1060_header ^. gpsOrbitClockCorrectionHeader_n) arbitrary
     pure Msg1060 {..}
 
+instance Arbitrary Msg1066 where
+  arbitrary = do
+    _msg1066_header      <- arbitrary
+    _msg1066_corrections <- replicateM (fromIntegral $ _msg1066_header ^. glonassOrbitClockCorrectionHeader_n) arbitrary
+    pure Msg1066 {..}
+
 testMsg1057 :: TestTree
 testMsg1057 =
   testProperty "Roundtrip Msg1057" $ \m ->
@@ -195,6 +229,11 @@ testMsg1060 =
   testProperty "Roundtrip Msg1060" $ \m ->
     decode (encode m) == (m :: Msg1060)
 
+testMsg1066 :: TestTree
+testMsg1066 =
+  testProperty "Roundtrip Msg1066" $ \m ->
+    decode (encode m) == (m :: Msg1066)
+
 tests :: TestTree
 tests =
   testGroup "SSR tests"
@@ -203,4 +242,5 @@ tests =
     , testMsg1063
     , testMsg1064
     , testMsg1060
+    , testMsg1066
     ]

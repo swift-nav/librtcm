@@ -492,6 +492,116 @@ instance BinaryBit GpsOrbitClockCorrection where
     putInt32be 21 _gpsOrbitClockCorrection_deltaClockC1
     putInt32be 27 _gpsOrbitClockCorrection_deltaClockC2
 
+-- | GlonassOrbitClockCorrectionHeader.
+--
+-- GLONASS orbit correction header.
+data GlonassOrbitClockCorrectionHeader = GlonassOrbitClockCorrectionHeader
+  { _glonassOrbitClockCorrectionHeader_num            :: Word16
+    -- ^ Message number.
+  , _glonassOrbitClockCorrectionHeader_epochs         :: Word32
+    -- ^ GLONASS epoch time.
+  , _glonassOrbitClockCorrectionHeader_updateInterval :: Word8
+    -- ^ SSR update interval.
+  , _glonassOrbitClockCorrectionHeader_multiple       :: Bool
+    -- ^ Multiple message indicator.
+  , _glonassOrbitClockCorrectionHeader_datum          :: Bool
+    -- ^ Satellite reference datum.
+  , _glonassOrbitClockCorrectionHeader_iod            :: Word8
+    -- ^ IOD SSR.
+  , _glonassOrbitClockCorrectionHeader_provider       :: Word16
+    -- ^ SSR provider id.
+  , _glonassOrbitClockCorrectionHeader_solution       :: Word8
+    -- ^ SSR solution id.
+  , _glonassOrbitClockCorrectionHeader_n              :: Word8
+    -- ^ Number of satellites.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GlonassOrbitClockCorrectionHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassOrbitClockCorrectionHeader_" . stripPrefix "_glonassOrbitClockCorrectionHeader_"} ''GlonassOrbitClockCorrectionHeader)
+
+instance BinaryBit GlonassOrbitClockCorrectionHeader where
+  getBits _n = do
+    _glonassOrbitClockCorrectionHeader_num            <- B.getWord16be 12
+    _glonassOrbitClockCorrectionHeader_epochs         <- B.getWord32be 17
+    _glonassOrbitClockCorrectionHeader_updateInterval <- B.getWord8 4
+    _glonassOrbitClockCorrectionHeader_multiple       <- B.getBool
+    _glonassOrbitClockCorrectionHeader_datum          <- B.getBool
+    _glonassOrbitClockCorrectionHeader_iod            <- B.getWord8 4
+    _glonassOrbitClockCorrectionHeader_provider       <- B.getWord16be 16
+    _glonassOrbitClockCorrectionHeader_solution       <- B.getWord8 4
+    _glonassOrbitClockCorrectionHeader_n              <- B.getWord8 6
+    pure GlonassOrbitClockCorrectionHeader {..}
+
+  putBits _n GlonassOrbitClockCorrectionHeader {..} = do
+    B.putWord16be 12 _glonassOrbitClockCorrectionHeader_num
+    B.putWord32be 17 _glonassOrbitClockCorrectionHeader_epochs
+    B.putWord8 4     _glonassOrbitClockCorrectionHeader_updateInterval
+    B.putBool        _glonassOrbitClockCorrectionHeader_multiple
+    B.putBool        _glonassOrbitClockCorrectionHeader_datum
+    B.putWord8 4     _glonassOrbitClockCorrectionHeader_iod
+    B.putWord16be 16 _glonassOrbitClockCorrectionHeader_provider
+    B.putWord8 4     _glonassOrbitClockCorrectionHeader_solution
+    B.putWord8 6     _glonassOrbitClockCorrectionHeader_n
+
+-- | GlonassOrbitClockCorrectionMessage.
+--
+-- GLONASS orbit correction message.
+data GlonassOrbitClockCorrection = GlonassOrbitClockCorrection
+  { _glonassOrbitClockCorrection_sat                :: Word8
+    -- ^ GLONASS satellite id.
+  , _glonassOrbitClockCorrection_iode               :: Word8
+    -- ^ GLONASS IODE.
+  , _glonassOrbitClockCorrection_deltaRadial        :: Int32
+    -- ^ Delta Radial.
+  , _glonassOrbitClockCorrection_deltaAlongTrack    :: Int32
+    -- ^ Delta Along-Track.
+  , _glonassOrbitClockCorrection_deltaCrossTrack    :: Int32
+    -- ^ Delta Cross-Track.
+  , _glonassOrbitClockCorrection_dotDeltaRadial     :: Int32
+    -- ^ Dot Delta Radial.
+  , _glonassOrbitClockCorrection_dotDeltaAlongTrack :: Int32
+    -- ^ Dot Delta Along-Track.
+  , _glonassOrbitClockCorrection_dotDeltaCrossTrack :: Int32
+    -- ^ Dot Delta Cross-Track.
+  , _glonassOrbitClockCorrection_deltaClockC0       :: Int32
+    -- ^ Delta clock C0.
+  , _glonassOrbitClockCorrection_deltaClockC1       :: Int32
+    -- ^ Delta clock C1.
+  , _glonassOrbitClockCorrection_deltaClockC2       :: Int32
+    -- ^ Delta clock C2.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GlonassOrbitClockCorrection)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassOrbitClockCorrection_" . stripPrefix "_glonassOrbitClockCorrection_"} ''GlonassOrbitClockCorrection)
+
+instance BinaryBit GlonassOrbitClockCorrection where
+  getBits _n = do
+    _glonassOrbitClockCorrection_sat                <- B.getWord8 5
+    _glonassOrbitClockCorrection_iode               <- B.getWord8 8
+    _glonassOrbitClockCorrection_deltaRadial        <- getInt32be 22
+    _glonassOrbitClockCorrection_deltaAlongTrack    <- getInt32be 20
+    _glonassOrbitClockCorrection_deltaCrossTrack    <- getInt32be 20
+    _glonassOrbitClockCorrection_dotDeltaRadial     <- getInt32be 21
+    _glonassOrbitClockCorrection_dotDeltaAlongTrack <- getInt32be 19
+    _glonassOrbitClockCorrection_dotDeltaCrossTrack <- getInt32be 19
+    _glonassOrbitClockCorrection_deltaClockC0       <- getInt32be 22
+    _glonassOrbitClockCorrection_deltaClockC1       <- getInt32be 21
+    _glonassOrbitClockCorrection_deltaClockC2       <- getInt32be 27
+    pure GlonassOrbitClockCorrection {..}
+
+  putBits _n GlonassOrbitClockCorrection {..} = do
+    B.putWord8 5  _glonassOrbitClockCorrection_sat
+    B.putWord8 8  _glonassOrbitClockCorrection_iode
+    putInt32be 22 _glonassOrbitClockCorrection_deltaRadial
+    putInt32be 20 _glonassOrbitClockCorrection_deltaAlongTrack
+    putInt32be 20 _glonassOrbitClockCorrection_deltaCrossTrack
+    putInt32be 21 _glonassOrbitClockCorrection_dotDeltaRadial
+    putInt32be 19 _glonassOrbitClockCorrection_dotDeltaAlongTrack
+    putInt32be 19 _glonassOrbitClockCorrection_dotDeltaCrossTrack
+    putInt32be 22 _glonassOrbitClockCorrection_deltaClockC0
+    putInt32be 21 _glonassOrbitClockCorrection_deltaClockC1
+    putInt32be 27 _glonassOrbitClockCorrection_deltaClockC2
+
 msg1057 :: Word16
 msg1057 = 1057
 
@@ -631,4 +741,32 @@ instance Binary Msg1060 where
     forM_ _msg1060_corrections $ putBits 0
 
 $(deriveRTCM3 ''Msg1060)
+
+msg1066 :: Word16
+msg1066 = 1066
+
+-- | Msg 1066.
+--
+-- RTCMv3 message 1066.
+data Msg1066 = Msg1066
+  { _msg1066_header      :: GlonassOrbitClockCorrectionHeader
+    -- ^ GLONASS orbit correction header.
+  , _msg1066_corrections :: [GlonassOrbitClockCorrection]
+    -- ^ GLONASS orbit corrections.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msg1066)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1066_" . stripPrefix "_msg1066_"} ''Msg1066)
+
+instance Binary Msg1066 where
+  get = B.runBitGet $ do
+    _msg1066_header      <- getBits 0
+    _msg1066_corrections <- replicateM (fromIntegral $ _msg1066_header ^. glonassOrbitClockCorrectionHeader_n) $ getBits 0
+    pure Msg1066 {..}
+
+  put Msg1066 {..} = B.runBitPut $ do
+    putBits 0 _msg1066_header
+    forM_ _msg1066_corrections $ putBits 0
+
+$(deriveRTCM3 ''Msg1066)
 
