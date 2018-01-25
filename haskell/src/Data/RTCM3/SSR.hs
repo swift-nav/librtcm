@@ -670,7 +670,7 @@ instance BinaryBit GpsCodeBias where
     pure GpsCodeBias {..}
 
   putBits _n GpsCodeBias {..} = do
-    B.putWord8 5   _gpsCodeBias_signal
+    B.putWord8 5  _gpsCodeBias_signal
     putInt16be 14 _gpsCodeBias_codeBias
 
 -- | GpsCodeBiasCorrectionMessage.
@@ -767,7 +767,7 @@ instance BinaryBit GlonassCodeBias where
     pure GlonassCodeBias {..}
 
   putBits _n GlonassCodeBias {..} = do
-    B.putWord8 5   _glonassCodeBias_signal
+    B.putWord8 5  _glonassCodeBias_signal
     putInt16be 14 _glonassCodeBias_codeBias
 
 -- | GlonassCodeBiasCorrectionMessage.
@@ -796,6 +796,150 @@ instance BinaryBit GlonassCodeBiasCorrection where
     B.putWord8 5 _glonassCodeBiasCorrection_sat
     B.putWord8 5 _glonassCodeBiasCorrection_n
     forM_ _glonassCodeBiasCorrection_codeBiases $ putBits 0
+
+-- | GpsPhaseBiasCorrectionHeader.
+--
+-- GPS phase bias correction header.
+data GpsPhaseBiasCorrectionHeader = GpsPhaseBiasCorrectionHeader
+  { _gpsPhaseBiasCorrectionHeader_num            :: Word16
+    -- ^ Message number.
+  , _gpsPhaseBiasCorrectionHeader_epochs         :: Word32
+    -- ^ GPS epoch time.
+  , _gpsPhaseBiasCorrectionHeader_updateInterval :: Word8
+    -- ^ SSR update interval.
+  , _gpsPhaseBiasCorrectionHeader_multiple       :: Bool
+    -- ^ Multiple message indicator.
+  , _gpsPhaseBiasCorrectionHeader_iod            :: Word8
+    -- ^ IOD SSR.
+  , _gpsPhaseBiasCorrectionHeader_provider       :: Word16
+    -- ^ SSR provider id.
+  , _gpsPhaseBiasCorrectionHeader_solution       :: Word8
+    -- ^ SSR solution id.
+  , _gpsPhaseBiasCorrectionHeader_dispersive     :: Bool
+    -- ^ Dispersive Bias Consistency Indicator.
+  , _gpsPhaseBiasCorrectionHeader_mw             :: Bool
+    -- ^ MW Consistency Indicator.
+  , _gpsPhaseBiasCorrectionHeader_n              :: Word8
+    -- ^ Number of satellites.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GpsPhaseBiasCorrectionHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsPhaseBiasCorrectionHeader_" . stripPrefix "_gpsPhaseBiasCorrectionHeader_"} ''GpsPhaseBiasCorrectionHeader)
+
+instance BinaryBit GpsPhaseBiasCorrectionHeader where
+  getBits _n = do
+    _gpsPhaseBiasCorrectionHeader_num            <- B.getWord16be 12
+    _gpsPhaseBiasCorrectionHeader_epochs         <- B.getWord32be 20
+    _gpsPhaseBiasCorrectionHeader_updateInterval <- B.getWord8 4
+    _gpsPhaseBiasCorrectionHeader_multiple       <- B.getBool
+    _gpsPhaseBiasCorrectionHeader_iod            <- B.getWord8 4
+    _gpsPhaseBiasCorrectionHeader_provider       <- B.getWord16be 16
+    _gpsPhaseBiasCorrectionHeader_solution       <- B.getWord8 4
+    _gpsPhaseBiasCorrectionHeader_dispersive     <- B.getBool
+    _gpsPhaseBiasCorrectionHeader_mw             <- B.getBool
+    _gpsPhaseBiasCorrectionHeader_n              <- B.getWord8 6
+    pure GpsPhaseBiasCorrectionHeader {..}
+
+  putBits _n GpsPhaseBiasCorrectionHeader {..} = do
+    B.putWord16be 12 _gpsPhaseBiasCorrectionHeader_num
+    B.putWord32be 20 _gpsPhaseBiasCorrectionHeader_epochs
+    B.putWord8 4     _gpsPhaseBiasCorrectionHeader_updateInterval
+    B.putBool        _gpsPhaseBiasCorrectionHeader_multiple
+    B.putWord8 4     _gpsPhaseBiasCorrectionHeader_iod
+    B.putWord16be 16 _gpsPhaseBiasCorrectionHeader_provider
+    B.putWord8 4     _gpsPhaseBiasCorrectionHeader_solution
+    B.putBool        _gpsPhaseBiasCorrectionHeader_dispersive
+    B.putBool        _gpsPhaseBiasCorrectionHeader_mw
+    B.putWord8 6     _gpsPhaseBiasCorrectionHeader_n
+
+-- | GpsPhaseBias.
+--
+-- GPS phase bias.
+data GpsPhaseBias = GpsPhaseBias
+  { _gpsPhaseBias_signal               :: Word8
+    -- ^ GPS signal.
+  , _gpsPhaseBias_integer              :: Bool
+    -- ^ Signal Integer Indicator.
+  , _gpsPhaseBias_wideLaneInteger      :: Word8
+    -- ^ Signals wide-lane integer indicator.
+  , _gpsPhaseBias_discontinuityCounter :: Word8
+    -- ^ Signal Discontinuity Counter.
+  , _gpsPhaseBias_phaseBias            :: Int32
+    -- ^ GPS phase bias.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GpsPhaseBias)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsPhaseBias_" . stripPrefix "_gpsPhaseBias_"} ''GpsPhaseBias)
+
+instance BinaryBit GpsPhaseBias where
+  getBits _n = do
+    _gpsPhaseBias_signal               <- B.getWord8 5
+    _gpsPhaseBias_integer              <- B.getBool
+    _gpsPhaseBias_wideLaneInteger      <- B.getWord8 2
+    _gpsPhaseBias_discontinuityCounter <- B.getWord8 4
+    _gpsPhaseBias_phaseBias            <- getInt32be 20
+    pure GpsPhaseBias {..}
+
+  putBits _n GpsPhaseBias {..} = do
+    B.putWord8 5  _gpsPhaseBias_signal
+    B.putBool     _gpsPhaseBias_integer
+    B.putWord8 2  _gpsPhaseBias_wideLaneInteger
+    B.putWord8 4  _gpsPhaseBias_discontinuityCounter
+    putInt32be 20 _gpsPhaseBias_phaseBias
+
+-- | GpsPhaseBiasCorrectionMessage.
+--
+-- GPS phase bias correction message.
+data GpsPhaseBiasCorrection = GpsPhaseBiasCorrection
+  { _gpsPhaseBiasCorrection_sat        :: Word8
+    -- ^ GPS satellite id.
+  , _gpsPhaseBiasCorrection_n          :: Word8
+    -- ^ Number of biases.
+  , _gpsPhaseBiasCorrection_yawAngle   :: Word16
+    -- ^ Yaw angle.
+  , _gpsPhaseBiasCorrection_yawRate    :: Int8
+    -- ^ Yaw rate.
+  , _gpsPhaseBiasCorrection_phaseBiases :: [GpsPhaseBias]
+    -- ^ GPS phase biases.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GpsPhaseBiasCorrection)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsPhaseBiasCorrection_" . stripPrefix "_gpsPhaseBiasCorrection_"} ''GpsPhaseBiasCorrection)
+
+instance BinaryBit GpsPhaseBiasCorrection where
+  getBits _n = do
+    _gpsPhaseBiasCorrection_sat         <- B.getWord8 6
+    _gpsPhaseBiasCorrection_n           <- B.getWord8 5
+    _gpsPhaseBiasCorrection_yawAngle    <- B.getWord16be 9
+    _gpsPhaseBiasCorrection_yawRate     <- getInt8 8
+    _gpsPhaseBiasCorrection_phaseBiases <- replicateM (fromIntegral _gpsPhaseBiasCorrection_n) $ getBits 0
+    pure GpsPhaseBiasCorrection {..}
+
+  putBits _n GpsPhaseBiasCorrection {..} = do
+    B.putWord8 6    _gpsPhaseBiasCorrection_sat
+    B.putWord8 5    _gpsPhaseBiasCorrection_n
+    B.putWord16be 9 _gpsPhaseBiasCorrection_yawAngle
+    putInt8 8       _gpsPhaseBiasCorrection_yawRate
+    forM_ _gpsPhaseBiasCorrection_phaseBiases $ putBits 0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 msg1057 :: Word16
 msg1057 = 1057
@@ -1020,3 +1164,31 @@ instance Binary Msg1065 where
     forM_ _msg1065_corrections $ putBits 0
 
 $(deriveRTCM3 ''Msg1065)
+
+msg1265 :: Word16
+msg1265 = 1265
+
+-- | Msg 1265.
+--
+-- RTCMv3 message 1265.
+data Msg1265 = Msg1265
+  { _msg1265_header      :: GpsPhaseBiasCorrectionHeader
+    -- ^ GPS phase bias correction header.
+  , _msg1265_corrections :: [GpsPhaseBiasCorrection]
+    -- ^ GPS phase bias corrections.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msg1265)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1265_" . stripPrefix "_msg1265_"} ''Msg1265)
+
+instance Binary Msg1265 where
+  get = B.runBitGet $ do
+    _msg1265_header      <- getBits 0
+    _msg1265_corrections <- replicateM (fromIntegral $ _msg1265_header ^. gpsPhaseBiasCorrectionHeader_n) $ getBits 0
+    pure Msg1265 {..}
+
+  put Msg1265 {..} = B.runBitPut $ do
+    putBits 0 _msg1265_header
+    forM_ _msg1265_corrections $ putBits 0
+
+$(deriveRTCM3 ''Msg1265)

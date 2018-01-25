@@ -218,6 +218,38 @@ instance Arbitrary GlonassCodeBiasCorrection where
     _glonassCodeBiasCorrection_codeBiases <- replicateM (fromIntegral _glonassCodeBiasCorrection_n) arbitrary
     pure GlonassCodeBiasCorrection {..}
 
+instance Arbitrary GpsPhaseBiasCorrectionHeader where
+  arbitrary = do
+    _gpsPhaseBiasCorrectionHeader_num            <- arbitraryWord 12
+    _gpsPhaseBiasCorrectionHeader_epochs         <- arbitraryWord 20
+    _gpsPhaseBiasCorrectionHeader_updateInterval <- arbitraryWord 4
+    _gpsPhaseBiasCorrectionHeader_multiple       <- arbitrary
+    _gpsPhaseBiasCorrectionHeader_iod            <- arbitraryWord 4
+    _gpsPhaseBiasCorrectionHeader_provider       <- arbitraryWord 16
+    _gpsPhaseBiasCorrectionHeader_solution       <- arbitraryWord 4
+    _gpsPhaseBiasCorrectionHeader_dispersive     <- arbitrary
+    _gpsPhaseBiasCorrectionHeader_mw             <- arbitrary
+    _gpsPhaseBiasCorrectionHeader_n              <- arbitraryWord 6
+    pure GpsPhaseBiasCorrectionHeader {..}
+
+instance Arbitrary GpsPhaseBias where
+  arbitrary = do
+    _gpsPhaseBias_signal               <- arbitraryWord 5
+    _gpsPhaseBias_integer              <- arbitrary
+    _gpsPhaseBias_wideLaneInteger      <- arbitraryWord 2
+    _gpsPhaseBias_discontinuityCounter <- arbitraryWord 4
+    _gpsPhaseBias_phaseBias            <- arbitraryInt 20
+    pure GpsPhaseBias {..}
+
+instance Arbitrary GpsPhaseBiasCorrection where
+  arbitrary = do
+    _gpsPhaseBiasCorrection_sat         <- arbitraryWord 6
+    _gpsPhaseBiasCorrection_n           <- arbitraryWord 5
+    _gpsPhaseBiasCorrection_yawAngle    <- arbitraryWord 9
+    _gpsPhaseBiasCorrection_yawRate     <- arbitraryInt 8
+    _gpsPhaseBiasCorrection_phaseBiases <- replicateM (fromIntegral _gpsPhaseBiasCorrection_n) arbitrary
+    pure GpsPhaseBiasCorrection {..}
+
 instance Arbitrary Msg1057 where
   arbitrary = do
     _msg1057_header      <- arbitrary
@@ -266,6 +298,12 @@ instance Arbitrary Msg1065 where
     _msg1065_corrections <- replicateM (fromIntegral $ _msg1065_header ^. glonassCodeBiasCorrectionHeader_n) arbitrary
     pure Msg1065 {..}
 
+instance Arbitrary Msg1265 where
+  arbitrary = do
+    _msg1265_header      <- arbitrary
+    _msg1265_corrections <- replicateM (fromIntegral $ _msg1265_header ^. gpsPhaseBiasCorrectionHeader_n) arbitrary
+    pure Msg1265 {..}
+
 testMsg1057 :: TestTree
 testMsg1057 =
   testProperty "Roundtrip Msg1057" $ \m ->
@@ -306,6 +344,11 @@ testMsg1065 =
   testProperty "Roundtrip Msg1065" $ \m ->
     decode (encode m) == (m :: Msg1065)
 
+testMsg1265 :: TestTree
+testMsg1265 =
+  testProperty "Roundtrip Msg1265" $ \m ->
+    decode (encode m) == (m :: Msg1265)
+
 tests :: TestTree
 tests =
   testGroup "SSR tests"
@@ -317,4 +360,5 @@ tests =
     , testMsg1066
     , testMsg1059
     , testMsg1065
+    , testMsg1265
     ]
