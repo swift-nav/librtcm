@@ -700,6 +700,103 @@ instance BinaryBit GpsCodeBiasCorrection where
     B.putWord8 5 _gpsCodeBiasCorrection_n
     forM_ _gpsCodeBiasCorrection_codeBiases $ putBits 0
 
+-- | GlonassCodeBiasCorrectionHeader.
+--
+-- GLONASS code bias correction header.
+data GlonassCodeBiasCorrectionHeader = GlonassCodeBiasCorrectionHeader
+  { _glonassCodeBiasCorrectionHeader_num            :: Word16
+    -- ^ Message number.
+  , _glonassCodeBiasCorrectionHeader_epochs         :: Word32
+    -- ^ GLONASS epoch time.
+  , _glonassCodeBiasCorrectionHeader_updateInterval :: Word8
+    -- ^ SSR update interval.
+  , _glonassCodeBiasCorrectionHeader_multiple       :: Bool
+    -- ^ Multiple message indicator.
+  , _glonassCodeBiasCorrectionHeader_iod            :: Word8
+    -- ^ IOD SSR.
+  , _glonassCodeBiasCorrectionHeader_provider       :: Word16
+    -- ^ SSR provider id.
+  , _glonassCodeBiasCorrectionHeader_solution       :: Word8
+    -- ^ SSR solution id.
+  , _glonassCodeBiasCorrectionHeader_n              :: Word8
+    -- ^ Number of satellites.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GlonassCodeBiasCorrectionHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassCodeBiasCorrectionHeader_" . stripPrefix "_glonassCodeBiasCorrectionHeader_"} ''GlonassCodeBiasCorrectionHeader)
+
+instance BinaryBit GlonassCodeBiasCorrectionHeader where
+  getBits _n = do
+    _glonassCodeBiasCorrectionHeader_num            <- B.getWord16be 12
+    _glonassCodeBiasCorrectionHeader_epochs         <- B.getWord32be 17
+    _glonassCodeBiasCorrectionHeader_updateInterval <- B.getWord8 4
+    _glonassCodeBiasCorrectionHeader_multiple       <- B.getBool
+    _glonassCodeBiasCorrectionHeader_iod            <- B.getWord8 4
+    _glonassCodeBiasCorrectionHeader_provider       <- B.getWord16be 16
+    _glonassCodeBiasCorrectionHeader_solution       <- B.getWord8 4
+    _glonassCodeBiasCorrectionHeader_n              <- B.getWord8 6
+    pure GlonassCodeBiasCorrectionHeader {..}
+
+  putBits _n GlonassCodeBiasCorrectionHeader {..} = do
+    B.putWord16be 12 _glonassCodeBiasCorrectionHeader_num
+    B.putWord32be 17 _glonassCodeBiasCorrectionHeader_epochs
+    B.putWord8 4     _glonassCodeBiasCorrectionHeader_updateInterval
+    B.putBool        _glonassCodeBiasCorrectionHeader_multiple
+    B.putWord8 4     _glonassCodeBiasCorrectionHeader_iod
+    B.putWord16be 16 _glonassCodeBiasCorrectionHeader_provider
+    B.putWord8 4     _glonassCodeBiasCorrectionHeader_solution
+    B.putWord8 6     _glonassCodeBiasCorrectionHeader_n
+
+-- | GlonassCodeBias.
+--
+-- GLONASS code bias.
+data GlonassCodeBias = GlonassCodeBias
+  { _glonassCodeBias_signal   :: Word8
+    -- ^ GLONASS signal.
+  , _glonassCodeBias_codeBias :: Int16
+    -- ^ GLONASS code bias.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GlonassCodeBias)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassCodeBias_" . stripPrefix "_glonassCodeBias_"} ''GlonassCodeBias)
+
+instance BinaryBit GlonassCodeBias where
+  getBits _n = do
+    _glonassCodeBias_signal   <- B.getWord8 5
+    _glonassCodeBias_codeBias <- getInt16be 14
+    pure GlonassCodeBias {..}
+
+  putBits _n GlonassCodeBias {..} = do
+    B.putWord8 5   _glonassCodeBias_signal
+    putInt16be 14 _glonassCodeBias_codeBias
+
+-- | GlonassCodeBiasCorrectionMessage.
+--
+-- GLONASS code bias correction message.
+data GlonassCodeBiasCorrection = GlonassCodeBiasCorrection
+  { _glonassCodeBiasCorrection_sat        :: Word8
+    -- ^ GLONASS satellite id.
+  , _glonassCodeBiasCorrection_n          :: Word8
+    -- ^ Number of biases.
+  , _glonassCodeBiasCorrection_codeBiases :: [GlonassCodeBias]
+    -- ^ GLONASS code biases.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GlonassCodeBiasCorrection)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassCodeBiasCorrection_" . stripPrefix "_glonassCodeBiasCorrection_"} ''GlonassCodeBiasCorrection)
+
+instance BinaryBit GlonassCodeBiasCorrection where
+  getBits _n = do
+    _glonassCodeBiasCorrection_sat        <- B.getWord8 5
+    _glonassCodeBiasCorrection_n          <- B.getWord8 5
+    _glonassCodeBiasCorrection_codeBiases <- replicateM (fromIntegral _glonassCodeBiasCorrection_n) $ getBits 0
+    pure GlonassCodeBiasCorrection {..}
+
+  putBits _n GlonassCodeBiasCorrection {..} = do
+    B.putWord8 5 _glonassCodeBiasCorrection_sat
+    B.putWord8 5 _glonassCodeBiasCorrection_n
+    forM_ _glonassCodeBiasCorrection_codeBiases $ putBits 0
+
 msg1057 :: Word16
 msg1057 = 1057
 
@@ -876,9 +973,9 @@ msg1059 = 1059
 -- RTCMv3 message 1059.
 data Msg1059 = Msg1059
   { _msg1059_header      :: GpsCodeBiasCorrectionHeader
-    -- ^ GLONASS orbit correction header.
+    -- ^ GPS code bias correction header.
   , _msg1059_corrections :: [GpsCodeBiasCorrection]
-    -- ^ GLONASS orbit corrections.
+    -- ^ GPS code bias corrections.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1059)
@@ -896,3 +993,30 @@ instance Binary Msg1059 where
 
 $(deriveRTCM3 ''Msg1059)
 
+msg1065 :: Word16
+msg1065 = 1065
+
+-- | Msg 1065.
+--
+-- RTCMv3 message 1065.
+data Msg1065 = Msg1065
+  { _msg1065_header      :: GlonassCodeBiasCorrectionHeader
+    -- ^ GLONASS code bias correction header.
+  , _msg1065_corrections :: [GlonassCodeBiasCorrection]
+    -- ^ GLONASS code bias corrections.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msg1065)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1065_" . stripPrefix "_msg1065_"} ''Msg1065)
+
+instance Binary Msg1065 where
+  get = B.runBitGet $ do
+    _msg1065_header      <- getBits 0
+    _msg1065_corrections <- replicateM (fromIntegral $ _msg1065_header ^. glonassCodeBiasCorrectionHeader_n) $ getBits 0
+    pure Msg1065 {..}
+
+  put Msg1065 {..} = B.runBitPut $ do
+    putBits 0 _msg1065_header
+    forM_ _msg1065_corrections $ putBits 0
+
+$(deriveRTCM3 ''Msg1065)

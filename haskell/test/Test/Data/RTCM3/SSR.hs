@@ -193,6 +193,31 @@ instance Arbitrary GpsCodeBiasCorrection where
     _gpsCodeBiasCorrection_codeBiases <- replicateM (fromIntegral _gpsCodeBiasCorrection_n) arbitrary
     pure GpsCodeBiasCorrection {..}
 
+instance Arbitrary GlonassCodeBiasCorrectionHeader where
+  arbitrary = do
+    _glonassCodeBiasCorrectionHeader_num            <- arbitraryWord 12
+    _glonassCodeBiasCorrectionHeader_epochs         <- arbitraryWord 17
+    _glonassCodeBiasCorrectionHeader_updateInterval <- arbitraryWord 4
+    _glonassCodeBiasCorrectionHeader_multiple       <- arbitrary
+    _glonassCodeBiasCorrectionHeader_iod            <- arbitraryWord 4
+    _glonassCodeBiasCorrectionHeader_provider       <- arbitraryWord 16
+    _glonassCodeBiasCorrectionHeader_solution       <- arbitraryWord 4
+    _glonassCodeBiasCorrectionHeader_n              <- arbitraryWord 6
+    pure GlonassCodeBiasCorrectionHeader {..}
+
+instance Arbitrary GlonassCodeBias where
+  arbitrary = do
+    _glonassCodeBias_signal   <- arbitraryWord 5
+    _glonassCodeBias_codeBias <- arbitraryInt 14
+    pure GlonassCodeBias {..}
+
+instance Arbitrary GlonassCodeBiasCorrection where
+  arbitrary = do
+    _glonassCodeBiasCorrection_sat        <- arbitraryWord 5
+    _glonassCodeBiasCorrection_n          <- arbitraryWord 5
+    _glonassCodeBiasCorrection_codeBiases <- replicateM (fromIntegral _glonassCodeBiasCorrection_n) arbitrary
+    pure GlonassCodeBiasCorrection {..}
+
 instance Arbitrary Msg1057 where
   arbitrary = do
     _msg1057_header      <- arbitrary
@@ -235,6 +260,12 @@ instance Arbitrary Msg1059 where
     _msg1059_corrections <- replicateM (fromIntegral $ _msg1059_header ^. gpsCodeBiasCorrectionHeader_n) arbitrary
     pure Msg1059 {..}
 
+instance Arbitrary Msg1065 where
+  arbitrary = do
+    _msg1065_header      <- arbitrary
+    _msg1065_corrections <- replicateM (fromIntegral $ _msg1065_header ^. glonassCodeBiasCorrectionHeader_n) arbitrary
+    pure Msg1065 {..}
+
 testMsg1057 :: TestTree
 testMsg1057 =
   testProperty "Roundtrip Msg1057" $ \m ->
@@ -270,6 +301,11 @@ testMsg1059 =
   testProperty "Roundtrip Msg1059" $ \m ->
     decode (encode m) == (m :: Msg1059)
 
+testMsg1065 :: TestTree
+testMsg1065 =
+  testProperty "Roundtrip Msg1065" $ \m ->
+    decode (encode m) == (m :: Msg1065)
+
 tests :: TestTree
 tests =
   testGroup "SSR tests"
@@ -280,4 +316,5 @@ tests =
     , testMsg1060
     , testMsg1066
     , testMsg1059
+    , testMsg1065
     ]
