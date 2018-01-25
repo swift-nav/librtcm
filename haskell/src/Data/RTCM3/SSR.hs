@@ -922,24 +922,130 @@ instance BinaryBit GpsPhaseBiasCorrection where
     putInt8 8       _gpsPhaseBiasCorrection_yawRate
     forM_ _gpsPhaseBiasCorrection_phaseBiases $ putBits 0
 
+-- | GlonassPhaseBiasCorrectionHeader.
+--
+-- GLONASS phase bias correction header.
+data GlonassPhaseBiasCorrectionHeader = GlonassPhaseBiasCorrectionHeader
+  { _glonassPhaseBiasCorrectionHeader_num            :: Word16
+    -- ^ Message number.
+  , _glonassPhaseBiasCorrectionHeader_epochs         :: Word32
+    -- ^ GLONASS epoch time.
+  , _glonassPhaseBiasCorrectionHeader_updateInterval :: Word8
+    -- ^ SSR update interval.
+  , _glonassPhaseBiasCorrectionHeader_multiple       :: Bool
+    -- ^ Multiple message indicator.
+  , _glonassPhaseBiasCorrectionHeader_iod            :: Word8
+    -- ^ IOD SSR.
+  , _glonassPhaseBiasCorrectionHeader_provider       :: Word16
+    -- ^ SSR provider id.
+  , _glonassPhaseBiasCorrectionHeader_solution       :: Word8
+    -- ^ SSR solution id.
+  , _glonassPhaseBiasCorrectionHeader_dispersive     :: Bool
+    -- ^ Dispersive Bias Consistency Indicator.
+  , _glonassPhaseBiasCorrectionHeader_mw             :: Bool
+    -- ^ MW Consistency Indicator.
+  , _glonassPhaseBiasCorrectionHeader_n              :: Word8
+    -- ^ Number of satellites.
+  } deriving ( Show, Read, Eq )
 
+$(makeLenses ''GlonassPhaseBiasCorrectionHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassPhaseBiasCorrectionHeader_" . stripPrefix "_glonassPhaseBiasCorrectionHeader_"} ''GlonassPhaseBiasCorrectionHeader)
 
+instance BinaryBit GlonassPhaseBiasCorrectionHeader where
+  getBits _n = do
+    _glonassPhaseBiasCorrectionHeader_num            <- B.getWord16be 12
+    _glonassPhaseBiasCorrectionHeader_epochs         <- B.getWord32be 17
+    _glonassPhaseBiasCorrectionHeader_updateInterval <- B.getWord8 4
+    _glonassPhaseBiasCorrectionHeader_multiple       <- B.getBool
+    _glonassPhaseBiasCorrectionHeader_iod            <- B.getWord8 4
+    _glonassPhaseBiasCorrectionHeader_provider       <- B.getWord16be 16
+    _glonassPhaseBiasCorrectionHeader_solution       <- B.getWord8 4
+    _glonassPhaseBiasCorrectionHeader_dispersive     <- B.getBool
+    _glonassPhaseBiasCorrectionHeader_mw             <- B.getBool
+    _glonassPhaseBiasCorrectionHeader_n              <- B.getWord8 6
+    pure GlonassPhaseBiasCorrectionHeader {..}
 
+  putBits _n GlonassPhaseBiasCorrectionHeader {..} = do
+    B.putWord16be 12 _glonassPhaseBiasCorrectionHeader_num
+    B.putWord32be 17 _glonassPhaseBiasCorrectionHeader_epochs
+    B.putWord8 4     _glonassPhaseBiasCorrectionHeader_updateInterval
+    B.putBool        _glonassPhaseBiasCorrectionHeader_multiple
+    B.putWord8 4     _glonassPhaseBiasCorrectionHeader_iod
+    B.putWord16be 16 _glonassPhaseBiasCorrectionHeader_provider
+    B.putWord8 4     _glonassPhaseBiasCorrectionHeader_solution
+    B.putBool        _glonassPhaseBiasCorrectionHeader_dispersive
+    B.putBool        _glonassPhaseBiasCorrectionHeader_mw
+    B.putWord8 6     _glonassPhaseBiasCorrectionHeader_n
 
+-- | GlonassPhaseBias.
+--
+-- GLONASS phase bias.
+data GlonassPhaseBias = GlonassPhaseBias
+  { _glonassPhaseBias_signal               :: Word8
+    -- ^ GLONASS signal.
+  , _glonassPhaseBias_integer              :: Bool
+    -- ^ Signal Integer Indicator.
+  , _glonassPhaseBias_wideLaneInteger      :: Word8
+    -- ^ Signals wide-lane integer indicator.
+  , _glonassPhaseBias_discontinuityCounter :: Word8
+    -- ^ Signal Discontinuity Counter.
+  , _glonassPhaseBias_phaseBias            :: Int32
+    -- ^ GLONASS phase bias.
+  } deriving ( Show, Read, Eq )
 
+$(makeLenses ''GlonassPhaseBias)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassPhaseBias_" . stripPrefix "_glonassPhaseBias_"} ''GlonassPhaseBias)
 
+instance BinaryBit GlonassPhaseBias where
+  getBits _n = do
+    _glonassPhaseBias_signal               <- B.getWord8 5
+    _glonassPhaseBias_integer              <- B.getBool
+    _glonassPhaseBias_wideLaneInteger      <- B.getWord8 2
+    _glonassPhaseBias_discontinuityCounter <- B.getWord8 4
+    _glonassPhaseBias_phaseBias            <- getInt32be 20
+    pure GlonassPhaseBias {..}
 
+  putBits _n GlonassPhaseBias {..} = do
+    B.putWord8 5  _glonassPhaseBias_signal
+    B.putBool     _glonassPhaseBias_integer
+    B.putWord8 2  _glonassPhaseBias_wideLaneInteger
+    B.putWord8 4  _glonassPhaseBias_discontinuityCounter
+    putInt32be 20 _glonassPhaseBias_phaseBias
 
+-- | GlonassPhaseBiasCorrectionMessage.
+--
+-- GLONASS phase bias correction message.
+data GlonassPhaseBiasCorrection = GlonassPhaseBiasCorrection
+  { _glonassPhaseBiasCorrection_sat        :: Word8
+    -- ^ GLONASS satellite id.
+  , _glonassPhaseBiasCorrection_n          :: Word8
+    -- ^ Number of biases.
+  , _glonassPhaseBiasCorrection_yawAngle   :: Word16
+    -- ^ Yaw angle.
+  , _glonassPhaseBiasCorrection_yawRate    :: Int8
+    -- ^ Yaw rate.
+  , _glonassPhaseBiasCorrection_phaseBiases :: [GlonassPhaseBias]
+    -- ^ GLONASS phase biases.
+  } deriving ( Show, Read, Eq )
 
+$(makeLenses ''GlonassPhaseBiasCorrection)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_glonassPhaseBiasCorrection_" . stripPrefix "_glonassPhaseBiasCorrection_"} ''GlonassPhaseBiasCorrection)
 
+instance BinaryBit GlonassPhaseBiasCorrection where
+  getBits _n = do
+    _glonassPhaseBiasCorrection_sat         <- B.getWord8 5
+    _glonassPhaseBiasCorrection_n           <- B.getWord8 5
+    _glonassPhaseBiasCorrection_yawAngle    <- B.getWord16be 9
+    _glonassPhaseBiasCorrection_yawRate     <- getInt8 8
+    _glonassPhaseBiasCorrection_phaseBiases <- replicateM (fromIntegral _glonassPhaseBiasCorrection_n) $ getBits 0
+    pure GlonassPhaseBiasCorrection {..}
 
-
-
-
-
-
-
-
+  putBits _n GlonassPhaseBiasCorrection {..} = do
+    B.putWord8 5    _glonassPhaseBiasCorrection_sat
+    B.putWord8 5    _glonassPhaseBiasCorrection_n
+    B.putWord16be 9 _glonassPhaseBiasCorrection_yawAngle
+    putInt8 8       _glonassPhaseBiasCorrection_yawRate
+    forM_ _glonassPhaseBiasCorrection_phaseBiases $ putBits 0
 
 msg1057 :: Word16
 msg1057 = 1057
@@ -1192,3 +1298,31 @@ instance Binary Msg1265 where
     forM_ _msg1265_corrections $ putBits 0
 
 $(deriveRTCM3 ''Msg1265)
+
+msg1266 :: Word16
+msg1266 = 1266
+
+-- | Msg 1266.
+--
+-- RTCMv3 message 1266.
+data Msg1266 = Msg1266
+  { _msg1266_header      :: GlonassPhaseBiasCorrectionHeader
+    -- ^ GLONASS phase bias correction header.
+  , _msg1266_corrections :: [GlonassPhaseBiasCorrection]
+    -- ^ GLONASS phase bias corrections.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msg1266)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1266_" . stripPrefix "_msg1266_"} ''Msg1266)
+
+instance Binary Msg1266 where
+  get = B.runBitGet $ do
+    _msg1266_header      <- getBits 0
+    _msg1266_corrections <- replicateM (fromIntegral $ _msg1266_header ^. glonassPhaseBiasCorrectionHeader_n) $ getBits 0
+    pure Msg1266 {..}
+
+  put Msg1266 {..} = B.runBitPut $ do
+    putBits 0 _msg1266_header
+    forM_ _msg1266_corrections $ putBits 0
+
+$(deriveRTCM3 ''Msg1266)
