@@ -380,6 +380,118 @@ instance BinaryBit GlonassClockCorrection where
     putInt32be 21 _glonassClockCorrection_deltaClockC1
     putInt32be 27 _glonassClockCorrection_deltaClockC2
 
+-- | GpsOrbitClockCorrectionHeader.
+--
+-- GPS orbit and clock correction header.
+
+data GpsOrbitClockCorrectionHeader = GpsOrbitClockCorrectionHeader
+  { _gpsOrbitClockCorrectionHeader_num            :: Word16
+    -- ^ Message number.
+  , _gpsOrbitClockCorrectionHeader_epochs         :: Word32
+    -- ^ GPS epoch time.
+  , _gpsOrbitClockCorrectionHeader_updateInterval :: Word8
+    -- ^ SSR update interval.
+  , _gpsOrbitClockCorrectionHeader_multiple       :: Bool
+    -- ^ Multiple message indicator.
+  , _gpsOrbitClockCorrectionHeader_datum          :: Bool
+    -- ^ Satellite reference datum.
+  , _gpsOrbitClockCorrectionHeader_iod            :: Word8
+    -- ^ IOD SSR.
+  , _gpsOrbitClockCorrectionHeader_provider       :: Word16
+    -- ^ SSR provider id.
+  , _gpsOrbitClockCorrectionHeader_solution       :: Word8
+    -- ^ SSR solution id.
+  , _gpsOrbitClockCorrectionHeader_n              :: Word8
+    -- ^ Number of satellites.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GpsOrbitClockCorrectionHeader)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsOrbitClockCorrectionHeader_" . stripPrefix "_gpsOrbitClockCorrectionHeader_"} ''GpsOrbitClockCorrectionHeader)
+
+instance BinaryBit GpsOrbitClockCorrectionHeader where
+  getBits _n = do
+    _gpsOrbitClockCorrectionHeader_num            <- B.getWord16be 12
+    _gpsOrbitClockCorrectionHeader_epochs         <- B.getWord32be 20
+    _gpsOrbitClockCorrectionHeader_updateInterval <- B.getWord8 4
+    _gpsOrbitClockCorrectionHeader_multiple       <- B.getBool
+    _gpsOrbitClockCorrectionHeader_datum          <- B.getBool
+    _gpsOrbitClockCorrectionHeader_iod            <- B.getWord8 4
+    _gpsOrbitClockCorrectionHeader_provider       <- B.getWord16be 16
+    _gpsOrbitClockCorrectionHeader_solution       <- B.getWord8 4
+    _gpsOrbitClockCorrectionHeader_n              <- B.getWord8 6
+    pure GpsOrbitClockCorrectionHeader {..}
+
+  putBits _n GpsOrbitClockCorrectionHeader {..} = do
+    B.putWord16be 12 _gpsOrbitClockCorrectionHeader_num
+    B.putWord32be 20 _gpsOrbitClockCorrectionHeader_epochs
+    B.putWord8 4     _gpsOrbitClockCorrectionHeader_updateInterval
+    B.putBool        _gpsOrbitClockCorrectionHeader_multiple
+    B.putBool        _gpsOrbitClockCorrectionHeader_datum
+    B.putWord8 4     _gpsOrbitClockCorrectionHeader_iod
+    B.putWord16be 16 _gpsOrbitClockCorrectionHeader_provider
+    B.putWord8 4     _gpsOrbitClockCorrectionHeader_solution
+    B.putWord8 6     _gpsOrbitClockCorrectionHeader_n
+
+-- | GpsOrbitClockCorrectionMessage.
+--
+-- GPS orbit correction message.
+data GpsOrbitClockCorrection = GpsOrbitClockCorrection
+  { _gpsOrbitClockCorrection_sat                :: Word8
+    -- ^ GPS satellite id.
+  , _gpsOrbitClockCorrection_iode               :: Word8
+    -- ^ GPS IODE.
+  , _gpsOrbitClockCorrection_deltaRadial        :: Int32
+    -- ^ Delta Radial.
+  , _gpsOrbitClockCorrection_deltaAlongTrack    :: Int32
+    -- ^ Delta Along-Track.
+  , _gpsOrbitClockCorrection_deltaCrossTrack    :: Int32
+    -- ^ Delta Cross-Track.
+  , _gpsOrbitClockCorrection_dotDeltaRadial     :: Int32
+    -- ^ Dot Delta Radial.
+  , _gpsOrbitClockCorrection_dotDeltaAlongTrack :: Int32
+    -- ^ Dot Delta Along-Track.
+  , _gpsOrbitClockCorrection_dotDeltaCrossTrack :: Int32
+    -- ^ Dot Delta Cross-Track.
+  , _gpsOrbitClockCorrection_deltaClockC0       :: Int32
+    -- ^ Delta clock C0.
+  , _gpsOrbitClockCorrection_deltaClockC1       :: Int32
+    -- ^ Delta clock C1.
+  , _gpsOrbitClockCorrection_deltaClockC2       :: Int32
+    -- ^ Delta clock C2.
+
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''GpsOrbitClockCorrection)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_gpsOrbitClockCorrection_" . stripPrefix "_gpsOrbitClockCorrection_"} ''GpsOrbitClockCorrection)
+
+instance BinaryBit GpsOrbitClockCorrection where
+  getBits _n = do
+    _gpsOrbitClockCorrection_sat                <- B.getWord8 6
+    _gpsOrbitClockCorrection_iode               <- B.getWord8 8
+    _gpsOrbitClockCorrection_deltaRadial        <- getInt32be 22
+    _gpsOrbitClockCorrection_deltaAlongTrack    <- getInt32be 20
+    _gpsOrbitClockCorrection_deltaCrossTrack    <- getInt32be 20
+    _gpsOrbitClockCorrection_dotDeltaRadial     <- getInt32be 21
+    _gpsOrbitClockCorrection_dotDeltaAlongTrack <- getInt32be 19
+    _gpsOrbitClockCorrection_dotDeltaCrossTrack <- getInt32be 19
+    _gpsOrbitClockCorrection_deltaClockC0       <- getInt32be 22
+    _gpsOrbitClockCorrection_deltaClockC1       <- getInt32be 21
+    _gpsOrbitClockCorrection_deltaClockC2       <- getInt32be 27
+    pure GpsOrbitClockCorrection {..}
+
+  putBits _n GpsOrbitClockCorrection {..} = do
+    B.putWord8 6  _gpsOrbitClockCorrection_sat
+    B.putWord8 8  _gpsOrbitClockCorrection_iode
+    putInt32be 22 _gpsOrbitClockCorrection_deltaRadial
+    putInt32be 20 _gpsOrbitClockCorrection_deltaAlongTrack
+    putInt32be 20 _gpsOrbitClockCorrection_deltaCrossTrack
+    putInt32be 21 _gpsOrbitClockCorrection_dotDeltaRadial
+    putInt32be 19 _gpsOrbitClockCorrection_dotDeltaAlongTrack
+    putInt32be 19 _gpsOrbitClockCorrection_dotDeltaCrossTrack
+    putInt32be 22 _gpsOrbitClockCorrection_deltaClockC0
+    putInt32be 21 _gpsOrbitClockCorrection_deltaClockC1
+    putInt32be 27 _gpsOrbitClockCorrection_deltaClockC2
+
 msg1057 :: Word16
 msg1057 = 1057
 
@@ -491,3 +603,32 @@ instance Binary Msg1064 where
     forM_ _msg1064_corrections $ putBits 0
 
 $(deriveRTCM3 ''Msg1064)
+
+msg1060 :: Word16
+msg1060 = 1060
+
+-- | Msg 1060.
+--
+-- RTCMv3 message 1060.
+data Msg1060 = Msg1060
+  { _msg1060_header      :: GpsOrbitClockCorrectionHeader
+    -- ^ GPS orbit correction header.
+  , _msg1060_corrections :: [GpsOrbitClockCorrection]
+    -- ^ GPS orbit corrections.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msg1060)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1060_" . stripPrefix "_msg1060_"} ''Msg1060)
+
+instance Binary Msg1060 where
+  get = B.runBitGet $ do
+    _msg1060_header      <- getBits 0
+    _msg1060_corrections <- replicateM (fromIntegral $ _msg1060_header ^. gpsOrbitClockCorrectionHeader_n) $ getBits 0
+    pure Msg1060 {..}
+
+  put Msg1060 {..} = B.runBitPut $ do
+    putBits 0 _msg1060_header
+    forM_ _msg1060_corrections $ putBits 0
+
+$(deriveRTCM3 ''Msg1060)
+
