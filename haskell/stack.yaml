@@ -1,1 +1,4 @@
-stack-nightly.yaml
+resolver: lts-10.10
+packages:
+- .
+
