@@ -24,7 +24,6 @@ import           Data.Binary.Bits
 import qualified Data.Binary.Bits.Get as B
 import qualified Data.Binary.Bits.Put as B
 import           Data.RTCM3.TH
-import qualified Data.ByteString as BS
 
 {-# ANN module ("HLint: ignore Use camelCase"::String) #-}
 
@@ -125,7 +124,7 @@ instance BinaryBit TextMessage where
     _textMessage_seconds    <- B.getWord32be 17
     _textMessage_characters <- B.getWord8 7
     _textMessage_n          <- B.getWord8 8
-    _textMessage_text       <- decodeUtf8 . BS.pack <$> replicateM (fromIntegral _textMessage_n) (B.getWord8 8)
+    _textMessage_text       <- decodeUtf8 <$> B.getByteString (fromIntegral _textMessage_n)
     pure TextMessage {..}
 
   putBits _n TextMessage {..} = do
@@ -135,7 +134,7 @@ instance BinaryBit TextMessage where
     B.putWord32be 17 _textMessage_seconds
     B.putWord8 7     _textMessage_characters
     B.putWord8 8     _textMessage_n
-    forM_ (BS.unpack $ encodeUtf8 _textMessage_text) $ B.putWord8 8
+    B.putByteString $ encodeUtf8 _textMessage_text
 
 msg1013 :: Word16
 msg1013 = 1013
@@ -155,7 +154,7 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1013_" . stripP
 
 instance Binary Msg1013 where
   get = B.runBitGet $ do
-    _msg1013_header <- getBits 0
+    _msg1013_header   <- getBits 0
     _msg1013_messages <- replicateM (fromIntegral $ _msg1013_header ^. messageHeader_n) $ getBits 0
     pure Msg1013 {..}
 
