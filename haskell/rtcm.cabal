@@ -1,7 +1,6 @@
 name:                  rtcm
-version:               0.2.14
-synopsis:              RTCM Library.
-description:           Haskell bindings for RTCM.
+version:               0.2.15
+synopsis:              Haskell bindings for RTCM.
 homepage:              http://github.com/swift-nav/librtcm
 license:               BSD3
 author:                Mark Fine <mark@swift-nav.com>

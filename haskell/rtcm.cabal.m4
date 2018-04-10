@@ -1,7 +1,6 @@
 name:                  rtcm
 version:               VERSION
-synopsis:              RTCM Library.
-description:           Haskell bindings for RTCM.
+synopsis:              Haskell bindings for RTCM.
 homepage:              http://github.com/swift-nav/librtcm
 license:               BSD3
 author:                Mark Fine <mark@swift-nav.com>
@@ -99,6 +98,7 @@ test-suite test
                      , tasty
                      , tasty-hunit
                      , tasty-quickcheck
+                     , text
                      , word24
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
   default-language:    Haskell2010
