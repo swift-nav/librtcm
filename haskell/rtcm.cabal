@@ -99,6 +99,7 @@ test-suite test
                      , tasty
                      , tasty-hunit
                      , tasty-quickcheck
+                     , text
                      , word24
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
   default-language:    Haskell2010

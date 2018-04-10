@@ -18,6 +18,7 @@ import BasicPrelude
 import Control.Lens
 import Data.Binary
 import Data.RTCM3
+import Data.Text
 import Test.Data.RTCM3.Test
 import Test.Tasty
 import Test.Tasty.QuickCheck
@@ -39,11 +40,27 @@ instance Arbitrary Message where
     _message_interval    <- arbitraryWord 16
     pure Message {..}
 
+instance Arbitrary TextMessage where
+  arbitrary = do
+    _textMessage_num        <- arbitraryWord 12
+    _textMessage_station    <- arbitraryWord 12
+    _textMessage_mjd        <- arbitraryWord 16
+    _textMessage_seconds    <- arbitraryWord 17
+    _textMessage_characters <- arbitraryWord 7
+    _textMessage_n          <- arbitraryWord 8
+    _textMessage_text       <- pack <$> replicateM (fromIntegral _textMessage_n) arbitrary
+    pure TextMessage {..}
+
 instance Arbitrary Msg1013 where
   arbitrary = do
     header   <- arbitrary
     messages <- replicateM (fromIntegral $ header ^. messageHeader_n) arbitrary
     pure $ Msg1013 header messages
+
+instance Arbitrary Msg1029 where
+  arbitrary = do
+    message <- arbitrary
+    pure $ Msg1029 message
 
 testMsg1013 :: TestTree
 testMsg1013 =
