@@ -17,8 +17,8 @@ module Test.Data.RTCM3.System
 import BasicPrelude
 import Control.Lens
 import Data.Binary
-import Data.Text
 import Data.RTCM3
+import Data.Text
 import Test.Data.RTCM3.Test
 import Test.Tasty
 import Test.Tasty.QuickCheck
@@ -59,8 +59,8 @@ instance Arbitrary Msg1013 where
 
 instance Arbitrary Msg1029 where
   arbitrary = do
-    textMessage <- arbitrary
-    pure $ Msg1029 textMessage
+    message <- arbitrary
+    pure $ Msg1029 message
 
 testMsg1013 :: TestTree
 testMsg1013 =

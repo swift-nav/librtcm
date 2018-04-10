@@ -171,7 +171,7 @@ msg1029 = 1029
 --
 -- RTCMv3 message 1029.
 newtype Msg1029 = Msg1029
-  { _msg1029_textMessage :: TextMessage
+  { _msg1029_message :: TextMessage
     -- ^ Text Messages.
   } deriving ( Show, Read, Eq )
 
@@ -180,11 +180,11 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1029_" . stripP
 
 instance Binary Msg1029 where
   get = B.runBitGet $ do
-    _msg1029_textMessage <- getBits 0
+    _msg1029_message <- getBits 0
     pure Msg1029 {..}
 
   put Msg1029 {..} = B.runBitPut $
-    putBits 0 _msg1029_textMessage
+    putBits 0 _msg1029_message
 
 $(deriveRTCM3 ''Msg1029)
 
