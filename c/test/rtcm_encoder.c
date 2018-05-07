@@ -682,28 +682,28 @@ uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t *buff)
 
   setbitu(buff, bit, 8, msg_1033->antenna_serial_num_counter);
   bit += 8;
-  for (uint8_t i = 0; i < 5; ++i) {
+  for (uint8_t i = 0; i < msg_1033->antenna_serial_num_counter; ++i) {
     setbitu(buff, bit, 8, msg_1033->antenna_serial_num[i]);
     bit += 8;
   }
 
   setbitu(buff, bit, 8, msg_1033->rcv_descriptor_counter);
   bit += 8;
-  for (uint8_t i = 0; i < 3; ++i) {
+  for (uint8_t i = 0; i < msg_1033->rcv_descriptor_counter; ++i) {
     setbitu(buff, bit, 8, msg_1033->rcv_descriptor[i]);
     bit += 8;
   }
 
   setbitu(buff, bit, 8, msg_1033->rcv_fw_counter);
   bit += 8;
-  for (uint8_t i = 0; i < 3; ++i) {
+  for (uint8_t i = 0; i < msg_1033->rcv_fw_counter; ++i) {
     setbitu(buff, bit, 8, msg_1033->rcv_fw_version[i]);
     bit += 8;
   }
 
   setbitu(buff, bit, 8, msg_1033->rcv_serial_num_counter);
   bit += 8;
-  for (uint8_t i = 0; i < 3; ++i) {
+  for (uint8_t i = 0; i < msg_1033->rcv_serial_num_counter; ++i) {
     setbitu(buff, bit, 8, msg_1033->rcv_serial_num[i]);
     bit += 8;
   }
