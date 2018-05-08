@@ -390,8 +390,8 @@ int8_t rtcm3_decode_1003(const uint8_t *buff, rtcm_obs_message *msg_1003)
     decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr,
                               &phr_pr_diff);
 
-    l2_freq_data->flags.valid_pr = construct_L2_code(l2_freq_data, l1_freq_data, l1_pr);
-    l2_freq_data->flags.valid_pr = construct_L2_phase(l2_freq_data, l1_freq_data, phr_pr_diff, GPS_L2_FREQ);
+    l2_freq_data->flags.valid_pr = construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
+    l2_freq_data->flags.valid_cp = construct_L2_phase(l2_freq_data, l1_freq_data, phr_pr_diff, GPS_L2_FREQ);
   }
 
   return 0;

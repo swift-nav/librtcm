@@ -610,6 +610,7 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
 {
 
   if (msg_in->header.msg_num != msg_out->header.msg_num) {
+    printf("msgobs msg_num not equal\n");
     return false;
   }
   bool L1_only = false;
@@ -617,12 +618,15 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
     L1_only = true;
   }
   if (msg_in->header.stn_id != msg_out->header.stn_id) {
+    printf("msgobs stn_id not equal\n");
     return false;
   }
   if (msg_in->header.tow_ms != msg_out->header.tow_ms) {
+    printf("msgobs tow_ms not equal\n");
     return false;
   }
   if (msg_in->header.sync != msg_out->header.sync) {
+    printf("msgobs header_sync not equal\n");
     return false;
   }
 
@@ -636,12 +640,15 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
     }
   }
   if (num_sats != msg_out->header.n_sat) {
+    printf("msgobs num_sats not equal\n");
     return false;
   }
   if (msg_in->header.div_free != msg_out->header.div_free) {
+    printf("msgobs div_free not equal\n");
     return false;
   }
   if (msg_in->header.smooth != msg_out->header.smooth) {
+    printf("msgobs smooth not equal\n");
     return false;
   }
 
@@ -655,6 +662,7 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
     }
 
     if (msg_in->sats[in_sat_idx].svId != msg_out->sats[out_sat_idx].svId) {
+      printf("msgobs svId not equal\n");
       return false;
     }
 
@@ -670,19 +678,24 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
       const rtcm_freq_data *out_freq = &msg_out->sats[out_sat_idx].obs[freq];
 
       if (in_freq->flags.valid_pr != out_freq->flags.valid_pr) {
+        printf("msgobs valid_pr not equal\n");
         return false;
       }
 
       if (in_freq->flags.valid_cp != out_freq->flags.valid_cp) {
+        printf("msgobs valid_cp not equal: %u %u\n",
+            in_freq->flags.valid_cp, out_freq->flags.valid_cp);
         return false;
       }
 
       if ((msg_in->header.msg_num == 1002 || msg_in->header.msg_num == 1004) &&
           in_freq->flags.valid_cnr != out_freq->flags.valid_cnr) {
+        printf("msgobs valid_cnr not equal\n");
         return false;
       }
 
       if (in_freq->flags.valid_lock != out_freq->flags.valid_lock) {
+        printf("msgobs valid_lock not equal\n");
         return false;
       }
 
@@ -690,6 +703,8 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
         if (in_freq->code != out_freq->code ||
             fabs(in_freq->pseudorange - out_freq->pseudorange -
                  amb * PRUNIT_GPS) > 0.01) {
+          printf("msgobs pseudorange not equal: %.2f %.2f\n",
+              in_freq->pseudorange, out_freq->pseudorange + amb*PRUNIT_GPS);
           return false;
         }
       }
@@ -698,52 +713,61 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
         if (fabs(in_freq->carrier_phase - out_freq->carrier_phase ) -
                  ((double)amb * PRUNIT_GPS / (CLIGHT / frequency)) >
             0.0005 / (CLIGHT / frequency)) {
+          printf("msgobs carrier_phase not equal\n");
           return false;
         }
       }
       if (in_freq->flags.valid_cnr) {
         if (fabs(in_freq->cnr - out_freq->cnr) > 0.125) {
+          printf("msgobs cnr not equal\n");
           return false;
         }
       }
       if (in_freq->flags.valid_lock) {
         if( in_freq->lock < 24 ) {
             if( out_freq->lock >= 24 ) {
+                printf("msgobs lock not equal\n");
                 return false;
             }
         }
         else if( in_freq->lock < 72 ) {
             if( out_freq->lock < 24 || out_freq->lock >= 72 )
             {
+                printf("msgobs lock not equal\n");
                 return false;
             }
         }
         else if( in_freq->lock < 168 ) {
             if (out_freq->lock < 72 || out_freq->lock >= 168)
             {
+                printf("msgobs lock not equal\n");
                 return false;
             }
         }
         else if( in_freq->lock < 360 ) {
             if( out_freq->lock < 168 || out_freq->lock >= 360
             ) {
+                printf("msgobs lock not equal\n");
                 return false;
             }
         }
         else if( in_freq->lock < 744 ) {
             if( out_freq->lock < 360 || out_freq->lock >= 744
             ) {
+                printf("msgobs lock not equal\n");
                 return false;
             }
         }
         else if( in_freq->lock < 937 ) {
             if( out_freq->lock < 744 || out_freq->lock >= 937
             ) {
+                printf("msgobs lock not equal\n");
                 return false;
             }
         }
         else {
             if( out_freq->lock < 937 ) {
+                printf("msgobs lock not equal\n");
                 return false;
             }
         }
@@ -1019,39 +1043,52 @@ bool msg1029_equals(const rtcm_msg_1029 *lhs, const rtcm_msg_1029 *rhs)
 bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs)
 {
   if (lhs->stn_id != rhs->stn_id) {
+    printf("1033 stn_id not equal\n");
     return false;
   }
   if (lhs->antenna_desc_counter != rhs->antenna_desc_counter) {
+    printf("1033 antenna_desc_counter not equal\n");
     return false;
   }
   if (strncmp(lhs->antenna_descriptor, rhs->antenna_descriptor, lhs->antenna_desc_counter) != 0) {
+    printf("1033 antenna_descriptor not equal\n");
     return false;
   }
   if (lhs->antenna_setup_ID != rhs->antenna_setup_ID) {
+    printf("1033 antenna_setup_ID not equal\n");
     return false;
   }
-  if (lhs->antenna_serial_num != rhs->antenna_serial_num) {
+  if (lhs->antenna_serial_num_counter != rhs->antenna_serial_num_counter) {
+    printf("1033 antenna_serial_num_counter not equal\n");
     return false;
   }
   if (strncmp(lhs->antenna_serial_num, rhs->antenna_serial_num, lhs->antenna_serial_num_counter) != 0) {
+    printf("1033 antenna_serial_num not equal\n");
     return false;
   }
   if (lhs->rcv_descriptor_counter != rhs->rcv_descriptor_counter) {
+    printf("1033 rcv_descriptor_counter not equal %u %u\n",
+        lhs->rcv_descriptor_counter, rhs->rcv_descriptor_counter);
     return false;
   }
   if (strncmp(lhs->rcv_descriptor, rhs->rcv_descriptor, lhs->rcv_descriptor_counter) != 0) {
+    printf("1033 rcv_descriptor not equal\n");
     return false;
   }
   if (lhs->rcv_fw_counter != rhs->rcv_fw_counter) {
+    printf("1033 rcv_fw_counter not equal\n");
     return false;
   }
   if (strncmp(lhs->rcv_fw_version, rhs->rcv_fw_version, lhs->rcv_fw_counter) != 0) {
+    printf("1033 rcv_fw_version not equal\n");
     return false;
   }
   if (lhs->rcv_serial_num_counter != rhs->rcv_serial_num_counter) {
+    printf("1033 rcv_serial_num_counter not equal\n");
     return false;
   }
   if (strncmp(lhs->rcv_serial_num, rhs->rcv_serial_num, lhs->rcv_serial_num_counter) != 0) {
+    printf("1033 rcv_serial_num not equal\n");
     return false;
   }
   return true;
