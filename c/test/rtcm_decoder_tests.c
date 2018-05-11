@@ -14,13 +14,12 @@
 #include <assert.h>
 #include <math.h>
 #include <rtcm3_decode.h>
+#include <rtcm3_messages.h>
+#include <stdio.h>
 #include <string.h>
 #include "rtcm_encoder.h"
-#include <stdio.h>
-#include <rtcm3_messages.h>
 
-int main(void)
-{
+int main(void) {
   test_rtcm_1001();
   test_rtcm_1002();
   test_rtcm_1003();
@@ -36,8 +35,7 @@ int main(void)
   test_rtcm_1230();
 }
 
-void test_rtcm_1001(void)
-{
+void test_rtcm_1001(void) {
   rtcm_obs_header header;
   header.msg_num = 1001;
   header.div_free = 0;
@@ -48,7 +46,7 @@ void test_rtcm_1001(void)
   header.tow_ms = 309000000;
 
   rtcm_obs_message msg1001;
-  memset((void *) &msg1001, 0, sizeof(msg1001));
+  memset((void *)&msg1001, 0, sizeof(msg1001));
   msg1001.header = header;
   msg1001.sats[0].svId = 4;
   msg1001.sats[0].obs[0].code = 0;
@@ -78,7 +76,7 @@ void test_rtcm_1001(void)
   msg1001.sats[2].obs[0].flags.valid_lock = 0;
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1001(&msg1001, buff);
 
   rtcm_obs_message msg1001_out;
@@ -87,8 +85,7 @@ void test_rtcm_1001(void)
   assert(ret == 0 && msgobs_equals(&msg1001, &msg1001_out));
 }
 
-void test_rtcm_1002(void)
-{
+void test_rtcm_1002(void) {
   rtcm_obs_header header;
   header.msg_num = 1002;
   header.div_free = 0;
@@ -99,7 +96,7 @@ void test_rtcm_1002(void)
   header.tow_ms = 309000000;
 
   rtcm_obs_message msg1002;
-  memset((void *) &msg1002, 0, sizeof(msg1002));
+  memset((void *)&msg1002, 0, sizeof(msg1002));
   msg1002.header = header;
   msg1002.sats[0].svId = 4;
   msg1002.sats[0].obs[0].code = 0;
@@ -135,7 +132,7 @@ void test_rtcm_1002(void)
   msg1002.sats[2].obs[0].flags.valid_cnr = 0;
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1002(&msg1002, buff);
 
   rtcm_obs_message msg1002_out;
@@ -144,8 +141,7 @@ void test_rtcm_1002(void)
   assert(ret == 0 && msgobs_equals(&msg1002, &msg1002_out));
 }
 
-void test_rtcm_1003(void)
-{
+void test_rtcm_1003(void) {
   rtcm_obs_header header;
   header.msg_num = 1003;
   header.div_free = 0;
@@ -156,7 +152,7 @@ void test_rtcm_1003(void)
   header.tow_ms = 309000000;
 
   rtcm_obs_message msg1003;
-  memset((void *) &msg1003, 0, sizeof(msg1003));
+  memset((void *)&msg1003, 0, sizeof(msg1003));
   msg1003.header = header;
   msg1003.sats[0].svId = 4;
   msg1003.sats[0].obs[0].code = 0;
@@ -184,7 +180,6 @@ void test_rtcm_1003(void)
   msg1003.sats[1].obs[1].pseudorange = 22000024.4;
   msg1003.sats[1].obs[1].carrier_phase = 90086422.236;
 
-
   msg1003.sats[2].svId = 6;
   msg1003.sats[2].obs[0].code = 0;
   msg1003.sats[2].obs[0].pseudorange = 22000004.4;
@@ -197,7 +192,7 @@ void test_rtcm_1003(void)
   msg1003.sats[2].obs[0].flags.valid_cnr = 0;
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1003(&msg1003, buff);
 
   rtcm_obs_message msg1003_out;
@@ -206,8 +201,7 @@ void test_rtcm_1003(void)
   assert(ret == 0 && msgobs_equals(&msg1003, &msg1003_out));
 }
 
-void test_rtcm_1004(void)
-{
+void test_rtcm_1004(void) {
   rtcm_obs_header header;
   header.msg_num = 1004;
   header.div_free = 0;
@@ -218,7 +212,7 @@ void test_rtcm_1004(void)
   header.tow_ms = 309000000;
 
   rtcm_obs_message msg1004;
-  memset((void *) &msg1004, 0, sizeof(msg1004));
+  memset((void *)&msg1004, 0, sizeof(msg1004));
   msg1004.header = header;
   msg1004.sats[0].svId = 4;
   msg1004.sats[0].obs[0].code = 0;
@@ -252,7 +246,6 @@ void test_rtcm_1004(void)
   msg1004.sats[1].obs[1].pseudorange = 22000024.4;
   msg1004.sats[1].obs[1].carrier_phase = 90086422.236;
 
-
   msg1004.sats[2].svId = 6;
   msg1004.sats[2].obs[0].code = 0;
   msg1004.sats[2].obs[0].pseudorange = 22000004.4;
@@ -269,7 +262,7 @@ void test_rtcm_1004(void)
   msg1004.sats[2].obs[1].flags.valid_cnr = 1;
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1004(&msg1004, buff);
 
   rtcm_obs_message msg1004_out;
@@ -278,8 +271,7 @@ void test_rtcm_1004(void)
   assert(ret == 0 && msgobs_equals(&msg1004, &msg1004_out));
 }
 
-void test_rtcm_1005(void)
-{
+void test_rtcm_1005(void) {
   rtcm_msg_1005 msg1005;
 
   msg1005.stn_id = 5;
@@ -295,7 +287,7 @@ void test_rtcm_1005(void)
   msg1005.arp_z = 2578346.6757;
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1005(&msg1005, buff);
 
   rtcm_msg_1005 msg1005_out;
@@ -304,8 +296,7 @@ void test_rtcm_1005(void)
   assert(ret == 0 && msg1005_equals(&msg1005, &msg1005_out));
 }
 
-void test_rtcm_1006(void)
-{
+void test_rtcm_1006(void) {
   rtcm_msg_1006 msg1006;
 
   msg1006.msg_1005.stn_id = 5;
@@ -322,7 +313,7 @@ void test_rtcm_1006(void)
   msg1006.ant_height = 1.567;
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1006(&msg1006, buff);
 
   rtcm_msg_1006 msg1006_out;
@@ -331,8 +322,7 @@ void test_rtcm_1006(void)
   assert(ret == 0 && msg1006_equals(&msg1006, &msg1006_out));
 }
 
-void test_rtcm_1007(void)
-{
+void test_rtcm_1007(void) {
   rtcm_msg_1007 msg1007;
 
   msg1007.stn_id = 1022;
@@ -341,7 +331,7 @@ void test_rtcm_1007(void)
   msg1007.ant_id = 254;
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1007(&msg1007, buff);
 
   rtcm_msg_1007 msg1007_out;
@@ -350,8 +340,7 @@ void test_rtcm_1007(void)
   assert(ret == 0 && msg1007_equals(&msg1007, &msg1007_out));
 }
 
-void test_rtcm_1008(void)
-{
+void test_rtcm_1008(void) {
   rtcm_msg_1008 msg1008;
 
   msg1008.msg_1007.stn_id = 22;
@@ -359,10 +348,10 @@ void test_rtcm_1008(void)
   strcpy(msg1008.msg_1007.desc, "Something without 30 chars.");
   msg1008.msg_1007.ant_id = 1;
   msg1008.serial_count = 9;
-  strncpy(msg1008.serial_num, "123456789",32);
+  strncpy(msg1008.serial_num, "123456789", 32);
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1008(&msg1008, buff);
 
   rtcm_msg_1008 msg1008_out;
@@ -371,8 +360,7 @@ void test_rtcm_1008(void)
   assert(ret == 0 && msg1008_equals(&msg1008, &msg1008_out));
 }
 
-void test_rtcm_1010(void)
-{
+void test_rtcm_1010(void) {
   rtcm_obs_header header;
   header.msg_num = 1010;
   header.div_free = 0;
@@ -383,7 +371,7 @@ void test_rtcm_1010(void)
   header.tow_ms = 86399000;
 
   rtcm_obs_message msg1010;
-  memset((void *) &msg1010, 0, sizeof(msg1010));
+  memset((void *)&msg1010, 0, sizeof(msg1010));
   msg1010.header = header;
   msg1010.sats[0].svId = 4;
   msg1010.sats[0].fcn = 9;
@@ -422,8 +410,8 @@ void test_rtcm_1010(void)
   msg1010.sats[2].obs[0].flags.valid_cnr = 0;
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
-    rtcm3_encode_1010(&msg1010, buff);
+  memset(buff, 0, 1024);
+  rtcm3_encode_1010(&msg1010, buff);
 
   rtcm_obs_message msg1010_out;
   int8_t ret = rtcm3_decode_1010(buff, &msg1010_out);
@@ -431,9 +419,7 @@ void test_rtcm_1010(void)
   assert(ret == 0 && msgobs_glo_equals(&msg1010, &msg1010_out));
 }
 
-void test_rtcm_1012(void)
-{
-
+void test_rtcm_1012(void) {
   rtcm_obs_header header;
   header.msg_num = 1012;
   header.div_free = 0;
@@ -444,13 +430,13 @@ void test_rtcm_1012(void)
   header.tow_ms = 34700000;
 
   rtcm_obs_message msg1012;
-  memset((void *) &msg1012, 0, sizeof(msg1012));
+  memset((void *)&msg1012, 0, sizeof(msg1012));
   msg1012.header = header;
   msg1012.sats[0].svId = 4;
   msg1012.sats[0].fcn = 7;
   msg1012.sats[0].obs[0].code = 0;
   msg1012.sats[0].obs[0].pseudorange = 20000004.4;
-  msg1012.sats[0].obs[0].carrier_phase =  106874009.6;
+  msg1012.sats[0].obs[0].carrier_phase = 106874009.6;
   msg1012.sats[0].obs[0].lock = 900;
   msg1012.sats[0].obs[0].flags.valid_pr = 1;
   msg1012.sats[0].obs[0].flags.valid_cp = 1;
@@ -480,7 +466,6 @@ void test_rtcm_1012(void)
   msg1012.sats[1].obs[1].pseudorange = 22000024.4;
   msg1012.sats[1].obs[1].carrier_phase = 91629341.2;
 
-
   msg1012.sats[2].svId = 6;
   msg1012.sats[2].fcn = 1;
   msg1012.sats[2].obs[0].code = 0;
@@ -498,7 +483,7 @@ void test_rtcm_1012(void)
   msg1012.sats[2].obs[1].flags.valid_cnr = 1;
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1012(&msg1012, buff);
 
   rtcm_obs_message msg1012_out;
@@ -507,21 +492,53 @@ void test_rtcm_1012(void)
   assert(ret == 0 && msgobs_glo_equals(&msg1012, &msg1012_out));
 }
 
-// from the RTCM3 Spec Section 3.5.10
+/* from the RTCM3 Spec Section 3.5.10 */
 static const uint8_t sample_1029_raw[] = {
-  // 1029, 23, 132, 59100, 21, 30
-  0x40, 0x50, 0x17, 0x00, 0x84, 0x73, 0x6E, 0x15, 0x1E,
-  // “UTF-8”
-  0x55, 0x54, 0x46, 0x2D, 0x38,
-  // " "
-  0x20,
-  // “проверка”
-  0xD0, 0xBF, 0xD1, 0x80, 0xD0, 0xBE, 0xD0, 0xB2, 0xD0, 0xB5, 0xD1, 0x80, 0xD0, 0xBA, 0xD0, 0xB0,
-  // " "
-  0x20,
-  // “wörter”
-  0x77, 0xC3, 0xB6, 0x72, 0x74, 0x65, 0x72
-};
+    /* 1029, 23, 132, 59100, 21, 30 */
+    0x40,
+    0x50,
+    0x17,
+    0x00,
+    0x84,
+    0x73,
+    0x6E,
+    0x15,
+    0x1E,
+    /* “UTF-8” */
+    0x55,
+    0x54,
+    0x46,
+    0x2D,
+    0x38,
+    /* " " */
+    0x20,
+    /* “проверка” */
+    0xD0,
+    0xBF,
+    0xD1,
+    0x80,
+    0xD0,
+    0xBE,
+    0xD0,
+    0xB2,
+    0xD0,
+    0xB5,
+    0xD1,
+    0x80,
+    0xD0,
+    0xBA,
+    0xD0,
+    0xB0,
+    /* " " */
+    0x20,
+    /* “wörter” */
+    0x77,
+    0xC3,
+    0xB6,
+    0x72,
+    0x74,
+    0x65,
+    0x72};
 
 void test_rtcm_1029(void) {
   rtcm_msg_1029 msg1029;
@@ -530,14 +547,14 @@ void test_rtcm_1029(void) {
   msg1029.utc_sec_of_day = 59100;
   msg1029.unicode_chars = 21;
   msg1029.utf8_code_units_n = 30;
-  memcpy(msg1029.utf8_code_units, &sample_1029_raw[9], msg1029.utf8_code_units_n);
+  memcpy(
+      msg1029.utf8_code_units, &sample_1029_raw[9], msg1029.utf8_code_units_n);
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1029(&msg1029, buff);
 
-  for (uint16_t i = 0; i < sizeof(sample_1029_raw); i++)
-  {
+  for (uint16_t i = 0; i < sizeof(sample_1029_raw); i++) {
     assert(buff[i] == sample_1029_raw[i]);
   }
 
@@ -564,18 +581,16 @@ void test_rtcm_1033(void) {
   strncpy(msg1033.rcv_serial_num, "66666666666666666666", 32);
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1033(&msg1033, buff);
 
   rtcm_msg_1033 msg1033_out;
   int8_t ret = rtcm3_decode_1033(buff, &msg1033_out);
 
   assert(ret == 0 && msg1033_equals(&msg1033, &msg1033_out));
-
 }
 
-void test_rtcm_1230(void)
-{
+void test_rtcm_1230(void) {
   rtcm_msg_1230 msg1230;
 
   msg1230.stn_id = 22;
@@ -587,7 +602,7 @@ void test_rtcm_1230(void)
   msg1230.L2_P_cpb_meter = -29.32;
 
   uint8_t buff[1024];
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1230(&msg1230, buff);
 
   rtcm_msg_1230 msg1230_out_1;
@@ -596,7 +611,7 @@ void test_rtcm_1230(void)
   assert(ret == 0 && msg1230_equals(&msg1230, &msg1230_out_1));
 
   msg1230.fdma_signal_mask = 0x0D;
-  memset(buff,0,1024);
+  memset(buff, 0, 1024);
   rtcm3_encode_1230(&msg1230, buff);
 
   rtcm_msg_1230 msg1230_out_2;
@@ -606,9 +621,7 @@ void test_rtcm_1230(void)
 }
 
 bool msgobs_equals(const rtcm_obs_message *msg_in,
-                   const rtcm_obs_message *msg_out)
-{
-
+                   const rtcm_obs_message *msg_out) {
   if (msg_in->header.msg_num != msg_out->header.msg_num) {
     printf("msgobs msg_num not equal\n");
     return false;
@@ -653,7 +666,8 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
   }
 
   uint8_t out_sat_idx = 0;
-  for (uint8_t in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat; ++in_sat_idx) {
+  for (uint8_t in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat;
+       ++in_sat_idx) {
     flag_bf l1_flags = msg_in->sats[in_sat_idx].obs[L1_FREQ].flags;
     flag_bf l2_flags = msg_in->sats[in_sat_idx].obs[L2_FREQ].flags;
     if (!l1_flags.valid_pr || !l1_flags.valid_cp ||
@@ -669,8 +683,8 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
     uint8_t amb = 0;
     if (msg_in->header.msg_num == 1001 || msg_in->header.msg_num == 1003) {
       amb = (uint8_t)roundl((msg_in->sats[in_sat_idx].obs[0].pseudorange -
-                        msg_out->sats[out_sat_idx].obs[0].pseudorange) /
-                       PRUNIT_GPS);
+                             msg_out->sats[out_sat_idx].obs[0].pseudorange) /
+                            PRUNIT_GPS);
     }
 
     for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {
@@ -684,7 +698,8 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
 
       if (in_freq->flags.valid_cp != out_freq->flags.valid_cp) {
         printf("msgobs valid_cp not equal: %u %u\n",
-            in_freq->flags.valid_cp, out_freq->flags.valid_cp);
+               in_freq->flags.valid_cp,
+               out_freq->flags.valid_cp);
         return false;
       }
 
@@ -704,14 +719,15 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
             fabs(in_freq->pseudorange - out_freq->pseudorange -
                  amb * PRUNIT_GPS) > 0.01) {
           printf("msgobs pseudorange not equal: %.2f %.2f\n",
-              in_freq->pseudorange, out_freq->pseudorange + amb*PRUNIT_GPS);
+                 in_freq->pseudorange,
+                 out_freq->pseudorange + amb * PRUNIT_GPS);
           return false;
         }
       }
       if (in_freq->flags.valid_cp) {
         double frequency = freq == L1_FREQ ? GPS_L1_FREQ : GPS_L2_FREQ;
-        if (fabs(in_freq->carrier_phase - out_freq->carrier_phase ) -
-                 ((double)amb * PRUNIT_GPS / (CLIGHT / frequency)) >
+        if (fabs(in_freq->carrier_phase - out_freq->carrier_phase) -
+                ((double)amb * PRUNIT_GPS / (CLIGHT / frequency)) >
             0.0005 / (CLIGHT / frequency)) {
           printf("msgobs carrier_phase not equal\n");
           return false;
@@ -724,52 +740,41 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
         }
       }
       if (in_freq->flags.valid_lock) {
-        if( in_freq->lock < 24 ) {
-            if( out_freq->lock >= 24 ) {
-                printf("msgobs lock not equal\n");
-                return false;
-            }
-        }
-        else if( in_freq->lock < 72 ) {
-            if( out_freq->lock < 24 || out_freq->lock >= 72 )
-            {
-                printf("msgobs lock not equal\n");
-                return false;
-            }
-        }
-        else if( in_freq->lock < 168 ) {
-            if (out_freq->lock < 72 || out_freq->lock >= 168)
-            {
-                printf("msgobs lock not equal\n");
-                return false;
-            }
-        }
-        else if( in_freq->lock < 360 ) {
-            if( out_freq->lock < 168 || out_freq->lock >= 360
-            ) {
-                printf("msgobs lock not equal\n");
-                return false;
-            }
-        }
-        else if( in_freq->lock < 744 ) {
-            if( out_freq->lock < 360 || out_freq->lock >= 744
-            ) {
-                printf("msgobs lock not equal\n");
-                return false;
-            }
-        }
-        else if( in_freq->lock < 937 ) {
-            if( out_freq->lock < 744 || out_freq->lock >= 937
-            ) {
-                printf("msgobs lock not equal\n");
-                return false;
-            }
-        }
-        else {
-            if( out_freq->lock < 937 ) {
-                printf("msgobs lock not equal\n");
-                return false;
-            }
+        if (in_freq->lock < 24) {
+          if (out_freq->lock >= 24) {
+            printf("msgobs lock not equal\n");
+            return false;
+          }
+        } else if (in_freq->lock < 72) {
+          if (out_freq->lock < 24 || out_freq->lock >= 72) {
+            printf("msgobs lock not equal\n");
+            return false;
+          }
+        } else if (in_freq->lock < 168) {
+          if (out_freq->lock < 72 || out_freq->lock >= 168) {
+            printf("msgobs lock not equal\n");
+            return false;
+          }
+        } else if (in_freq->lock < 360) {
+          if (out_freq->lock < 168 || out_freq->lock >= 360) {
+            printf("msgobs lock not equal\n");
+            return false;
+          }
+        } else if (in_freq->lock < 744) {
+          if (out_freq->lock < 360 || out_freq->lock >= 744) {
+            printf("msgobs lock not equal\n");
+            return false;
+          }
+        } else if (in_freq->lock < 937) {
+          if (out_freq->lock < 744 || out_freq->lock >= 937) {
+            printf("msgobs lock not equal\n");
+            return false;
+          }
+        } else {
+          if (out_freq->lock < 937) {
+            printf("msgobs lock not equal\n");
+            return false;
+          }
         }
       }
     }
@@ -780,9 +785,7 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
 }
 
 bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
-                       const rtcm_obs_message *msg_out)
-{
-
+                       const rtcm_obs_message *msg_out) {
   if (msg_in->header.msg_num != msg_out->header.msg_num) {
     return false;
   }
@@ -820,7 +823,8 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
   }
 
   uint8_t out_sat_idx = 0;
-  for (uint8_t in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat; ++in_sat_idx) {
+  for (uint8_t in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat;
+       ++in_sat_idx) {
     flag_bf l1_flags = msg_in->sats[in_sat_idx].obs[L1_FREQ].flags;
     flag_bf l2_flags = msg_in->sats[in_sat_idx].obs[L2_FREQ].flags;
     if (!l1_flags.valid_pr || !l1_flags.valid_cp ||
@@ -839,8 +843,8 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
     uint8_t amb = 0;
     if (msg_in->header.msg_num == 1009 || msg_in->header.msg_num == 1011) {
       amb = (uint8_t)roundl((msg_in->sats[in_sat_idx].obs[0].pseudorange -
-                        msg_out->sats[out_sat_idx].obs[0].pseudorange) /
-                       PRUNIT_GLO);
+                             msg_out->sats[out_sat_idx].obs[0].pseudorange) /
+                            PRUNIT_GLO);
     }
 
     for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {
@@ -873,9 +877,11 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
       }
       if (in_freq->flags.valid_cp) {
         int fcn = msg_in->sats[in_sat_idx].fcn - 7;
-        double frequency = freq == L1_FREQ ? GLO_L1_FREQ + fcn * GLO_L1_CH_OFFSET : GLO_L1_FREQ + fcn * GLO_L2_CH_OFFSET;
-        if (fabs(in_freq->carrier_phase - out_freq->carrier_phase ) -
-            ((double)amb * PRUNIT_GLO / (CLIGHT / frequency)) >
+        double frequency = freq == L1_FREQ
+                               ? GLO_L1_FREQ + fcn * GLO_L1_CH_OFFSET
+                               : GLO_L1_FREQ + fcn * GLO_L2_CH_OFFSET;
+        if (fabs(in_freq->carrier_phase - out_freq->carrier_phase) -
+                ((double)amb * PRUNIT_GLO / (CLIGHT / frequency)) >
             0.0005 / (CLIGHT / frequency)) {
           return false;
         }
@@ -886,43 +892,32 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
         }
       }
       if (in_freq->flags.valid_lock) {
-        if( in_freq->lock < 24 ) {
-          if( out_freq->lock >= 24 ) {
+        if (in_freq->lock < 24) {
+          if (out_freq->lock >= 24) {
             return false;
           }
-        }
-        else if( in_freq->lock < 72 ) {
-          if( out_freq->lock < 24 || out_freq->lock >= 72 )
-          {
+        } else if (in_freq->lock < 72) {
+          if (out_freq->lock < 24 || out_freq->lock >= 72) {
             return false;
           }
-        }
-        else if( in_freq->lock < 168 ) {
-          if (out_freq->lock < 72 || out_freq->lock >= 168)
-          {
+        } else if (in_freq->lock < 168) {
+          if (out_freq->lock < 72 || out_freq->lock >= 168) {
             return false;
           }
-        }
-        else if( in_freq->lock < 360 ) {
-          if( out_freq->lock < 168 || out_freq->lock >= 360
-            ) {
+        } else if (in_freq->lock < 360) {
+          if (out_freq->lock < 168 || out_freq->lock >= 360) {
             return false;
           }
-        }
-        else if( in_freq->lock < 744 ) {
-          if( out_freq->lock < 360 || out_freq->lock >= 744
-            ) {
+        } else if (in_freq->lock < 744) {
+          if (out_freq->lock < 360 || out_freq->lock >= 744) {
             return false;
           }
-        }
-        else if( in_freq->lock < 937 ) {
-          if( out_freq->lock < 744 || out_freq->lock >= 937
-            ) {
+        } else if (in_freq->lock < 937) {
+          if (out_freq->lock < 744 || out_freq->lock >= 937) {
             return false;
           }
-        }
-        else {
-          if( out_freq->lock < 937 ) {
+        } else {
+          if (out_freq->lock < 937) {
             return false;
           }
         }
@@ -934,8 +929,7 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
   return true;
 }
 
-bool msg1005_equals(const rtcm_msg_1005 *lhs, const rtcm_msg_1005 *rhs)
-{
+bool msg1005_equals(const rtcm_msg_1005 *lhs, const rtcm_msg_1005 *rhs) {
   if (lhs->stn_id != rhs->stn_id) {
     return false;
   }
@@ -973,8 +967,7 @@ bool msg1005_equals(const rtcm_msg_1005 *lhs, const rtcm_msg_1005 *rhs)
   return true;
 }
 
-bool msg1006_equals(const rtcm_msg_1006 *lhs, const rtcm_msg_1006 *rhs)
-{
+bool msg1006_equals(const rtcm_msg_1006 *lhs, const rtcm_msg_1006 *rhs) {
   if (fabs(lhs->ant_height - rhs->ant_height) > 0.00005) {
     return false;
   }
@@ -982,8 +975,7 @@ bool msg1006_equals(const rtcm_msg_1006 *lhs, const rtcm_msg_1006 *rhs)
   return msg1005_equals(&lhs->msg_1005, &rhs->msg_1005);
 }
 
-bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs)
-{
+bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs) {
   if (lhs->stn_id != rhs->stn_id) {
     return false;
   }
@@ -1002,8 +994,7 @@ bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs)
   return true;
 }
 
-bool msg1008_equals(const rtcm_msg_1008 *lhs, const rtcm_msg_1008 *rhs)
-{
+bool msg1008_equals(const rtcm_msg_1008 *lhs, const rtcm_msg_1008 *rhs) {
   for (uint8_t ch = 0; ch < lhs->serial_count; ++ch) {
     if (lhs->serial_num[ch] != rhs->serial_num[ch]) {
       return false;
@@ -1013,8 +1004,7 @@ bool msg1008_equals(const rtcm_msg_1008 *lhs, const rtcm_msg_1008 *rhs)
   return msg1007_equals(&lhs->msg_1007, &rhs->msg_1007);
 }
 
-bool msg1029_equals(const rtcm_msg_1029 *lhs, const rtcm_msg_1029 *rhs)
-{
+bool msg1029_equals(const rtcm_msg_1029 *lhs, const rtcm_msg_1029 *rhs) {
   if (lhs->stn_id != rhs->stn_id) {
     return false;
   }
@@ -1030,18 +1020,15 @@ bool msg1029_equals(const rtcm_msg_1029 *lhs, const rtcm_msg_1029 *rhs)
   if (lhs->utf8_code_units_n != rhs->utf8_code_units_n) {
     return false;
   }
-  for (uint16_t i = 0; i < sizeof(lhs->utf8_code_units_n); i++)
-  {
-    if (lhs->utf8_code_units[i] != rhs->utf8_code_units[i])
-    {
+  for (uint16_t i = 0; i < sizeof(lhs->utf8_code_units_n); i++) {
+    if (lhs->utf8_code_units[i] != rhs->utf8_code_units[i]) {
       return false;
     }
   }
   return true;
 }
 
-bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs)
-{
+bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs) {
   if (lhs->stn_id != rhs->stn_id) {
     printf("1033 stn_id not equal\n");
     return false;
@@ -1050,7 +1037,9 @@ bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs)
     printf("1033 antenna_desc_counter not equal\n");
     return false;
   }
-  if (strncmp(lhs->antenna_descriptor, rhs->antenna_descriptor, lhs->antenna_desc_counter) != 0) {
+  if (strncmp(lhs->antenna_descriptor,
+              rhs->antenna_descriptor,
+              lhs->antenna_desc_counter) != 0) {
     printf("1033 antenna_descriptor not equal\n");
     return false;
   }
@@ -1062,16 +1051,21 @@ bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs)
     printf("1033 antenna_serial_num_counter not equal\n");
     return false;
   }
-  if (strncmp(lhs->antenna_serial_num, rhs->antenna_serial_num, lhs->antenna_serial_num_counter) != 0) {
+  if (strncmp(lhs->antenna_serial_num,
+              rhs->antenna_serial_num,
+              lhs->antenna_serial_num_counter) != 0) {
     printf("1033 antenna_serial_num not equal\n");
     return false;
   }
   if (lhs->rcv_descriptor_counter != rhs->rcv_descriptor_counter) {
     printf("1033 rcv_descriptor_counter not equal %u %u\n",
-        lhs->rcv_descriptor_counter, rhs->rcv_descriptor_counter);
+           lhs->rcv_descriptor_counter,
+           rhs->rcv_descriptor_counter);
     return false;
   }
-  if (strncmp(lhs->rcv_descriptor, rhs->rcv_descriptor, lhs->rcv_descriptor_counter) != 0) {
+  if (strncmp(lhs->rcv_descriptor,
+              rhs->rcv_descriptor,
+              lhs->rcv_descriptor_counter) != 0) {
     printf("1033 rcv_descriptor not equal\n");
     return false;
   }
@@ -1079,7 +1073,8 @@ bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs)
     printf("1033 rcv_fw_counter not equal\n");
     return false;
   }
-  if (strncmp(lhs->rcv_fw_version, rhs->rcv_fw_version, lhs->rcv_fw_counter) != 0) {
+  if (strncmp(lhs->rcv_fw_version, rhs->rcv_fw_version, lhs->rcv_fw_counter) !=
+      0) {
     printf("1033 rcv_fw_version not equal\n");
     return false;
   }
@@ -1087,54 +1082,67 @@ bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs)
     printf("1033 rcv_serial_num_counter not equal\n");
     return false;
   }
-  if (strncmp(lhs->rcv_serial_num, rhs->rcv_serial_num, lhs->rcv_serial_num_counter) != 0) {
+  if (strncmp(lhs->rcv_serial_num,
+              rhs->rcv_serial_num,
+              lhs->rcv_serial_num_counter) != 0) {
     printf("1033 rcv_serial_num not equal\n");
     return false;
   }
   return true;
 }
 
-bool msg1230_equals(const rtcm_msg_1230 *lhs, const rtcm_msg_1230 *rhs)
-{
+bool msg1230_equals(const rtcm_msg_1230 *lhs, const rtcm_msg_1230 *rhs) {
   if (lhs->stn_id != rhs->stn_id) {
-    printf("1230 Station ID's not equal %u %u\n",lhs->stn_id,rhs->stn_id);
+    printf("1230 Station ID's not equal %u %u\n", lhs->stn_id, rhs->stn_id);
     return false;
   }
 
   if (lhs->bias_indicator != rhs->bias_indicator) {
-    printf("1230 Bias indicator fields not equal %u %u\n",lhs->bias_indicator,rhs->bias_indicator);
+    printf("1230 Bias indicator fields not equal %u %u\n",
+           lhs->bias_indicator,
+           rhs->bias_indicator);
     return false;
   }
 
   if (lhs->fdma_signal_mask != rhs->fdma_signal_mask) {
-    printf("1230 FDMA signal mask not equal %u %u\n",lhs->fdma_signal_mask,rhs->fdma_signal_mask);
+    printf("1230 FDMA signal mask not equal %u %u\n",
+           lhs->fdma_signal_mask,
+           rhs->fdma_signal_mask);
     return false;
   }
 
   if (lhs->fdma_signal_mask & 0x08) {
-    if (fabs(lhs->L1_CA_cpb_meter - rhs->L1_CA_cpb_meter) > 0.015 ) {
-      printf("1230 L1 CA code phase bias not equal %5.3f %5.3f\n",lhs->L1_CA_cpb_meter,rhs->L1_CA_cpb_meter);
+    if (fabs(lhs->L1_CA_cpb_meter - rhs->L1_CA_cpb_meter) > 0.015) {
+      printf("1230 L1 CA code phase bias not equal %5.3f %5.3f\n",
+             lhs->L1_CA_cpb_meter,
+             rhs->L1_CA_cpb_meter);
       return false;
     }
   }
 
   if (lhs->fdma_signal_mask & 0x04) {
     if (fabs(lhs->L1_P_cpb_meter - rhs->L1_P_cpb_meter) > 0.015) {
-      printf("1230 L1 P code phase bias not equal %5.3f %5.3f\n",lhs->L1_P_cpb_meter,rhs->L1_P_cpb_meter);
+      printf("1230 L1 P code phase bias not equal %5.3f %5.3f\n",
+             lhs->L1_P_cpb_meter,
+             rhs->L1_P_cpb_meter);
       return false;
     }
   }
 
   if (lhs->fdma_signal_mask & 0x02) {
     if (fabs(lhs->L2_CA_cpb_meter - rhs->L2_CA_cpb_meter) > 0.015) {
-      printf("1230 L2 CA code phase bias not equal %5.3f %5.3f\n",lhs->L2_CA_cpb_meter,rhs->L2_CA_cpb_meter);
+      printf("1230 L2 CA code phase bias not equal %5.3f %5.3f\n",
+             lhs->L2_CA_cpb_meter,
+             rhs->L2_CA_cpb_meter);
       return false;
     }
   }
 
   if (lhs->fdma_signal_mask & 0x01) {
     if (fabs(lhs->L2_P_cpb_meter - rhs->L2_P_cpb_meter) > 0.015) {
-      printf("1230 L2 P code phase bias not equal %5.3f %5.3f\n",lhs->L2_P_cpb_meter,rhs->L2_P_cpb_meter);
+      printf("1230 L2 P code phase bias not equal %5.3f %5.3f\n",
+             lhs->L2_P_cpb_meter,
+             rhs->L2_P_cpb_meter);
       return false;
     }
   }

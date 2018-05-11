@@ -19,7 +19,6 @@ function build_c() {
     cd build
     cmake ../
     make -j4
-    test/rtcm_test
     cd ../
     cd ../
 }

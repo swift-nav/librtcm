@@ -10,9 +10,9 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-/* These encoder functions are provided to allow for easier unit testing however they are not robust to be used
- * in production. Before using with real data, we would need to handle ambiguity rollover and code carrier
- * divergance at least
+/* These encoder functions are provided to allow for easier unit testing however
+ * they are not robust to be used in production. Before using with real data, we
+ * would need to handle ambiguity rollover and code carrier divergance at least
  */
 
 #ifndef LIBRTCM_RTCM_ENCODER_H
@@ -25,7 +25,9 @@ void setbitul(uint8_t *buff, uint32_t pos, uint32_t len, uint64_t data);
 void setbits(uint8_t *buff, uint32_t pos, uint32_t len, int32_t data);
 void setbitsl(uint8_t *buff, uint32_t pos, uint32_t len, int64_t data);
 
-uint16_t rtcm3_write_header(const rtcm_obs_header *header, uint8_t num_sats, uint8_t *buff);
+uint16_t rtcm3_write_header(const rtcm_obs_header *header,
+                            uint8_t num_sats,
+                            uint8_t *buff);
 
 uint16_t rtcm3_encode_1001(const rtcm_obs_message *msg_1001, uint8_t *buff);
 uint16_t rtcm3_encode_1002(const rtcm_obs_message *msg_1002, uint8_t *buff);
@@ -41,4 +43,4 @@ uint16_t rtcm3_encode_1029(const rtcm_msg_1029 *msg_1029, uint8_t *buff);
 uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t *buff);
 uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t *buff);
 
-#endif //LIBRTCM_RTCM_ENCODER_H
+#endif /* LIBRTCM_RTCM_ENCODER_H */

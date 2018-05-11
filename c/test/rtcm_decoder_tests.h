@@ -41,4 +41,4 @@ bool msg1029_equals(const rtcm_msg_1029 *lhs, const rtcm_msg_1029 *rhs);
 bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs);
 bool msg1230_equals(const rtcm_msg_1230 *lhs, const rtcm_msg_1230 *rhs);
 
-#endif // PIKSI_BUILDROOT_RTCM_DECODER_TESTS_H
+#endif /* PIKSI_BUILDROOT_RTCM_DECODER_TESTS_H */

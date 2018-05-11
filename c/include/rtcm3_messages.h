@@ -13,20 +13,20 @@
 #ifndef PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H
 #define PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <constants.h>
+#include <stdbool.h>
+#include <stdint.h>
 
 typedef enum { L1_FREQ, L2_FREQ, NUM_FREQS } freq_enum;
 
 typedef struct {
-  uint16_t msg_num;      /* Msg Num DF002 uint16 12*/
-  uint16_t stn_id;       /* Station Id DF003 uint16 12*/
-  uint32_t tow_ms;       /* GPS/GLO time of week DF004/DF034 uint32 30/27 */
-  uint8_t sync;          /* Syncronous flag DF005 bit(1) 1 */
-  uint8_t n_sat;         /* Number of satellites DF006 uint8 5 */
-  uint8_t div_free;      /* Divergance free flag DF007 bit(1) 1 */
-  uint8_t smooth;        /* GPS Smoothing Interval DF008 bit(3) 3 */
+  uint16_t msg_num; /* Msg Num DF002 uint16 12*/
+  uint16_t stn_id;  /* Station Id DF003 uint16 12*/
+  uint32_t tow_ms;  /* GPS/GLO time of week DF004/DF034 uint32 30/27 */
+  uint8_t sync;     /* Syncronous flag DF005 bit(1) 1 */
+  uint8_t n_sat;    /* Number of satellites DF006 uint8 5 */
+  uint8_t div_free; /* Divergance free flag DF007 bit(1) 1 */
+  uint8_t smooth;   /* GPS Smoothing Interval DF008 bit(3) 3 */
 } rtcm_obs_header;
 
 typedef union {
@@ -62,17 +62,17 @@ typedef struct {
 
 typedef struct {
   uint16_t stn_id;
-  uint8_t ITRF;            /* Reserved for ITRF Realization Year DF021 uint6 6 */
-  uint8_t GPS_ind;         /* GPS Indicator DF022 bit(1) 1 */
-  uint8_t GLO_ind;         /* GLONASS Indicator DF023 bit(1) 1 */
-  uint8_t GAL_ind;         /* Reserved for Galileo Indicator DF024 bit(1) 1 */
-  uint8_t ref_stn_ind;     /* Reference-Station Indicator DF141 bit(1) 1 */
-  double arp_x;       /* Antenna Reference Point ECEF-X DF025 int38 38 */
-  uint8_t osc_ind;         /* Single Receiver Oscillator Indicator DF142 bit(1) 1 */
-  uint8_t reserved;        /* Reserved DF001 bit(1) 1 */
-  double arp_y;       /* Antenna Reference Point ECEF-Y DF026 int38 38 */
+  uint8_t ITRF;        /* Reserved for ITRF Realization Year DF021 uint6 6 */
+  uint8_t GPS_ind;     /* GPS Indicator DF022 bit(1) 1 */
+  uint8_t GLO_ind;     /* GLONASS Indicator DF023 bit(1) 1 */
+  uint8_t GAL_ind;     /* Reserved for Galileo Indicator DF024 bit(1) 1 */
+  uint8_t ref_stn_ind; /* Reference-Station Indicator DF141 bit(1) 1 */
+  double arp_x;        /* Antenna Reference Point ECEF-X DF025 int38 38 */
+  uint8_t osc_ind;     /* Single Receiver Oscillator Indicator DF142 bit(1) 1 */
+  uint8_t reserved;    /* Reserved DF001 bit(1) 1 */
+  double arp_y;        /* Antenna Reference Point ECEF-Y DF026 int38 38 */
   uint8_t quart_cycle_ind; /* Quarter Cycle Indicator DF364 bit(2) 2 */
-  double arp_z;       /* Antenna Reference Point ECEF-Z DF027 int38 38 */
+  double arp_z;            /* Antenna Reference Point ECEF-Z DF027 int38 38 */
 } rtcm_msg_1005;
 
 typedef struct {
@@ -83,14 +83,14 @@ typedef struct {
 typedef struct {
   uint16_t stn_id;    /* Reference Station ID DF003 uint12 12 */
   uint8_t desc_count; /* Descriptor Counter N DF029 uint8 8 N <= 31 */
-  char desc[32]; /* Antenna Descriptor DF030 char8(N) 8*N */
+  char desc[32];      /* Antenna Descriptor DF030 char8(N) 8*N */
   uint8_t ant_id;     /* Antenna Setup ID DF031 uint8 8 */
 } rtcm_msg_1007;
 
 typedef struct {
   rtcm_msg_1007 msg_1007;
-  uint8_t serial_count;     /* Serial Number Counter M DF032 uint8 8 M <= 31 */
-  char serial_num[32]; /* Antenna Serial Number DF033 char8(M) 8*M */
+  uint8_t serial_count; /* Serial Number Counter M DF032 uint8 8 M <= 31 */
+  char serial_num[32];  /* Antenna Serial Number DF033 char8(M) 8*M */
 } rtcm_msg_1008;
 
 #define RTCM_1029_MAX_CODE_UNITS (255u)

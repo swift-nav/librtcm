@@ -10,7 +10,7 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-// pgrgich: need to handle invalid obs...
+/* pgrgich: need to handle invalid obs... */
 
 #include "rtcm3_decode.h"
 #include <math.h>
@@ -24,8 +24,7 @@
  * \param len Length of bit field in bits.
  * \return Bit field as an unsigned value.
  */
-uint32_t getbitu(const uint8_t *buff, uint32_t pos, uint8_t len)
-{
+uint32_t getbitu(const uint8_t *buff, uint32_t pos, uint8_t len) {
   uint32_t bits = 0;
 
   for (uint32_t i = pos; i < pos + len; i++) {
@@ -44,8 +43,7 @@ uint32_t getbitu(const uint8_t *buff, uint32_t pos, uint8_t len)
  * \param len Length of bit field in bits.
  * \return Bit field as an unsigned value.
  */
-uint64_t getbitul(const uint8_t *buff, uint32_t pos, uint8_t len)
-{
+uint64_t getbitul(const uint8_t *buff, uint32_t pos, uint8_t len) {
   uint64_t bits = 0;
 
   for (uint32_t i = pos; i < pos + len; i++) {
@@ -66,8 +64,7 @@ uint64_t getbitul(const uint8_t *buff, uint32_t pos, uint8_t len)
  * \param len Length of bit field in bits.
  * \return Bit field as a signed value.
  */
-int32_t getbits(const uint8_t *buff, uint32_t pos, uint8_t len)
-{
+int32_t getbits(const uint8_t *buff, uint32_t pos, uint8_t len) {
   int32_t bits = (int32_t)getbitu(buff, pos, len);
 
   /* Sign extend, taken from:
@@ -88,8 +85,7 @@ int32_t getbits(const uint8_t *buff, uint32_t pos, uint8_t len)
  * \param len Length of bit field in bits.
  * \return Bit field as a signed value.
  */
-int64_t getbitsl(const uint8_t *buff, uint32_t pos, uint8_t len)
-{
+int64_t getbitsl(const uint8_t *buff, uint32_t pos, uint8_t len) {
   int64_t bits = (int64_t)getbitul(buff, pos, len);
 
   /* Sign extend, taken from:
@@ -99,34 +95,27 @@ int64_t getbitsl(const uint8_t *buff, uint32_t pos, uint8_t len)
   return (bits ^ m) - m;
 }
 
-void init_data(rtcm_sat_data *sat_data)
-{
+void init_data(rtcm_sat_data *sat_data) {
   for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {
     sat_data->obs[freq].flags.data = 0;
   }
 }
 
-static uint32_t from_lock_ind(uint8_t lock)
-{
-  if (lock < 24)
-    return lock;
-  if (lock < 48)
-    return 2 * lock - 24;
-  if (lock < 72)
-    return 4 * lock - 120;
-  if (lock < 96)
-    return 8 * lock - 408;
-  if (lock < 120)
-    return 16 * lock - 1176;
-  if (lock < 127)
-    return 32 * lock - 3096;
+static uint32_t from_lock_ind(uint8_t lock) {
+  if (lock < 24) return lock;
+  if (lock < 48) return 2 * lock - 24;
+  if (lock < 72) return 4 * lock - 120;
+  if (lock < 96) return 8 * lock - 408;
+  if (lock < 120) return 16 * lock - 1176;
+  if (lock < 127) return 32 * lock - 3096;
   return 937;
 }
 
-void decode_basic_gps_l1_freq_data(const uint8_t *buff, uint16_t *bit,
-                                   rtcm_freq_data *freq_data, uint32_t *pr,
-                                   int32_t *phr_pr_diff)
-{
+void decode_basic_gps_l1_freq_data(const uint8_t *buff,
+                                   uint16_t *bit,
+                                   rtcm_freq_data *freq_data,
+                                   uint32_t *pr,
+                                   int32_t *phr_pr_diff) {
   freq_data->code = getbitu(buff, *bit, 1);
   *bit += 1;
   *pr = getbitu(buff, *bit, 24);
@@ -141,10 +130,12 @@ void decode_basic_gps_l1_freq_data(const uint8_t *buff, uint16_t *bit,
   return;
 }
 
-void decode_basic_glo_l1_freq_data(const uint8_t *buff, uint16_t *bit,
-                                   rtcm_freq_data *freq_data, uint32_t *pr,
-                                   int32_t *phr_pr_diff, uint8_t *fcn)
-{
+void decode_basic_glo_l1_freq_data(const uint8_t *buff,
+                                   uint16_t *bit,
+                                   rtcm_freq_data *freq_data,
+                                   uint32_t *pr,
+                                   int32_t *phr_pr_diff,
+                                   uint8_t *fcn) {
   freq_data->code = getbitu(buff, *bit, 1);
   *bit += 1;
   *fcn = getbitu(buff, *bit, 5);
@@ -159,10 +150,11 @@ void decode_basic_glo_l1_freq_data(const uint8_t *buff, uint16_t *bit,
   return;
 }
 
-void decode_basic_l2_freq_data(const uint8_t *buff, uint16_t *bit,
-                               rtcm_freq_data *freq_data, int32_t *pr,
-                               int32_t *phr_pr_diff)
-{
+void decode_basic_l2_freq_data(const uint8_t *buff,
+                               uint16_t *bit,
+                               rtcm_freq_data *freq_data,
+                               int32_t *pr,
+                               int32_t *phr_pr_diff) {
   freq_data->code = getbitu(buff, *bit, 2);
   *bit += 2;
   *pr = getbits(buff, *bit, 14);
@@ -177,8 +169,7 @@ void decode_basic_l2_freq_data(const uint8_t *buff, uint16_t *bit,
   return;
 }
 
-uint16_t rtcm3_read_header(const uint8_t *buff, rtcm_obs_header *header)
-{
+uint16_t rtcm3_read_header(const uint8_t *buff, rtcm_obs_header *header) {
   uint16_t bit = 0;
   header->msg_num = getbitu(buff, bit, 12);
   bit += 12;
@@ -197,8 +188,7 @@ uint16_t rtcm3_read_header(const uint8_t *buff, rtcm_obs_header *header)
   return bit;
 }
 
-uint16_t rtcm3_read_glo_header(const uint8_t *buff, rtcm_obs_header *header)
-{
+uint16_t rtcm3_read_glo_header(const uint8_t *buff, rtcm_obs_header *header) {
   uint16_t bit = 0;
   header->msg_num = getbitu(buff, bit, 12);
   bit += 12;
@@ -217,59 +207,58 @@ uint16_t rtcm3_read_glo_header(const uint8_t *buff, rtcm_obs_header *header)
   return bit;
 }
 
-uint8_t construct_L1_code(rtcm_freq_data *l1_freq_data, int32_t pr, double amb_correction)
-{
+uint8_t construct_L1_code(rtcm_freq_data *l1_freq_data,
+                          int32_t pr,
+                          double amb_correction) {
   l1_freq_data->pseudorange = 0.02 * pr + amb_correction;
-  if(pr != (int)PR_L1_INVALID) {
+  if (pr != (int)PR_L1_INVALID) {
     return 1;
   }
   return 0;
 }
 
-
-uint8_t construct_L1_phase(rtcm_freq_data *l1_freq_data, int32_t phr_pr_diff, double freq)
-{
+uint8_t construct_L1_phase(rtcm_freq_data *l1_freq_data,
+                           int32_t phr_pr_diff,
+                           double freq) {
   l1_freq_data->carrier_phase =
-    (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-    (CLIGHT / freq);
-  if(phr_pr_diff != (int)CP_INVALID) {
+      (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) / (CLIGHT / freq);
+  if (phr_pr_diff != (int)CP_INVALID) {
     return 1;
   }
   return 0;
 }
 
-uint8_t construct_L2_code(rtcm_freq_data *l2_freq_data, const rtcm_freq_data *l1_freq_data, int32_t pr)
-{
+uint8_t construct_L2_code(rtcm_freq_data *l2_freq_data,
+                          const rtcm_freq_data *l1_freq_data,
+                          int32_t pr) {
   l2_freq_data->pseudorange = 0.02 * pr + l1_freq_data->pseudorange;
-  if(pr != (int)PR_L2_INVALID) {
+  if (pr != (int)PR_L2_INVALID) {
     return 1;
   }
   return 0;
 }
 
-uint8_t construct_L2_phase(rtcm_freq_data *l2_freq_data, const rtcm_freq_data *l1_freq_data, int32_t phr_pr_diff, double freq)
-{
+uint8_t construct_L2_phase(rtcm_freq_data *l2_freq_data,
+                           const rtcm_freq_data *l1_freq_data,
+                           int32_t phr_pr_diff,
+                           double freq) {
   l2_freq_data->carrier_phase =
-    (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) /
-    (CLIGHT / freq);
-  if(phr_pr_diff != (int)CP_INVALID) {
+      (l1_freq_data->pseudorange + 0.0005 * phr_pr_diff) / (CLIGHT / freq);
+  if (phr_pr_diff != (int)CP_INVALID) {
     return 1;
   }
   return 0;
 }
 
-uint8_t get_cnr(rtcm_freq_data *freq_data, const uint8_t *buff, uint16_t *bit)
-{
+uint8_t get_cnr(rtcm_freq_data *freq_data, const uint8_t *buff, uint16_t *bit) {
   uint8_t cnr = getbitu(buff, *bit, 8);
   *bit += 8;
-  if(cnr == 0) {
+  if (cnr == 0) {
     return 0;
   }
   freq_data->cnr = 0.25 * cnr;
   return 1;
 }
-
-
 
 /** Decode an RTCMv3 message type 1001 (L1-Only GPS RTK Observables)
  *
@@ -279,13 +268,11 @@ uint8_t get_cnr(rtcm_freq_data *freq_data, const uint8_t *buff, uint16_t *bit)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1001(const uint8_t *buff, rtcm_obs_message *msg_1001)
-{
+int8_t rtcm3_decode_1001(const uint8_t *buff, rtcm_obs_message *msg_1001) {
   uint16_t bit = 0;
   bit += rtcm3_read_header(buff, &msg_1001->header);
 
-  if (msg_1001->header.msg_num != 1001)
-    /* Unexpected message type. */
+  if (msg_1001->header.msg_num != 1001) /* Unexpected message type. */
     return -1;
 
   for (uint8_t i = 0; i < msg_1001->header.n_sat; i++) {
@@ -299,11 +286,12 @@ int8_t rtcm3_decode_1001(const uint8_t *buff, rtcm_obs_message *msg_1001)
 
     uint32_t l1_pr;
     int32_t phr_pr_diff;
-    decode_basic_gps_l1_freq_data(buff, &bit, l1_freq_data, &l1_pr,
-                                  &phr_pr_diff);
+    decode_basic_gps_l1_freq_data(
+        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff);
 
     l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, 0);
-    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
+    l1_freq_data->flags.valid_cp =
+        construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
   }
 
   return 0;
@@ -317,13 +305,11 @@ int8_t rtcm3_decode_1001(const uint8_t *buff, rtcm_obs_message *msg_1001)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1002(const uint8_t *buff, rtcm_obs_message *msg_1002)
-{
+int8_t rtcm3_decode_1002(const uint8_t *buff, rtcm_obs_message *msg_1002) {
   uint16_t bit = 0;
   bit += rtcm3_read_header(buff, &msg_1002->header);
 
-  if (msg_1002->header.msg_num != 1002)
-    /* Unexpected message type. */
+  if (msg_1002->header.msg_num != 1002) /* Unexpected message type. */
     return -1;
 
   for (uint8_t i = 0; i < msg_1002->header.n_sat; i++) {
@@ -337,14 +323,16 @@ int8_t rtcm3_decode_1002(const uint8_t *buff, rtcm_obs_message *msg_1002)
 
     uint32_t l1_pr;
     int32_t phr_pr_diff;
-    decode_basic_gps_l1_freq_data(buff, &bit, l1_freq_data, &l1_pr,
-                                  &phr_pr_diff);
+    decode_basic_gps_l1_freq_data(
+        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff);
 
     uint8_t amb = getbitu(buff, bit, 8);
     bit += 8;
-    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data,buff,&bit);
-    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
-    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
+    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
+    l1_freq_data->flags.valid_pr =
+        construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
+    l1_freq_data->flags.valid_cp =
+        construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
   }
 
   return 0;
@@ -358,13 +346,11 @@ int8_t rtcm3_decode_1002(const uint8_t *buff, rtcm_obs_message *msg_1002)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1003(const uint8_t *buff, rtcm_obs_message *msg_1003)
-{
+int8_t rtcm3_decode_1003(const uint8_t *buff, rtcm_obs_message *msg_1003) {
   uint16_t bit = 0;
   bit += rtcm3_read_header(buff, &msg_1003->header);
 
-  if (msg_1003->header.msg_num != 1003)
-    /* Unexpected message type. */
+  if (msg_1003->header.msg_num != 1003) /* Unexpected message type. */
     return -1;
 
   for (uint8_t i = 0; i < msg_1003->header.n_sat; i++) {
@@ -379,19 +365,21 @@ int8_t rtcm3_decode_1003(const uint8_t *buff, rtcm_obs_message *msg_1003)
     uint32_t l1_pr;
     int32_t l2_pr;
     int32_t phr_pr_diff;
-    decode_basic_gps_l1_freq_data(buff, &bit, l1_freq_data, &l1_pr,
-                                  &phr_pr_diff);
+    decode_basic_gps_l1_freq_data(
+        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff);
 
     l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, 0);
-    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
+    l1_freq_data->flags.valid_cp =
+        construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
 
     rtcm_freq_data *l2_freq_data = &msg_1003->sats[i].obs[L2_FREQ];
 
-    decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr,
-                              &phr_pr_diff);
+    decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr, &phr_pr_diff);
 
-    l2_freq_data->flags.valid_pr = construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
-    l2_freq_data->flags.valid_cp = construct_L2_phase(l2_freq_data, l1_freq_data, phr_pr_diff, GPS_L2_FREQ);
+    l2_freq_data->flags.valid_pr =
+        construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
+    l2_freq_data->flags.valid_cp = construct_L2_phase(
+        l2_freq_data, l1_freq_data, phr_pr_diff, GPS_L2_FREQ);
   }
 
   return 0;
@@ -405,13 +393,11 @@ int8_t rtcm3_decode_1003(const uint8_t *buff, rtcm_obs_message *msg_1003)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1004(const uint8_t *buff, rtcm_obs_message *msg_1004)
-{
+int8_t rtcm3_decode_1004(const uint8_t *buff, rtcm_obs_message *msg_1004) {
   uint16_t bit = 0;
   bit += rtcm3_read_header(buff, &msg_1004->header);
 
-  if (msg_1004->header.msg_num != 1004)
-    /* Unexpected message type. */
+  if (msg_1004->header.msg_num != 1004) /* Unexpected message type. */
     return -1;
 
   for (uint8_t i = 0; i < msg_1004->header.n_sat; i++) {
@@ -426,32 +412,35 @@ int8_t rtcm3_decode_1004(const uint8_t *buff, rtcm_obs_message *msg_1004)
     uint32_t l1_pr;
     int32_t l2_pr;
     int32_t phr_pr_diff;
-    decode_basic_gps_l1_freq_data(buff, &bit, l1_freq_data, &l1_pr,
-                                  &phr_pr_diff);
+    decode_basic_gps_l1_freq_data(
+        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff);
 
     uint8_t amb = getbitu(buff, bit, 8);
     bit += 8;
 
-    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data,buff,&bit);
-    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
-    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
+    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
+    l1_freq_data->flags.valid_pr =
+        construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
+    l1_freq_data->flags.valid_cp =
+        construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_FREQ);
 
     rtcm_freq_data *l2_freq_data = &msg_1004->sats[i].obs[L2_FREQ];
 
-    decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr,
-                              &phr_pr_diff);
+    decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr, &phr_pr_diff);
 
-    l2_freq_data->flags.valid_cnr = get_cnr(l2_freq_data,buff,&bit);
-    l2_freq_data->flags.valid_pr = construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
-    l2_freq_data->flags.valid_cp = construct_L2_phase(l2_freq_data,l1_freq_data,phr_pr_diff, GPS_L2_FREQ);
+    l2_freq_data->flags.valid_cnr = get_cnr(l2_freq_data, buff, &bit);
+    l2_freq_data->flags.valid_pr =
+        construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
+    l2_freq_data->flags.valid_cp = construct_L2_phase(
+        l2_freq_data, l1_freq_data, phr_pr_diff, GPS_L2_FREQ);
   }
 
   return 0;
 }
 
-int8_t rtcm3_decode_1005_base(const uint8_t *buff, rtcm_msg_1005 *msg_1005,
-                          uint16_t *bit)
-{
+int8_t rtcm3_decode_1005_base(const uint8_t *buff,
+                              rtcm_msg_1005 *msg_1005,
+                              uint16_t *bit) {
   msg_1005->stn_id = getbitu(buff, *bit, 12);
   *bit += 12;
   msg_1005->ITRF = getbitu(buff, *bit, 6);
@@ -488,20 +477,19 @@ int8_t rtcm3_decode_1005_base(const uint8_t *buff, rtcm_msg_1005 *msg_1005,
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1005(const uint8_t *buff, rtcm_msg_1005 *msg_1005)
-{
+int8_t rtcm3_decode_1005(const uint8_t *buff, rtcm_msg_1005 *msg_1005) {
   uint16_t bit = 0;
   uint16_t msg_num = getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1005)
-    /* Unexpected message type. */
+  if (msg_num != 1005) /* Unexpected message type. */
     return -1;
 
   return rtcm3_decode_1005_base(buff, msg_1005, &bit);
 }
 
-/** Decode an RTCMv3 message type 1005 (Stationary RTK Reference Station ARP with antenna height)
+/** Decode an RTCMv3 message type 1005 (Stationary RTK Reference Station ARP
+ * with antenna height)
  *
  * \param buff The input data buffer
  * \param RTCM message struct
@@ -509,14 +497,12 @@ int8_t rtcm3_decode_1005(const uint8_t *buff, rtcm_msg_1005 *msg_1005)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1006(const uint8_t *buff, rtcm_msg_1006 *msg_1006)
-{
+int8_t rtcm3_decode_1006(const uint8_t *buff, rtcm_msg_1006 *msg_1006) {
   uint16_t bit = 0;
   uint16_t msg_num = getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1006)
-    /* Unexpected message type. */
+  if (msg_num != 1006) /* Unexpected message type. */
     return -1;
 
   rtcm3_decode_1005_base(buff, &msg_1006->msg_1005, &bit);
@@ -525,9 +511,9 @@ int8_t rtcm3_decode_1006(const uint8_t *buff, rtcm_msg_1006 *msg_1006)
   return 0;
 }
 
-int8_t rtcm3_decode_1007_base(const uint8_t *buff, rtcm_msg_1007 *msg_1007,
-                          uint16_t *bit)
-{
+int8_t rtcm3_decode_1007_base(const uint8_t *buff,
+                              rtcm_msg_1007 *msg_1007,
+                              uint16_t *bit) {
   msg_1007->stn_id = getbitu(buff, *bit, 12);
   *bit += 12;
   msg_1007->desc_count = getbitu(buff, *bit, 8);
@@ -550,14 +536,12 @@ int8_t rtcm3_decode_1007_base(const uint8_t *buff, rtcm_msg_1007 *msg_1007,
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1007(const uint8_t *buff, rtcm_msg_1007 *msg_1007)
-{
+int8_t rtcm3_decode_1007(const uint8_t *buff, rtcm_msg_1007 *msg_1007) {
   uint16_t bit = 0;
   uint16_t msg_num = getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1007)
-    /* Unexpected message type. */
+  if (msg_num != 1007) /* Unexpected message type. */
     return -1;
 
   rtcm3_decode_1007_base(buff, msg_1007, &bit);
@@ -573,14 +557,12 @@ int8_t rtcm3_decode_1007(const uint8_t *buff, rtcm_msg_1007 *msg_1007)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1008(const uint8_t *buff, rtcm_msg_1008 *msg_1008)
-{
+int8_t rtcm3_decode_1008(const uint8_t *buff, rtcm_msg_1008 *msg_1008) {
   uint16_t bit = 0;
   uint16_t msg_num = getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1008)
-    /* Unexpected message type. */
+  if (msg_num != 1008) /* Unexpected message type. */
     return -1;
 
   rtcm3_decode_1007_base(buff, &msg_1008->msg_1007, &bit);
@@ -601,13 +583,11 @@ int8_t rtcm3_decode_1008(const uint8_t *buff, rtcm_msg_1008 *msg_1008)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1010(const uint8_t *buff, rtcm_obs_message *msg_1010)
-{
+int8_t rtcm3_decode_1010(const uint8_t *buff, rtcm_obs_message *msg_1010) {
   uint16_t bit = 0;
   bit += rtcm3_read_glo_header(buff, &msg_1010->header);
 
-  if (msg_1010->header.msg_num != 1010)
-    /* Unexpected message type. */
+  if (msg_1010->header.msg_num != 1010) /* Unexpected message type. */
     return -1;
 
   for (uint8_t i = 0; i < msg_1010->header.n_sat; i++) {
@@ -620,17 +600,19 @@ int8_t rtcm3_decode_1010(const uint8_t *buff, rtcm_obs_message *msg_1010)
 
     uint32_t l1_pr;
     int32_t phr_pr_diff;
-    decode_basic_glo_l1_freq_data(buff, &bit, l1_freq_data, &l1_pr,
-                                  &phr_pr_diff, &msg_1010->sats[i].fcn);
+    decode_basic_glo_l1_freq_data(
+        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff, &msg_1010->sats[i].fcn);
 
     uint8_t amb = getbitu(buff, bit, 7);
     bit += 7;
 
-    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data,buff,&bit);
+    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
 
     int8_t glo_fcn = msg_1010->sats[i].fcn - 7;
-    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data,l1_pr,PRUNIT_GLO * amb);
-    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data,phr_pr_diff,GLO_L1_FREQ + glo_fcn * GLO_L1_CH_OFFSET);
+    l1_freq_data->flags.valid_pr =
+        construct_L1_code(l1_freq_data, l1_pr, PRUNIT_GLO * amb);
+    l1_freq_data->flags.valid_cp = construct_L1_phase(
+        l1_freq_data, phr_pr_diff, GLO_L1_FREQ + glo_fcn * GLO_L1_CH_OFFSET);
   }
 
   return 0;
@@ -644,13 +626,11 @@ int8_t rtcm3_decode_1010(const uint8_t *buff, rtcm_obs_message *msg_1010)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1012(const uint8_t *buff, rtcm_obs_message *msg_1012)
-{
+int8_t rtcm3_decode_1012(const uint8_t *buff, rtcm_obs_message *msg_1012) {
   uint16_t bit = 0;
   bit += rtcm3_read_glo_header(buff, &msg_1012->header);
 
-  if (msg_1012->header.msg_num != 1012)
-    /* Unexpected message type. */
+  if (msg_1012->header.msg_num != 1012) /* Unexpected message type. */
     return -1;
 
   for (uint8_t i = 0; i < msg_1012->header.n_sat; i++) {
@@ -665,30 +645,31 @@ int8_t rtcm3_decode_1012(const uint8_t *buff, rtcm_obs_message *msg_1012)
     uint32_t l1_pr;
     int32_t l2_pr;
     int32_t phr_pr_diff;
-    decode_basic_glo_l1_freq_data(buff, &bit, l1_freq_data, &l1_pr,
-                                  &phr_pr_diff, &msg_1012->sats[i].fcn);
+    decode_basic_glo_l1_freq_data(
+        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff, &msg_1012->sats[i].fcn);
 
     uint8_t amb = getbitu(buff, bit, 7);
     bit += 7;
 
     int8_t glo_fcn = msg_1012->sats[i].fcn - 7;
-    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data,buff,&bit);
-    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GLO);
-    l1_freq_data->flags.valid_cp = construct_L1_phase(l1_freq_data,
-                                                      phr_pr_diff,
-                                                      GLO_L1_FREQ + glo_fcn * GLO_L1_CH_OFFSET);
+    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
+    l1_freq_data->flags.valid_pr =
+        construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GLO);
+    l1_freq_data->flags.valid_cp = construct_L1_phase(
+        l1_freq_data, phr_pr_diff, GLO_L1_FREQ + glo_fcn * GLO_L1_CH_OFFSET);
 
     rtcm_freq_data *l2_freq_data = &msg_1012->sats[i].obs[L2_FREQ];
 
-    decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr,
-                                    &phr_pr_diff);
+    decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr, &phr_pr_diff);
 
-    l2_freq_data->flags.valid_cnr = get_cnr(l2_freq_data,buff,&bit);
-    l2_freq_data->flags.valid_pr = construct_L2_code(l2_freq_data,l1_freq_data,l2_pr);
-    l2_freq_data->flags.valid_cp = construct_L2_phase(l2_freq_data,
-                                                      l1_freq_data,
-                                                      phr_pr_diff,
-                                                      GLO_L2_FREQ + glo_fcn * GLO_L2_CH_OFFSET);
+    l2_freq_data->flags.valid_cnr = get_cnr(l2_freq_data, buff, &bit);
+    l2_freq_data->flags.valid_pr =
+        construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
+    l2_freq_data->flags.valid_cp =
+        construct_L2_phase(l2_freq_data,
+                           l1_freq_data,
+                           phr_pr_diff,
+                           GLO_L2_FREQ + glo_fcn * GLO_L2_CH_OFFSET);
   }
 
   return 0;
@@ -702,14 +683,12 @@ int8_t rtcm3_decode_1012(const uint8_t *buff, rtcm_obs_message *msg_1012)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1029(const uint8_t *buff, rtcm_msg_1029 *msg_1029)
-{
+int8_t rtcm3_decode_1029(const uint8_t *buff, rtcm_msg_1029 *msg_1029) {
   uint16_t bit = 0;
   uint16_t msg_num = getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1029)
-    /* Unexpected message type. */
+  if (msg_num != 1029) /* Unexpected message type. */
     return -1;
 
   msg_1029->stn_id = getbitu(buff, bit, 12);
@@ -742,14 +721,12 @@ int8_t rtcm3_decode_1029(const uint8_t *buff, rtcm_msg_1029 *msg_1029)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1033(const uint8_t *buff, rtcm_msg_1033 *msg_1033)
-{
+int8_t rtcm3_decode_1033(const uint8_t *buff, rtcm_msg_1033 *msg_1033) {
   uint16_t bit = 0;
   uint16_t msg_num = getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1033)
-    /* Unexpected message type. */
+  if (msg_num != 1033) /* Unexpected message type. */
     return -1;
 
   msg_1033->stn_id = getbitu(buff, bit, 12);
@@ -804,14 +781,12 @@ int8_t rtcm3_decode_1033(const uint8_t *buff, rtcm_msg_1033 *msg_1033)
  *         Returns a negative number if the message is invalid:
  *          - `-1` : Message type mismatch
  */
-int8_t rtcm3_decode_1230(const uint8_t *buff, rtcm_msg_1230 *msg_1230)
-{
+int8_t rtcm3_decode_1230(const uint8_t *buff, rtcm_msg_1230 *msg_1230) {
   uint16_t bit = 0;
   uint16_t msg_num = getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1230)
-    /* Unexpected message type. */
+  if (msg_num != 1230) /* Unexpected message type. */
     return -1;
 
   msg_1230->stn_id = getbitu(buff, bit, 12);
@@ -819,26 +794,25 @@ int8_t rtcm3_decode_1230(const uint8_t *buff, rtcm_msg_1230 *msg_1230)
   msg_1230->bias_indicator = getbitu(buff, bit, 1);
   bit += 1;
   /* 3 Reserved bits */
-  bit+= 3;
+  bit += 3;
   msg_1230->fdma_signal_mask = getbitu(buff, bit, 4);
   bit += 4;
-  if(msg_1230->fdma_signal_mask & 0x08) {
+  if (msg_1230->fdma_signal_mask & 0x08) {
     msg_1230->L1_CA_cpb_meter = getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
-  if(msg_1230->fdma_signal_mask & 0x04) {
+  if (msg_1230->fdma_signal_mask & 0x04) {
     msg_1230->L1_P_cpb_meter = getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
-  if(msg_1230->fdma_signal_mask & 0x02) {
+  if (msg_1230->fdma_signal_mask & 0x02) {
     msg_1230->L2_CA_cpb_meter = getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
-  if(msg_1230->fdma_signal_mask & 0x01) {
+  if (msg_1230->fdma_signal_mask & 0x01) {
     msg_1230->L2_P_cpb_meter = getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
 
   return 0;
 }
-
