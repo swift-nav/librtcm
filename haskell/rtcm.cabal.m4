@@ -26,6 +26,7 @@ library
                      , Data.RTCM3.Antennas
                      , Data.RTCM3.Ephemerides
                      , Data.RTCM3.Internal
+                     , Data.RTCM3.MSM
                      , Data.RTCM3.Observations
                      , Data.RTCM3.SSR
                      , Data.RTCM3.System
@@ -83,6 +84,7 @@ test-suite test
                      , Test.Data.RTCM3.Antennas
                      , Test.Data.RTCM3.Ephemerides
                      , Test.Data.RTCM3.Extras
+                     , Test.Data.RTCM3.MSM
                      , Test.Data.RTCM3.Observations
                      , Test.Data.RTCM3.SSR
                      , Test.Data.RTCM3.System

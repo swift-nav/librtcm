@@ -26,6 +26,7 @@ import Data.Binary
 import Data.ByteString.Lazy
 import Data.RTCM3.Antennas     as Export
 import Data.RTCM3.Ephemerides  as Export
+import Data.RTCM3.MSM          as Export
 import Data.RTCM3.Observations as Export
 import Data.RTCM3.SSR          as Export
 import Data.RTCM3.System       as Export
@@ -61,6 +62,7 @@ data RTCM3Msg =
    | RTCM3Msg1064    Msg1064 Msg
    | RTCM3Msg1065    Msg1065 Msg
    | RTCM3Msg1066    Msg1066 Msg
+   | RTCM3Msg1074    Msg1074 Msg
    | RTCM3Msg1230    Msg1230 Msg
    | RTCM3Msg1265    Msg1265 Msg
    | RTCM3Msg1266    Msg1266 Msg
@@ -104,6 +106,7 @@ instance Binary RTCM3Msg where
           | num == msg1064 = RTCM3Msg1064 (decode $ fromStrict $ unBytes _msgRTCM3Payload) m
           | num == msg1065 = RTCM3Msg1065 (decode $ fromStrict $ unBytes _msgRTCM3Payload) m
           | num == msg1066 = RTCM3Msg1066 (decode $ fromStrict $ unBytes _msgRTCM3Payload) m
+          | num == msg1074 = RTCM3Msg1074 (decode $ fromStrict $ unBytes _msgRTCM3Payload) m
           | num == msg1230 = RTCM3Msg1230 (decode $ fromStrict $ unBytes _msgRTCM3Payload) m
           | num == msg1265 = RTCM3Msg1265 (decode $ fromStrict $ unBytes _msgRTCM3Payload) m
           | num == msg1266 = RTCM3Msg1266 (decode $ fromStrict $ unBytes _msgRTCM3Payload) m
@@ -139,6 +142,7 @@ instance Binary RTCM3Msg where
       encoder (RTCM3Msg1064    _n m) = put m
       encoder (RTCM3Msg1065    _n m) = put m
       encoder (RTCM3Msg1066    _n m) = put m
+      encoder (RTCM3Msg1074    _n m) = put m
       encoder (RTCM3Msg1230    _n m) = put m
       encoder (RTCM3Msg1265    _n m) = put m
       encoder (RTCM3Msg1266    _n m) = put m
@@ -172,6 +176,7 @@ instance HasMsg RTCM3Msg where
   msg f (RTCM3Msg1064    n m) = RTCM3Msg1064    n <$> f m
   msg f (RTCM3Msg1065    n m) = RTCM3Msg1065    n <$> f m
   msg f (RTCM3Msg1066    n m) = RTCM3Msg1066    n <$> f m
+  msg f (RTCM3Msg1074    n m) = RTCM3Msg1074    n <$> f m
   msg f (RTCM3Msg1230    n m) = RTCM3Msg1230    n <$> f m
   msg f (RTCM3Msg1265    n m) = RTCM3Msg1265    n <$> f m
   msg f (RTCM3Msg1266    n m) = RTCM3Msg1266    n <$> f m
@@ -211,6 +216,7 @@ instance ToJSON RTCM3Msg where
   toJSON (RTCM3Msg1064    n m) = toJSON n <<>> toJSON m
   toJSON (RTCM3Msg1065    n m) = toJSON n <<>> toJSON m
   toJSON (RTCM3Msg1066    n m) = toJSON n <<>> toJSON m
+  toJSON (RTCM3Msg1074    n m) = toJSON n <<>> toJSON m
   toJSON (RTCM3Msg1230    n m) = toJSON n <<>> toJSON m
   toJSON (RTCM3Msg1265    n m) = toJSON n <<>> toJSON m
   toJSON (RTCM3Msg1266    n m) = toJSON n <<>> toJSON m
@@ -248,6 +254,7 @@ instance FromJSON RTCM3Msg where
         | num == msg1064 = RTCM3Msg1064 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
         | num == msg1065 = RTCM3Msg1065 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
         | num == msg1066 = RTCM3Msg1066 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
+        | num == msg1074 = RTCM3Msg1074 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
         | num == msg1230 = RTCM3Msg1230 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
         | num == msg1265 = RTCM3Msg1265 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
         | otherwise = RTCM3MsgUnknown <$> pure num <*> parseJSON obj
