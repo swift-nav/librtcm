@@ -42,6 +42,46 @@ typedef enum constellation_e {
   CONSTELLATION_COUNT,
 } constellation_t;
 
+/** Code identifier (from libswiftnav-private) */
+typedef enum code_e {
+  CODE_INVALID = -1,
+  CODE_GPS_L1CA = 0,
+  CODE_GPS_L2CM = 1,
+  CODE_SBAS_L1CA = 2,
+  CODE_GLO_L1OF = 3,
+  CODE_GLO_L2OF = 4,
+  CODE_GPS_L1P = 5,
+  CODE_GPS_L2P = 6,
+  CODE_GPS_L2CL = 7,
+  CODE_GPS_L2CX = 8, /* combined L2C tracking */
+  CODE_GPS_L5I = 9,
+  CODE_GPS_L5Q = 10,
+  CODE_GPS_L5X = 11,  /* combined L5 tracking */
+  CODE_BDS2_B11 = 12, /* data channel at 1526 * 1.023 MHz */
+  CODE_BDS2_B2 = 13,  /* data channel at 1180 * 1.023 MHz */
+  CODE_GAL_E1B = 14,  /* data channel at E1 (1540 * 1.023 MHz) */
+  CODE_GAL_E1C = 15,  /* pilot channel at E1 */
+  CODE_GAL_E1X = 16,  /* combined tracking on E1 */
+  CODE_GAL_E6B = 17,
+  CODE_GAL_E6C = 18,
+  CODE_GAL_E6X = 19, /* combined tracking on E6 */
+  CODE_GAL_E7I = 20,
+  CODE_GAL_E7Q = 21,
+  CODE_GAL_E7X = 22, /* combined tracking on E5b */
+  CODE_GAL_E8 = 23,  /* E5 AltBOC tracking */
+  CODE_GAL_E5I = 24,
+  CODE_GAL_E5Q = 25,
+  CODE_GAL_E5X = 26, /* combined tracking on E5a */
+  CODE_QZS_L1CA = 27,
+  CODE_QZS_L2CM = 28,
+  CODE_QZS_L2CL = 29,
+  CODE_QZS_L2CX = 30,
+  CODE_QZS_L5I = 31,
+  CODE_QZS_L5Q = 32,
+  CODE_QZS_L5X = 33,
+  CODE_COUNT
+} code_t;
+
 /* return codes for the decoders */
 typedef enum rtcm3_rc_e {
   RC_OK = 0,
@@ -81,6 +121,7 @@ typedef struct {
 } rtcm_msm_header;
 
 typedef union {
+  uint8_t data;
   struct {
     uint8_t valid_pr : 1;
     uint8_t valid_cp : 1;
@@ -88,7 +129,6 @@ typedef union {
     uint8_t valid_lock : 1;
     uint8_t valid_dop : 1;
   };
-  uint8_t data;
 } flag_bf;
 
 typedef struct {

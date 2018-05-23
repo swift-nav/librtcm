@@ -74,15 +74,15 @@ void encode_basic_freq_data(const rtcm_freq_data *freq_data,
   double l1_prc = calc_l1_pr * 0.02 + amb * PRUNIT_GPS;
 
   /* phaserange - L1 pseudorange */
-  double cp_pr = freq_data->carrier_phase - l1_prc / (CLIGHT / freq);
+  double cp_pr = freq_data->carrier_phase - l1_prc / (GPS_C / freq);
 
   /* TODO (anthony) If the pr and cp diverge, we should adjust the cp ambiguity
    * and reset the lock time indicator */
 
   /* Calculate PhaseRange – L1 Pseudorange (DF012/DF018). */
-  int32_t ppr = roundl(cp_pr * (CLIGHT / freq) / 0.0005);
+  int32_t ppr = roundl(cp_pr * (GPS_C / freq) / 0.0005);
 
-  if (fabs(freq - GPS_L1_FREQ) < 0.01) {
+  if (fabs(freq - GPS_L1_HZ) < 0.01) {
     setbitu(buff, *bit, 1, 0);
     *bit += 1;
     setbitu(buff, *bit, 24, pr);
@@ -108,7 +108,7 @@ void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data,
                                 const uint8_t fcn,
                                 uint8_t buff[],
                                 uint16_t *bit) {
-  bool L1 = fabs(freq - GLO_L1_FREQ) < 0.01;
+  bool L1 = fabs(freq - GLO_L1_HZ) < 0.01;
   /* Calculate GPS Integer L1 Pseudorange Modulus Ambiguity (DF044). */
   uint8_t amb = (uint8_t)(*l1_pr / PRUNIT_GLO);
 
@@ -124,15 +124,15 @@ void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data,
 
   double glo_freq = 0.0;
   if (L1) {
-    glo_freq = freq + (fcn - 7) * GLO_L1_CH_OFFSET;
+    glo_freq = freq + (fcn - 7) * GLO_L1_DELTA_HZ;
   } else {
-    glo_freq = freq + (fcn - 7) * GLO_L2_CH_OFFSET;
+    glo_freq = freq + (fcn - 7) * GLO_L2_DELTA_HZ;
   }
   /* phaserange - L1 pseudorange */
-  double cp_pr = freq_data->carrier_phase - l1_prc / (CLIGHT / glo_freq);
+  double cp_pr = freq_data->carrier_phase - l1_prc / (GPS_C / glo_freq);
 
   /* Calculate PhaseRange – L1 Pseudorange (DF042/DF048). */
-  int32_t ppr = roundl(cp_pr * (CLIGHT / glo_freq) / 0.0005);
+  int32_t ppr = roundl(cp_pr * (GPS_C / glo_freq) / 0.0005);
 
   if (L1) {
     setbitu(buff, *bit, 1, 0);
@@ -286,7 +286,7 @@ uint16_t rtcm3_encode_1001(const rtcm_obs_message *msg_1001, uint8_t buff[]) {
       setbitu(buff, bit, 6, msg_1001->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1001->sats[i].obs[L1_FREQ],
-                             GPS_L1_FREQ,
+                             GPS_L1_HZ,
                              &msg_1001->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
@@ -322,7 +322,7 @@ uint16_t rtcm3_encode_1002(const rtcm_obs_message *msg_1002, uint8_t buff[]) {
       setbitu(buff, bit, 6, msg_1002->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1002->sats[i].obs[L1_FREQ],
-                             GPS_L1_FREQ,
+                             GPS_L1_HZ,
                              &msg_1002->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
@@ -360,12 +360,12 @@ uint16_t rtcm3_encode_1003(const rtcm_obs_message *msg_1003, uint8_t buff[]) {
       setbitu(buff, bit, 6, msg_1003->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1003->sats[i].obs[L1_FREQ],
-                             GPS_L1_FREQ,
+                             GPS_L1_HZ,
                              &msg_1003->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
       encode_basic_freq_data(&msg_1003->sats[i].obs[L2_FREQ],
-                             GPS_L2_FREQ,
+                             GPS_L2_HZ,
                              &msg_1003->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
@@ -391,7 +391,7 @@ uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
       setbitu(buff, bit, 6, msg_1004->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1004->sats[i].obs[L1_FREQ],
-                             GPS_L1_FREQ,
+                             GPS_L1_HZ,
                              &msg_1004->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
@@ -409,7 +409,7 @@ uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
       bit += 8;
 
       encode_basic_freq_data(&msg_1004->sats[i].obs[L2_FREQ],
-                             GPS_L2_FREQ,
+                             GPS_L2_HZ,
                              &msg_1004->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
@@ -531,7 +531,7 @@ uint16_t rtcm3_encode_1010(const rtcm_obs_message *msg_1010, uint8_t buff[]) {
       setbitu(buff, bit, 6, sat_obs->svId);
       bit += 6;
       encode_basic_glo_freq_data(&sat_obs->obs[L1_FREQ],
-                                 GLO_L1_FREQ,
+                                 GLO_L1_HZ,
                                  &sat_obs->obs[L1_FREQ].pseudorange,
                                  sat_obs->fcn,
                                  buff,
@@ -567,7 +567,7 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
       setbitu(buff, bit, 6, sat_obs->svId);
       bit += 6;
       encode_basic_glo_freq_data(&sat_obs->obs[L1_FREQ],
-                                 GLO_L1_FREQ,
+                                 GLO_L1_HZ,
                                  &sat_obs->obs[L1_FREQ].pseudorange,
                                  sat_obs->fcn,
                                  buff,
@@ -582,7 +582,7 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
       bit += 8;
 
       encode_basic_glo_freq_data(&sat_obs->obs[L2_FREQ],
-                                 GLO_L2_FREQ,
+                                 GLO_L2_HZ,
                                  &sat_obs->obs[L1_FREQ].pseudorange,
                                  sat_obs->fcn,
                                  buff,
@@ -748,8 +748,8 @@ static uint16_t rtcm3_encode_msm_header(const rtcm_msm_header *header,
     bit++;
   }
   uint8_t num_sats =
-      count_mask_bits(MSM_SATELLITE_MASK_SIZE, header->satellite_mask);
-  uint8_t num_sigs = count_mask_bits(MSM_SIGNAL_MASK_SIZE, header->signal_mask);
+      count_mask_values(MSM_SATELLITE_MASK_SIZE, header->satellite_mask);
+  uint8_t num_sigs = count_mask_values(MSM_SIGNAL_MASK_SIZE, header->signal_mask);
   uint8_t cell_mask_size = num_sats * num_sigs;
 
   for (uint8_t i = 0; i < cell_mask_size; i++) {
@@ -877,10 +877,10 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
   }
 
   uint8_t num_sats =
-      count_mask_bits(MSM_SATELLITE_MASK_SIZE, header->satellite_mask);
-  uint8_t num_sigs = count_mask_bits(MSM_SIGNAL_MASK_SIZE, header->signal_mask);
+      count_mask_values(MSM_SATELLITE_MASK_SIZE, header->satellite_mask);
+  uint8_t num_sigs = count_mask_values(MSM_SIGNAL_MASK_SIZE, header->signal_mask);
   uint8_t cell_mask_size = num_sats * num_sigs;
-  uint8_t num_cells = count_mask_bits(cell_mask_size, header->cell_mask);
+  uint8_t num_cells = count_mask_values(cell_mask_size, header->cell_mask);
 
   /* Header */
   uint16_t bit = rtcm3_encode_msm_header(header, buff);
@@ -943,15 +943,15 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
   for (uint8_t sat = 0; sat < num_sats; sat++) {
     for (uint8_t sig = 0; sig < num_sigs; sig++) {
       if (header->cell_mask[sat * num_sigs + sig]) {
-        double freq = msm_signal_frequency(
-            cons, sig, msg->header.signal_mask, msg->sats[sat].sat_info);
+        double freq =
+            msm_signal_frequency(&msg->header, sig, msg->sats[sat].sat_info);
 
         flags[i] = msg->signals[i].flags;
         if (flags[i].valid_pr) {
           fine_pr[i] = msg->signals[i].pseudorange_m - rough_range_m[sat];
         }
         if (flags[i].valid_cp) {
-          fine_cp[i] = msg->signals[i].carrier_phase_cyc * (CLIGHT / freq) -
+          fine_cp[i] = msg->signals[i].carrier_phase_cyc * (GPS_C / freq) -
                        rough_range_m[sat];
         }
         if (flags[i].valid_lock) {
@@ -964,7 +964,7 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
           cnr[i] = 0;
         }
         if (MSM5 == msm_type) {
-          fine_dop[i] = msg->signals[i].range_rate_Hz * (CLIGHT / freq) -
+          fine_dop[i] = msg->signals[i].range_rate_Hz * (GPS_C / freq) -
                         rough_rate_m_s[sat];
         }
         i++;

@@ -28,6 +28,8 @@
 #define MSM_CP_EXT_INVALID -8388608   /* Signed bit pattern 0x800000 */
 #define MSM_DOP_INVALID -16384        /* Signed bit pattern 0x4000 */
 
+#define MSM_GLO_FCN_OFFSET 7 /* Offset for FCN coding in sat_info */
+
 /** 2^-4 */
 #define C_1_2P4 0.0625
 /** 2^-24 */
@@ -37,13 +39,73 @@
 /** 2^-31 */
 #define C_1_2P31 4.656612873077393e-10
 
-static const double CLIGHT = 299792458.0; /* speed of light (m/s) */
+/** The official GPS value of the speed of light in m / s.
+ * \note This is the exact value of the speed of light in vacuum (by the
+ * definition of meters). */
+#define GPS_C 299792458.0
 
-static const double GPS_L1_FREQ = 1.57542e9;     /* GPS L1 frequency (Hz) */
-static const double GPS_L2_FREQ = 1.22760e9;     /* GPS L2 Frequency */
-static const double GLO_L1_FREQ = 1.602e9;       /* GLO L1 frequency (Hz) */
-static const double GLO_L2_FREQ = 1.246e9;       /* GLO L2 Frequency */
-static const double GLO_L1_CH_OFFSET = 0.5625e6; /* GLO L1 Channel offset */
-static const double GLO_L2_CH_OFFSET = 0.4375e6; /* GLO L2 Channel offset */
+/** The GPS L1 center frequency in Hz. */
+#define GPS_L1_HZ 1.57542e9
+
+/** The GPS L2 center frequency in Hz. */
+#define GPS_L2_HZ 1.22760e9
+
+/** The GPS L5 center frequency in Hz. */
+#define GPS_L5_HZ (115 * 10.23e6)
+
+/** The GLO L1 center frequency in Hz. */
+#define GLO_L1_HZ 1.602e9
+
+/** The GLO L2 center frequency in Hz. */
+#define GLO_L2_HZ 1.246e9
+
+/** Frequency range between two adjacent GLO channel in Hz for L1 band*/
+#define GLO_L1_DELTA_HZ 5.625e5
+
+/** Frequency range between two adjacent GLO channel in Hz for L2 band */
+#define GLO_L2_DELTA_HZ 4.375e5
+
+/** Centre frequency of SBAS L1 */
+#define SBAS_L1_HZ (1.023e6 * 1540)
+
+/** Centre frequency of SBAS L5 */
+#define SBAS_L5_HZ (1.023e6 * 1150)
+
+/** Centre frequency of Beidou2 B11 */
+#define BDS2_B11_HZ (1.023e6 * (1540 - 14))
+
+/** Centre frequency of Beidou2 B2 */
+#define BDS2_B2_HZ (1.023e6 * 1180)
+
+/** Centre frequency of Galileo E1 */
+#define GAL_E1_HZ (1.023e6 * 1540)
+
+/** Centre frequency of Galileo E6 */
+#define GAL_E6_HZ (1.023e6 * 1250)
+
+/** Centre frequency of Galileo E5b */
+#define GAL_E7_HZ (1.023e6 * 1180)
+
+/** Centre frequency of Galileo E5AltBOC */
+#define GAL_E8_HZ (1.023e6 * 1165)
+
+/** Centre frequency of Galileo E5a */
+#define GAL_E5_HZ (1.023e6 * 1150)
+
+/** Centre frequency of QZSS L1CA */
+#define QZS_L1_HZ (1.023e6 * 1540)
+
+/** Centre frequency of QZSS L2C */
+#define QZS_L2_HZ (1.023e6 * 1200)
+
+/** Centre frequency of QZSS L5 */
+#define QZS_L5_HZ (1.023e6 * 1150)
+
+#define GPS_FIRST_PRN 1
+#define SBAS_FIRST_PRN 120
+#define GLO_FIRST_PRN 1
+#define BDS2_FIRST_PRN 1
+#define GAL_FIRST_PRN 1
+#define QZS_FIRST_PRN 193
 
 #endif /* LIBRTCM_CONSTANTS_H */

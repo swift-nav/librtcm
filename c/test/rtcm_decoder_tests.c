@@ -16,11 +16,13 @@
 #include <rtcm3_decode.h>
 #include <rtcm3_messages.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "bits.h"
 #include "rtcm_encoder.h"
 
 int main(void) {
+  test_msm_bit_utils();
   test_rtcm_1001();
   test_rtcm_1002();
   test_rtcm_1003();
@@ -36,6 +38,8 @@ int main(void) {
   test_rtcm_1230();
   test_rtcm_msm4();
   test_rtcm_msm5();
+  test_rtcm_msm7();
+  test_rtcm_random_bits();
 }
 
 void test_rtcm_1001(void) {
@@ -85,7 +89,7 @@ void test_rtcm_1001(void) {
   rtcm_obs_message msg1001_out;
   int8_t ret = rtcm3_decode_1001(buff, &msg1001_out);
 
-  assert(ret == 0 && msgobs_equals(&msg1001, &msg1001_out));
+  assert(RC_OK == ret && msgobs_equals(&msg1001, &msg1001_out));
 }
 
 void test_rtcm_1002(void) {
@@ -141,7 +145,7 @@ void test_rtcm_1002(void) {
   rtcm_obs_message msg1002_out;
   int8_t ret = rtcm3_decode_1002(buff, &msg1002_out);
 
-  assert(ret == 0 && msgobs_equals(&msg1002, &msg1002_out));
+  assert(RC_OK == ret && msgobs_equals(&msg1002, &msg1002_out));
 }
 
 void test_rtcm_1003(void) {
@@ -201,7 +205,7 @@ void test_rtcm_1003(void) {
   rtcm_obs_message msg1003_out;
   int8_t ret = rtcm3_decode_1003(buff, &msg1003_out);
 
-  assert(ret == 0 && msgobs_equals(&msg1003, &msg1003_out));
+  assert(RC_OK == ret && msgobs_equals(&msg1003, &msg1003_out));
 }
 
 void test_rtcm_1004(void) {
@@ -272,7 +276,7 @@ void test_rtcm_1004(void) {
   rtcm_obs_message msg1004_out;
   int8_t ret = rtcm3_decode_1004(buff, &msg1004_out);
 
-  assert(ret == 0 && msgobs_equals(&msg1004, &msg1004_out));
+  assert(RC_OK == ret && msgobs_equals(&msg1004, &msg1004_out));
 }
 
 void test_rtcm_1005(void) {
@@ -297,7 +301,7 @@ void test_rtcm_1005(void) {
   rtcm_msg_1005 msg1005_out;
   int8_t ret = rtcm3_decode_1005(buff, &msg1005_out);
 
-  assert(ret == 0 && msg1005_equals(&msg1005, &msg1005_out));
+  assert(RC_OK == ret && msg1005_equals(&msg1005, &msg1005_out));
 }
 
 void test_rtcm_1006(void) {
@@ -323,7 +327,7 @@ void test_rtcm_1006(void) {
   rtcm_msg_1006 msg1006_out;
   int8_t ret = rtcm3_decode_1006(buff, &msg1006_out);
 
-  assert(ret == 0 && msg1006_equals(&msg1006, &msg1006_out));
+  assert(RC_OK == ret && msg1006_equals(&msg1006, &msg1006_out));
 }
 
 void test_rtcm_1007(void) {
@@ -341,7 +345,7 @@ void test_rtcm_1007(void) {
   rtcm_msg_1007 msg1007_out;
   int8_t ret = rtcm3_decode_1007(buff, &msg1007_out);
 
-  assert(ret == 0 && msg1007_equals(&msg1007, &msg1007_out));
+  assert(RC_OK == ret && msg1007_equals(&msg1007, &msg1007_out));
 }
 
 void test_rtcm_1008(void) {
@@ -361,7 +365,7 @@ void test_rtcm_1008(void) {
   rtcm_msg_1008 msg1008_out;
   int8_t ret = rtcm3_decode_1008(buff, &msg1008_out);
 
-  assert(ret == 0 && msg1008_equals(&msg1008, &msg1008_out));
+  assert(RC_OK == ret && msg1008_equals(&msg1008, &msg1008_out));
 }
 
 void test_rtcm_1010(void) {
@@ -420,7 +424,7 @@ void test_rtcm_1010(void) {
   rtcm_obs_message msg1010_out;
   int8_t ret = rtcm3_decode_1010(buff, &msg1010_out);
 
-  assert(ret == 0 && msgobs_glo_equals(&msg1010, &msg1010_out));
+  assert(RC_OK == ret && msgobs_glo_equals(&msg1010, &msg1010_out));
 }
 
 void test_rtcm_1012(void) {
@@ -493,7 +497,7 @@ void test_rtcm_1012(void) {
   rtcm_obs_message msg1012_out;
   int8_t ret = rtcm3_decode_1012(buff, &msg1012_out);
 
-  assert(ret == 0 && msgobs_glo_equals(&msg1012, &msg1012_out));
+  assert(RC_OK == ret && msgobs_glo_equals(&msg1012, &msg1012_out));
 }
 
 /* from the RTCM3 Spec Section 3.5.10 */
@@ -565,8 +569,7 @@ void test_rtcm_1029(void) {
   rtcm_msg_1029 msg1029_out;
   int8_t ret = rtcm3_decode_1029(buff, &msg1029_out);
 
-  assert(ret == 0 && msg1029_equals(&msg1029, &msg1029_out));
-  assert(ret == 0);
+  assert(RC_OK == ret && msg1029_equals(&msg1029, &msg1029_out));
 }
 
 void test_rtcm_1033(void) {
@@ -591,7 +594,7 @@ void test_rtcm_1033(void) {
   rtcm_msg_1033 msg1033_out;
   int8_t ret = rtcm3_decode_1033(buff, &msg1033_out);
 
-  assert(ret == 0 && msg1033_equals(&msg1033, &msg1033_out));
+  assert(RC_OK == ret && msg1033_equals(&msg1033, &msg1033_out));
 }
 
 void test_rtcm_1230(void) {
@@ -612,7 +615,7 @@ void test_rtcm_1230(void) {
   rtcm_msg_1230 msg1230_out_1;
   int8_t ret = rtcm3_decode_1230(buff, &msg1230_out_1);
 
-  assert(ret == 0 && msg1230_equals(&msg1230, &msg1230_out_1));
+  assert(RC_OK == ret && msg1230_equals(&msg1230, &msg1230_out_1));
 
   msg1230.fdma_signal_mask = 0x0D;
   memset(buff, 0, 1024);
@@ -621,7 +624,7 @@ void test_rtcm_1230(void) {
   rtcm_msg_1230 msg1230_out_2;
   ret = rtcm3_decode_1230(buff, &msg1230_out_2);
 
-  assert(ret == 0 && msg1230_equals(&msg1230, &msg1230_out_2));
+  assert(RC_OK == ret && msg1230_equals(&msg1230, &msg1230_out_2));
 }
 
 bool msgobs_equals(const rtcm_obs_message *msg_in,
@@ -729,10 +732,10 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
         }
       }
       if (in_freq->flags.valid_cp) {
-        double frequency = freq == L1_FREQ ? GPS_L1_FREQ : GPS_L2_FREQ;
+        double frequency = freq == L1_FREQ ? GPS_L1_HZ : GPS_L2_HZ;
         if (fabs(in_freq->carrier_phase - out_freq->carrier_phase) -
-                ((double)amb * PRUNIT_GPS / (CLIGHT / frequency)) >
-            0.0005 / (CLIGHT / frequency)) {
+                ((double)amb * PRUNIT_GPS / (GPS_C / frequency)) >
+            0.0005 / (GPS_C / frequency)) {
           printf("msgobs carrier_phase not equal\n");
           return false;
         }
@@ -881,12 +884,11 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
       }
       if (in_freq->flags.valid_cp) {
         int fcn = msg_in->sats[in_sat_idx].fcn - 7;
-        double frequency = freq == L1_FREQ
-                               ? GLO_L1_FREQ + fcn * GLO_L1_CH_OFFSET
-                               : GLO_L1_FREQ + fcn * GLO_L2_CH_OFFSET;
+        double frequency = freq == L1_FREQ ? GLO_L1_HZ + fcn * GLO_L1_DELTA_HZ
+                                           : GLO_L1_HZ + fcn * GLO_L2_DELTA_HZ;
         if (fabs(in_freq->carrier_phase - out_freq->carrier_phase) -
-                ((double)amb * PRUNIT_GLO / (CLIGHT / frequency)) >
-            0.0005 / (CLIGHT / frequency)) {
+                ((double)amb * PRUNIT_GLO / (GPS_C / frequency)) >
+            0.0005 / (GPS_C / frequency)) {
           return false;
         }
       }
@@ -1192,9 +1194,9 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
     }
   }
   uint8_t num_sats =
-      count_mask_bits(MSM_SATELLITE_MASK_SIZE, msg_in->header.satellite_mask);
+      count_mask_values(MSM_SATELLITE_MASK_SIZE, msg_in->header.satellite_mask);
   uint8_t num_sigs =
-      count_mask_bits(MSM_SIGNAL_MASK_SIZE, msg_in->header.signal_mask);
+      count_mask_values(MSM_SIGNAL_MASK_SIZE, msg_in->header.signal_mask);
   uint8_t cell_mask_size = num_sats * num_sigs;
 
   for (uint8_t i = 0; i < cell_mask_size; i++) {
@@ -1208,8 +1210,8 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
   }
 
   for (uint8_t i = 0; i < num_sats; i++) {
-    if (fabs(msg_in->sats[i].rough_range_m -
-             msg_out->sats[i].rough_range_m) > 1) {
+    if (fabs(msg_in->sats[i].rough_range_m - msg_out->sats[i].rough_range_m) >
+        1) {
       printf("msm sats[%d].rough_pseudorange not equal: %.1f %.1f\n",
              i,
              msg_in->sats[i].rough_range_m,
@@ -1230,7 +1232,8 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
     }
   }
 
-  uint8_t num_cells = count_mask_bits(MSM_MAX_CELLS, msg_in->header.cell_mask);
+  uint8_t num_cells =
+      count_mask_values(MSM_MAX_CELLS, msg_in->header.cell_mask);
 
   for (uint8_t i = 0; i < num_cells; i++) {
     const rtcm_msm_signal_data *in_data = &msg_in->signals[i];
@@ -1420,7 +1423,7 @@ void test_rtcm_msm4(void) {
   rtcm_msm_message msg_msm4_out;
   int8_t ret = rtcm3_decode_msm4(buff, &msg_msm4_out);
 
-  assert(ret == 0 && msg_msm_equals(&msg_msm4, &msg_msm4_out));
+  assert(RC_OK == ret && msg_msm_equals(&msg_msm4, &msg_msm4_out));
 }
 
 void test_rtcm_msm5(void) {
@@ -1459,7 +1462,7 @@ void test_rtcm_msm5(void) {
   msg_msm5.header = header;
   msg_msm5.sats[0].rough_range_m =
       round(20000004.4 / PRUNIT_GPS * 1024) * PRUNIT_GPS / 1024;
-  msg_msm5.sats[0].rough_range_rate_m_s = round(1001 * (CLIGHT / GPS_L1_FREQ));
+  msg_msm5.sats[0].rough_range_rate_m_s = round(1001 * (GPS_C / GPS_L1_HZ));
   msg_msm5.signals[0].pseudorange_m = 20000004.4;
   msg_msm5.signals[0].carrier_phase_cyc = 105100794.4;
   msg_msm5.signals[0].range_rate_Hz = 1001; /* Hz */
@@ -1474,12 +1477,12 @@ void test_rtcm_msm5(void) {
   msg_msm5.signals[1] = msg_msm5.signals[0];
   msg_msm5.signals[1].pseudorange_m = 20000124.4;
   msg_msm5.signals[1].carrier_phase_cyc = 81897184.4;
-  msg_msm5.signals[1].range_rate_Hz = 1001 * GPS_L2_FREQ / GPS_L1_FREQ;
+  msg_msm5.signals[1].range_rate_Hz = 1001 * GPS_L2_HZ / GPS_L1_HZ;
   msg_msm5.signals[1].cnr = 35;
 
   msg_msm5.sats[1].rough_range_m =
       round(22000004.4 / PRUNIT_GPS * 1024) * PRUNIT_GPS / 1024;
-  msg_msm5.sats[1].rough_range_rate_m_s = round(-1001 * (CLIGHT / GPS_L1_FREQ));
+  msg_msm5.sats[1].rough_range_rate_m_s = round(-1001 * (GPS_C / GPS_L1_HZ));
   msg_msm5.signals[2].pseudorange_m = 22000004.4;
   msg_msm5.signals[2].carrier_phase_cyc = 115610703.4;
   msg_msm5.signals[2].range_rate_Hz = -1001.5;
@@ -1493,11 +1496,11 @@ void test_rtcm_msm5(void) {
   msg_msm5.signals[3] = msg_msm5.signals[2];
   msg_msm5.signals[3].pseudorange_m = 22000024.4;
   msg_msm5.signals[3].carrier_phase_cyc = 90086422.236;
-  msg_msm5.signals[3].range_rate_Hz = -1001.5 * GPS_L2_FREQ / GPS_L1_FREQ;
+  msg_msm5.signals[3].range_rate_Hz = -1001.5 * GPS_L2_HZ / GPS_L1_HZ;
 
   msg_msm5.sats[2].rough_range_m =
       round(22000004.55 / PRUNIT_GPS * 1024) * PRUNIT_GPS / 1024;
-  msg_msm5.sats[2].rough_range_rate_m_s = round(550 * (CLIGHT / GPS_L1_FREQ));
+  msg_msm5.sats[2].rough_range_rate_m_s = round(550 * (GPS_C / GPS_L1_HZ));
   msg_msm5.signals[4].pseudorange_m = 22000004.55;
   msg_msm5.signals[4].carrier_phase_cyc = 115610553.4;
   msg_msm5.signals[4].range_rate_Hz = 555;
@@ -1521,5 +1524,107 @@ void test_rtcm_msm5(void) {
   rtcm_msm_message msg_msm5_out;
   int8_t ret = rtcm3_decode_msm5(buff, &msg_msm5_out);
 
-  assert(ret == 0 && msg_msm_equals(&msg_msm5, &msg_msm5_out));
+  assert(RC_OK == ret && msg_msm_equals(&msg_msm5, &msg_msm5_out));
+}
+
+void test_rtcm_msm7(void) {
+  rtcm_msm_message msg_msm7_decoded;
+  int8_t ret = rtcm3_decode_msm7(msm7_raw, &msg_msm7_decoded);
+
+  rtcm_msm_message msg_msm7_expected;
+  msg_msm7_expected.header = msm7_expected_header;
+  memcpy(msg_msm7_expected.sats,
+         msm7_expected_sat_data,
+         sizeof(msm7_expected_sat_data));
+  memcpy(msg_msm7_expected.signals,
+         msm7_expected_sig_data,
+         sizeof(msm7_expected_sig_data));
+
+  assert(RC_OK == ret && msg_msm_equals(&msg_msm7_expected, &msg_msm7_decoded));
+}
+
+void test_rtcm_random_bits(void) {
+  /* test the MSM decoders with random garbage, they should either return a
+   * failure code or manage to decode something, but not crash */
+
+  uint8_t buff[1024];
+  rtcm_msm_message msg_msm;
+  for (uint16_t rep = 0; rep < 10000; rep++) {
+    /* fill with random garbage */
+    for (uint16_t i = 0; i < 1024; i++) {
+      buff[i] = rand() & 0xFF;
+    }
+
+    /* fill the message number in the range from 1070 to 1200 */
+    uint16_t msg_num = 1070 + (rand() % 130);
+    setbitu(buff, 0, 12, msg_num);
+
+    /* add more zeros to satellite and signal masks to make them plausible */
+    for (uint16_t bit = 73; bit < 170; bit++) {
+      if ((double)rand() / RAND_MAX < 0.5) {
+        setbitu(buff, bit, 1, 0);
+      }
+    }
+
+    rtcm3_decode_msm4(buff, &msg_msm);
+    rtcm3_decode_msm5(buff, &msg_msm);
+    rtcm3_decode_msm6(buff, &msg_msm);
+    rtcm3_decode_msm7(buff, &msg_msm);
+  }
+}
+
+void test_msm_bit_utils(void) {
+  {
+    bool mask[] = {0};
+    assert(0 == count_mask_values(sizeof(mask), mask));
+  }
+  {
+    bool mask[] = {1, 0};
+    assert(1 == count_mask_values(sizeof(mask), mask));
+    assert(0 == find_nth_mask_value(sizeof(mask), mask, 1));
+  }
+  {
+    bool mask[] = {0, 1};
+    assert(1 == count_mask_values(sizeof(mask), mask));
+    assert(1 == find_nth_mask_value(sizeof(mask), mask, 1));
+  }
+  {
+    bool mask[] = {0, 0, 0, 0, 0};
+    assert(0 == count_mask_values(sizeof(mask), mask));
+  }
+  {
+    bool mask[] = {1, 0, 0, 0, 0};
+    assert(1 == count_mask_values(sizeof(mask), mask));
+    assert(0 == find_nth_mask_value(sizeof(mask), mask, 1));
+  }
+  {
+    bool mask[] = {0, 0, 0, 0, 1};
+    assert(1 == count_mask_values(sizeof(mask), mask));
+    assert(4 == find_nth_mask_value(sizeof(mask), mask, 1));
+  }
+  {
+    bool mask[] = {1, 1, 1, 1, 0};
+    assert(4 == count_mask_values(sizeof(mask), mask));
+    assert(0 == find_nth_mask_value(sizeof(mask), mask, 1));
+    assert(1 == find_nth_mask_value(sizeof(mask), mask, 2));
+    assert(2 == find_nth_mask_value(sizeof(mask), mask, 3));
+    assert(3 == find_nth_mask_value(sizeof(mask), mask, 4));
+  }
+  {
+    bool mask[] = {0, 1, 1, 1, 1};
+    assert(4 == count_mask_values(sizeof(mask), mask));
+    assert(1 == find_nth_mask_value(sizeof(mask), mask, 1));
+    assert(2 == find_nth_mask_value(sizeof(mask), mask, 2));
+    assert(3 == find_nth_mask_value(sizeof(mask), mask, 3));
+    assert(4 == find_nth_mask_value(sizeof(mask), mask, 4));
+  }
+  {
+    bool mask[] = {1, 1, 1, 1, 1};
+    assert(5 == count_mask_values(sizeof(mask), mask));
+    assert(0 == find_nth_mask_value(sizeof(mask), mask, 1));
+    assert(1 == find_nth_mask_value(sizeof(mask), mask, 2));
+    assert(2 == find_nth_mask_value(sizeof(mask), mask, 3));
+    assert(3 == find_nth_mask_value(sizeof(mask), mask, 4));
+    assert(4 == find_nth_mask_value(sizeof(mask), mask, 5));
+  }
 }
