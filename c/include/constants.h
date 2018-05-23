@@ -16,9 +16,26 @@
 #define PRUNIT_GPS 299792.458 /**< RTCM v3 Unit of GPS Pseudorange (m) */
 #define PRUNIT_GLO 599584.916 /**< RTCM v3 Unit of GLO Pseudorange (m) */
 #define RTCM_MAX_SATS 32
-#define CP_INVALID 0xFFF80000    /* Unsigend bit pattern 0x80000 */
-#define PR_L1_INVALID 0xFFF80000 /* Unsigend bit pattern 0x80000 */
-#define PR_L2_INVALID 0xFFFFE000 /* Unsigend bit pattern 0x20000 */
+#define CP_INVALID 0xFFF80000    /* Unsigned bit pattern 0x80000 */
+#define PR_L1_INVALID 0xFFF80000 /* Unsigned bit pattern 0x80000 */
+#define PR_L2_INVALID 0xFFFFE000 /* Unsigned bit pattern 0x20000 */
+#define MSM_MAX_CELLS 64         /* Maximum number of cells in MSM message */
+#define MSM_ROUGH_RANGE_INVALID 0xFF  /* Unsigned bit pattern 0xFF */
+#define MSM_ROUGH_RATE_INVALID 0x2000 /* Unsigned bit pattern 0x2000 */
+#define MSM_PR_INVALID -16384         /* Signed bit pattern 0x4000 */
+#define MSM_PR_EXT_INVALID -8388608   /* Signed bit pattern 0x800000 */
+#define MSM_CP_INVALID -2097152       /* Signed bit pattern 0x200000 */
+#define MSM_CP_EXT_INVALID -8388608   /* Signed bit pattern 0x800000 */
+#define MSM_DOP_INVALID -16384        /* Signed bit pattern 0x4000 */
+
+/** 2^-4 */
+#define C_1_2P4 0.0625
+/** 2^-24 */
+#define C_1_2P24 5.960464477539063e-08
+/** 2^-29 */
+#define C_1_2P29 1.862645149230957e-09
+/** 2^-31 */
+#define C_1_2P31 4.656612873077393e-10
 
 static const double CLIGHT = 299792458.0; /* speed of light (m/s) */
 

@@ -28,6 +28,8 @@ static void test_rtcm_1012(void);
 static void test_rtcm_1029(void);
 static void test_rtcm_1033(void);
 static void test_rtcm_1230(void);
+static void test_rtcm_msm4(void);
+static void test_rtcm_msm5(void);
 
 bool msgobs_equals(const rtcm_obs_message *msg_in,
                    const rtcm_obs_message *msg_out);
