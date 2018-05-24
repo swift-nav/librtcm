@@ -147,7 +147,8 @@ constellation_t to_constellation(uint16_t msg_num) {
 
 static uint8_t get_msm_gps_prn(uint8_t sat_id) {
   /*RTCM 10403.3 Table 3.5-90 */
-  return sat_id + GPS_FIRST_PRN;
+  uint8_t prn = sat_id + GPS_FIRST_PRN;
+  return (prn <= GPS_LAST_PRN) ? prn : PRN_INVALID;
 }
 
 static code_t get_msm_gps_code(uint8_t signal_id) {
@@ -184,7 +185,8 @@ static code_t get_msm_gps_code(uint8_t signal_id) {
 
 static uint8_t get_msm_glo_prn(uint8_t sat_id) {
   /*RTCM 10403.3 Table 3.5-95 */
-  return sat_id + GLO_FIRST_PRN;
+  uint8_t prn = sat_id + GLO_FIRST_PRN;
+  return (prn <= GLO_LAST_PRN) ? prn : PRN_INVALID;
 }
 
 static code_t get_msm_glo_code(uint8_t signal_id) {
@@ -209,7 +211,8 @@ static uint8_t get_msm_gal_prn(uint8_t sat_id) {
    *  52 - GIOVE-B
    */
 
-  return sat_id + GAL_FIRST_PRN;
+  uint8_t prn = sat_id + GAL_FIRST_PRN;
+  return (prn <= GAL_LAST_PRN) ? prn : PRN_INVALID;
 }
 
 static code_t get_msm_gal_code(uint8_t signal_id) {
@@ -254,7 +257,8 @@ static code_t get_msm_gal_code(uint8_t signal_id) {
 
 static uint8_t get_msm_sbas_prn(uint8_t sat_id) {
   /*RTCM 10403.3 Table 3.5-101 */
-  return sat_id + SBAS_FIRST_PRN;
+  uint8_t prn = sat_id + SBAS_FIRST_PRN;
+  return (prn <= SBAS_LAST_PRN) ? prn : PRN_INVALID;
 }
 
 static code_t get_msm_sbas_code(uint8_t signal_id) {
@@ -272,7 +276,8 @@ static code_t get_msm_sbas_code(uint8_t signal_id) {
 
 static uint8_t get_msm_qzs_prn(uint8_t sat_id) {
   /*RTCM 10403.3 Table 3.5-104 */
-  return sat_id + QZS_FIRST_PRN;
+  uint8_t prn = sat_id + QZS_FIRST_PRN;
+  return (prn <= QZS_LAST_PRN) ? prn : PRN_INVALID;
 }
 
 static code_t get_msm_qzs_code(uint8_t signal_id) {
@@ -305,7 +310,8 @@ static code_t get_msm_qzs_code(uint8_t signal_id) {
 
 static uint8_t get_msm_bds2_prn(uint8_t sat_id) {
   /*RTCM 10403.3 Table 3.5-107 */
-  return sat_id + BDS2_FIRST_PRN;
+  uint8_t prn = sat_id + BDS2_FIRST_PRN;
+  return (prn <= BDS2_LAST_PRN) ? prn : PRN_INVALID;
 }
 
 static code_t get_msm_bds2_code(uint8_t signal_id) {
@@ -425,6 +431,6 @@ uint8_t msm_sat_to_prn(const rtcm_msm_header *header, uint8_t satellite_index) {
     case CONSTELLATION_INVALID:
     case CONSTELLATION_COUNT:
     default:
-      return 0;
+      return PRN_INVALID;
   }
 }

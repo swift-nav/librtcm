@@ -101,11 +101,20 @@
 /** Centre frequency of QZSS L5 */
 #define QZS_L5_HZ (1.023e6 * 1150)
 
+/** Valid PRN ranges, Tables 3.5.90 to 3.5-107 */
 #define GPS_FIRST_PRN 1
+#define GPS_LAST_PRN 63
 #define SBAS_FIRST_PRN 120
+#define SBAS_LAST_PRN 158
 #define GLO_FIRST_PRN 1
+#define GLO_LAST_PRN 24
 #define BDS2_FIRST_PRN 1
+#define BDS2_LAST_PRN 37
 #define GAL_FIRST_PRN 1
+#define GAL_LAST_PRN 50
 #define QZS_FIRST_PRN 193
+#define QZS_LAST_PRN 202
+
+#define PRN_INVALID 0
 
 #endif /* LIBRTCM_CONSTANTS_H */
