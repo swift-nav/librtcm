@@ -13,6 +13,7 @@ import qualified Test.Data.CRC24Q             as CRC24Q
 import qualified Test.Data.RTCM3.Antennas     as Antennas
 import qualified Test.Data.RTCM3.Ephemerides  as Ephemerides
 import qualified Test.Data.RTCM3.Extras       as Extras
+import qualified Test.Data.RTCM3.MSM          as MSM
 import qualified Test.Data.RTCM3.Observations as Observations
 import qualified Test.Data.RTCM3.SSR          as SSR
 import qualified Test.Data.RTCM3.System       as System
@@ -25,6 +26,7 @@ tests =
     , Antennas.tests
     , Ephemerides.tests
     , Extras.tests
+    , MSM.tests
     , Observations.tests
     , SSR.tests
     , System.tests
