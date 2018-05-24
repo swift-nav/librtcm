@@ -24,6 +24,8 @@ import           Data.Binary.Bits
 import qualified Data.Binary.Bits.Get as B
 import qualified Data.Binary.Bits.Put as B
 import           Data.Bits
+import           Data.Int
+import           Data.RTCM3.Extras
 import           Data.RTCM3.TH
 
 {-# ANN module ("HLint: ignore Use camelCase"::String) #-}
@@ -122,8 +124,8 @@ getBitsMsm46SatelliteData n = do
 --
 putBitsMsm46SatelliteData :: Msm46SatelliteData -> B.BitPut ()
 putBitsMsm46SatelliteData Msm46SatelliteData {..} = do
-    forM_ _msm46SatelliteData_roughRanges $ B.putWord8 8
-    forM_ _msm46SatelliteData_roughRangesModulo $ B.putWord16be 10
+  forM_ _msm46SatelliteData_roughRanges $ B.putWord8 8
+  forM_ _msm46SatelliteData_roughRangesModulo $ B.putWord16be 10
 
 -- | Msm57SatelliteData
 --
@@ -156,10 +158,178 @@ getBitsMsm57SatelliteData n = do
 --
 putBitsMsm57SatelliteData :: Msm57SatelliteData -> B.BitPut ()
 putBitsMsm57SatelliteData Msm57SatelliteData {..} = do
-    forM_ _msm57SatelliteData_roughRanges $ B.putWord8 8
-    forM_ _msm57SatelliteData_extendeds $ B.putWord8 4
-    forM_ _msm57SatelliteData_roughRangesModulo $ B.putWord16be 10
-    forM_ _msm57SatelliteData_roughPhaseRangeRates $ B.putWord16be 14
+  forM_ _msm57SatelliteData_roughRanges $ B.putWord8 8
+  forM_ _msm57SatelliteData_extendeds $ B.putWord8 4
+  forM_ _msm57SatelliteData_roughRangesModulo $ B.putWord16be 10
+  forM_ _msm57SatelliteData_roughPhaseRangeRates $ B.putWord16be 14
+
+-- | Msm4SignalData.
+--
+-- MSM4 satellite data.
+data Msm4SignalData = Msm4SignalData
+  { _msm4SignalData_pseudoranges :: [Int16]
+    -- ^ GNSS signal fine pseudoranges.
+  , _msm4SignalData_phaseranges  :: [Int32]
+    -- ^ GNSS signal fine phaserange data.
+  , _msm4SignalData_lockTimes    :: [Word8]
+    -- ^ GNSS phaserange lock time indicators.
+  , _msm4SignalData_halfCycles   :: [Bool]
+    -- ^ Half-cycle ambiguity indicators.
+  , _msm4SignalData_cnrs         :: [Word8]
+    -- ^ GNSS signal CNRs.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msm4SignalData)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msm4SignalData_" . stripPrefix "_msm4SignalData_"} ''Msm4SignalData)
+
+-- | Get Bits for Msm4SignalData.
+--
+getBitsMsm4SignalData :: Int -> B.BitGet Msm4SignalData
+getBitsMsm4SignalData n = do
+  _msm4SignalData_pseudoranges <- replicateM n $ getInt16be 15
+  _msm4SignalData_phaseranges  <- replicateM n $ getInt32be 22
+  _msm4SignalData_lockTimes    <- replicateM n $ B.getWord8 4
+  _msm4SignalData_halfCycles   <- replicateM n B.getBool
+  _msm4SignalData_cnrs         <- replicateM n $ B.getWord8 6
+  pure Msm4SignalData {..}
+
+-- | Put Bits for Msm4SignalData.
+--
+putBitsMsm4SignalData :: Msm4SignalData -> B.BitPut ()
+putBitsMsm4SignalData Msm4SignalData {..} = do
+  forM_ _msm4SignalData_pseudoranges $ putInt16be 15
+  forM_ _msm4SignalData_phaseranges $ putInt32be 22
+  forM_ _msm4SignalData_lockTimes $ B.putWord8 4
+  forM_ _msm4SignalData_halfCycles B.putBool
+  forM_ _msm4SignalData_cnrs $ B.putWord8 6
+
+-- | Msm5SignalData.
+--
+-- MSM5 satellite data.
+data Msm5SignalData = Msm5SignalData
+  { _msm5SignalData_pseudoranges    :: [Int16]
+    -- ^ GNSS signal fine pseudoranges.
+  , _msm5SignalData_phaseranges     :: [Int32]
+    -- ^ GNSS signal fine phaserange data.
+  , _msm5SignalData_lockTimes       :: [Word8]
+    -- ^ GNSS phaserange lock time indicators.
+  , _msm5SignalData_halfCycles      :: [Bool]
+    -- ^ Half-cycle ambiguity indicators.
+  , _msm5SignalData_cnrs            :: [Word8]
+    -- ^ GNSS signal CNRs.
+  , _msm5SignalData_phaseRangeRates :: [Int16]
+    -- ^ GNSS signal fine phaserangerates.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msm5SignalData)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msm5SignalData_" . stripPrefix "_msm5SignalData_"} ''Msm5SignalData)
+
+-- | Get Bits for Msm5SignalData.
+--
+getBitsMsm5SignalData :: Int -> B.BitGet Msm5SignalData
+getBitsMsm5SignalData n = do
+  _msm5SignalData_pseudoranges    <- replicateM n $ getInt16be 15
+  _msm5SignalData_phaseranges     <- replicateM n $ getInt32be 22
+  _msm5SignalData_lockTimes       <- replicateM n $ B.getWord8 4
+  _msm5SignalData_halfCycles      <- replicateM n B.getBool
+  _msm5SignalData_cnrs            <- replicateM n $ B.getWord8 6
+  _msm5SignalData_phaseRangeRates <- replicateM n $ getInt16be 15
+  pure Msm5SignalData {..}
+
+-- | Put Bits for Msm5SignalData.
+--
+putBitsMsm5SignalData :: Msm5SignalData -> B.BitPut ()
+putBitsMsm5SignalData Msm5SignalData {..} = do
+  forM_ _msm5SignalData_pseudoranges $ putInt16be 15
+  forM_ _msm5SignalData_phaseranges $ putInt32be 22
+  forM_ _msm5SignalData_lockTimes $ B.putWord8 4
+  forM_ _msm5SignalData_halfCycles B.putBool
+  forM_ _msm5SignalData_cnrs $ B.putWord8 6
+  forM_ _msm5SignalData_phaseRangeRates $ putInt16be 15
+
+-- | Msm6SignalData.
+--
+-- MSM6 satellite data.
+data Msm6SignalData = Msm6SignalData
+  { _msm6SignalData_pseudoranges :: [Int32]
+    -- ^ GNSS signal fine pseudoranges.
+  , _msm6SignalData_phaseranges  :: [Int32]
+    -- ^ GNSS signal fine phaserange data.
+  , _msm6SignalData_lockTimes    :: [Word16]
+    -- ^ GNSS phaserange lock time indicators.
+  , _msm6SignalData_halfCycles   :: [Bool]
+    -- ^ Half-cycle ambiguity indicators.
+  , _msm6SignalData_cnrs         :: [Word16]
+    -- ^ GNSS signal CNRs.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msm6SignalData)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msm6SignalData_" . stripPrefix "_msm6SignalData_"} ''Msm6SignalData)
+
+-- | Get Bits for Msm6SignalData.
+--
+getBitsMsm6SignalData :: Int -> B.BitGet Msm6SignalData
+getBitsMsm6SignalData n = do
+  _msm6SignalData_pseudoranges <- replicateM n $ getInt32be 20
+  _msm6SignalData_phaseranges  <- replicateM n $ getInt32be 24
+  _msm6SignalData_lockTimes    <- replicateM n $ B.getWord16be 10
+  _msm6SignalData_halfCycles   <- replicateM n B.getBool
+  _msm6SignalData_cnrs         <- replicateM n $ B.getWord16be 10
+  pure Msm6SignalData {..}
+
+-- | Put Bits for Msm6SignalData.
+--
+putBitsMsm6SignalData :: Msm6SignalData -> B.BitPut ()
+putBitsMsm6SignalData Msm6SignalData {..} = do
+  forM_ _msm6SignalData_pseudoranges $ putInt32be 20
+  forM_ _msm6SignalData_phaseranges $ putInt32be 24
+  forM_ _msm6SignalData_lockTimes $ B.putWord16be 10
+  forM_ _msm6SignalData_halfCycles B.putBool
+  forM_ _msm6SignalData_cnrs $ B.putWord16be 10
+
+-- | Msm7SignalData.
+--
+-- MSM7 satellite data.
+data Msm7SignalData = Msm7SignalData
+  { _msm7SignalData_pseudoranges    :: [Int32]
+    -- ^ GNSS signal fine pseudoranges.
+  , _msm7SignalData_phaseranges     :: [Int32]
+    -- ^ GNSS signal fine phaserange data.
+  , _msm7SignalData_lockTimes       :: [Word16]
+    -- ^ GNSS phaserange lock time indicators.
+  , _msm7SignalData_halfCycles      :: [Bool]
+    -- ^ Half-cycle ambiguity indicators.
+  , _msm7SignalData_cnrs            :: [Word16]
+    -- ^ GNSS signal CNRs.
+  , _msm7SignalData_phaseRangeRates :: [Int16]
+    -- ^ GNSS signal fine phaserangerates.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msm7SignalData)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msm7SignalData_" . stripPrefix "_msm7SignalData_"} ''Msm7SignalData)
+
+-- | Get Bits for Msm7SignalData.
+--
+getBitsMsm7SignalData :: Int -> B.BitGet Msm7SignalData
+getBitsMsm7SignalData n = do
+  _msm7SignalData_pseudoranges    <- replicateM n $ getInt32be 20
+  _msm7SignalData_phaseranges     <- replicateM n $ getInt32be 24
+  _msm7SignalData_lockTimes       <- replicateM n $ B.getWord16be 10
+  _msm7SignalData_halfCycles      <- replicateM n B.getBool
+  _msm7SignalData_cnrs            <- replicateM n $ B.getWord16be 10
+  _msm7SignalData_phaseRangeRates <- replicateM n $ getInt16be 15
+  pure Msm7SignalData {..}
+
+-- | Put Bits for Msm7SignalData.
+--
+putBitsMsm7SignalData :: Msm7SignalData -> B.BitPut ()
+putBitsMsm7SignalData Msm7SignalData {..} = do
+  forM_ _msm7SignalData_pseudoranges $ putInt32be 20
+  forM_ _msm7SignalData_phaseranges $ putInt32be 24
+  forM_ _msm7SignalData_lockTimes $ B.putWord16be 10
+  forM_ _msm7SignalData_halfCycles B.putBool
+  forM_ _msm7SignalData_cnrs $ B.putWord16be 10
+  forM_ _msm7SignalData_phaseRangeRates $ putInt16be 15
 
 msg1074 :: Word16
 msg1074 = 1074
@@ -175,6 +345,8 @@ data Msg1074 = Msg1074
     -- ^ MSM header.
   , _msg1074_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1074_signalData    :: Msm4SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1074)
@@ -184,11 +356,13 @@ instance Binary Msg1074 where
   get = B.runBitGet $ do
     _msg1074_header        <- getBits 0
     _msg1074_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1074_header ^. msmHeader_satelliteMask
+    _msg1074_signalData    <- getBitsMsm4SignalData $ popCount $ _msg1074_header ^. msmHeader_cellMask
     pure Msg1074 {..}
 
   put Msg1074 {..} = B.runBitPut $ do
     putBits 0                 _msg1074_header
     putBitsMsm46SatelliteData _msg1074_satelliteData
+    putBitsMsm4SignalData     _msg1074_signalData
 
 $(deriveRTCM3 ''Msg1074)
 
@@ -206,6 +380,8 @@ data Msg1075 = Msg1075
     -- ^ MSM header.
   , _msg1075_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1075_signalData    :: Msm5SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1075)
@@ -215,11 +391,13 @@ instance Binary Msg1075 where
   get = B.runBitGet $ do
     _msg1075_header        <- getBits 0
     _msg1075_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1075_header ^. msmHeader_satelliteMask
+    _msg1075_signalData    <- getBitsMsm5SignalData $ popCount $ _msg1075_header ^. msmHeader_cellMask
     pure Msg1075 {..}
 
   put Msg1075 {..} = B.runBitPut $ do
     putBits 0                 _msg1075_header
     putBitsMsm57SatelliteData _msg1075_satelliteData
+    putBitsMsm5SignalData     _msg1075_signalData
 
 $(deriveRTCM3 ''Msg1075)
 
@@ -237,6 +415,8 @@ data Msg1076 = Msg1076
     -- ^ MSM header.
   , _msg1076_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1076_signalData    :: Msm6SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1076)
@@ -246,11 +426,13 @@ instance Binary Msg1076 where
   get = B.runBitGet $ do
     _msg1076_header        <- getBits 0
     _msg1076_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1076_header ^. msmHeader_satelliteMask
+    _msg1076_signalData    <- getBitsMsm6SignalData $ popCount $ _msg1076_header ^. msmHeader_cellMask
     pure Msg1076 {..}
 
   put Msg1076 {..} = B.runBitPut $ do
     putBits 0                 _msg1076_header
     putBitsMsm46SatelliteData _msg1076_satelliteData
+    putBitsMsm6SignalData     _msg1076_signalData
 
 $(deriveRTCM3 ''Msg1076)
 
@@ -268,6 +450,8 @@ data Msg1077 = Msg1077
     -- ^ MSM header.
   , _msg1077_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1077_signalData    :: Msm7SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1077)
@@ -277,11 +461,13 @@ instance Binary Msg1077 where
   get = B.runBitGet $ do
     _msg1077_header        <- getBits 0
     _msg1077_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1077_header ^. msmHeader_satelliteMask
+    _msg1077_signalData    <- getBitsMsm7SignalData $ popCount $ _msg1077_header ^. msmHeader_cellMask
     pure Msg1077 {..}
 
   put Msg1077 {..} = B.runBitPut $ do
     putBits 0                 _msg1077_header
     putBitsMsm57SatelliteData _msg1077_satelliteData
+    putBitsMsm7SignalData     _msg1077_signalData
 
 $(deriveRTCM3 ''Msg1077)
 
@@ -299,6 +485,8 @@ data Msg1084 = Msg1084
     -- ^ MSM header.
   , _msg1084_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1084_signalData    :: Msm4SignalData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1084)
@@ -308,11 +496,13 @@ instance Binary Msg1084 where
   get = B.runBitGet $ do
     _msg1084_header        <- getBits 0
     _msg1084_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1084_header ^. msmHeader_satelliteMask
+    _msg1084_signalData    <- getBitsMsm4SignalData $ popCount $ _msg1084_header ^. msmHeader_cellMask
     pure Msg1084 {..}
 
   put Msg1084 {..} = B.runBitPut $ do
     putBits 0                 _msg1084_header
     putBitsMsm46SatelliteData _msg1084_satelliteData
+    putBitsMsm4SignalData     _msg1084_signalData
 
 $(deriveRTCM3 ''Msg1084)
 
@@ -330,6 +520,8 @@ data Msg1085 = Msg1085
     -- ^ MSM header.
   , _msg1085_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1085_signalData    :: Msm5SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1085)
@@ -339,11 +531,13 @@ instance Binary Msg1085 where
   get = B.runBitGet $ do
     _msg1085_header <- getBits 0
     _msg1085_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1085_header ^. msmHeader_satelliteMask
+    _msg1085_signalData    <- getBitsMsm5SignalData $ popCount $ _msg1085_header ^. msmHeader_cellMask
     pure Msg1085 {..}
 
   put Msg1085 {..} = B.runBitPut $ do
     putBits 0                 _msg1085_header
     putBitsMsm57SatelliteData _msg1085_satelliteData
+    putBitsMsm5SignalData     _msg1085_signalData
 
 $(deriveRTCM3 ''Msg1085)
 
@@ -361,6 +555,8 @@ data Msg1086 = Msg1086
     -- ^ MSM header.
   , _msg1086_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1086_signalData    :: Msm6SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1086)
@@ -370,11 +566,13 @@ instance Binary Msg1086 where
   get = B.runBitGet $ do
     _msg1086_header        <- getBits 0
     _msg1086_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1086_header ^. msmHeader_satelliteMask
+    _msg1086_signalData    <- getBitsMsm6SignalData $ popCount $ _msg1086_header ^. msmHeader_cellMask
     pure Msg1086 {..}
 
   put Msg1086 {..} = B.runBitPut $ do
     putBits 0                 _msg1086_header
     putBitsMsm46SatelliteData _msg1086_satelliteData
+    putBitsMsm6SignalData     _msg1086_signalData
 
 $(deriveRTCM3 ''Msg1086)
 
@@ -392,6 +590,8 @@ data Msg1087 = Msg1087
     -- ^ MSM header.
   , _msg1087_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1087_signalData    :: Msm7SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1087)
@@ -401,11 +601,13 @@ instance Binary Msg1087 where
   get = B.runBitGet $ do
     _msg1087_header        <- getBits 0
     _msg1087_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1087_header ^. msmHeader_satelliteMask
+    _msg1087_signalData    <- getBitsMsm7SignalData $ popCount $ _msg1087_header ^. msmHeader_cellMask
     pure Msg1087 {..}
 
   put Msg1087 {..} = B.runBitPut $ do
     putBits 0                 _msg1087_header
     putBitsMsm57SatelliteData _msg1087_satelliteData
+    putBitsMsm7SignalData     _msg1087_signalData
 
 $(deriveRTCM3 ''Msg1087)
 
@@ -423,6 +625,8 @@ data Msg1094 = Msg1094
     -- ^ MSM header.
   , _msg1094_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1094_signalData    :: Msm4SignalData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1094)
@@ -432,11 +636,13 @@ instance Binary Msg1094 where
   get = B.runBitGet $ do
     _msg1094_header        <- getBits 0
     _msg1094_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1094_header ^. msmHeader_satelliteMask
+    _msg1094_signalData    <- getBitsMsm4SignalData $ popCount $ _msg1094_header ^. msmHeader_cellMask
     pure Msg1094 {..}
 
   put Msg1094 {..} = B.runBitPut $ do
     putBits 0                 _msg1094_header
     putBitsMsm46SatelliteData _msg1094_satelliteData
+    putBitsMsm4SignalData     _msg1094_signalData
 
 $(deriveRTCM3 ''Msg1094)
 
@@ -454,6 +660,8 @@ data Msg1095 = Msg1095
     -- ^ MSM header.
   , _msg1095_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1095_signalData    :: Msm5SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1095)
@@ -463,11 +671,13 @@ instance Binary Msg1095 where
   get = B.runBitGet $ do
     _msg1095_header        <- getBits 0
     _msg1095_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1095_header ^. msmHeader_satelliteMask
+    _msg1095_signalData    <- getBitsMsm5SignalData $ popCount $ _msg1095_header ^. msmHeader_cellMask
     pure Msg1095 {..}
 
   put Msg1095 {..} = B.runBitPut $ do
     putBits 0                 _msg1095_header
     putBitsMsm57SatelliteData _msg1095_satelliteData
+    putBitsMsm5SignalData     _msg1095_signalData
 
 $(deriveRTCM3 ''Msg1095)
 
@@ -485,6 +695,8 @@ data Msg1096 = Msg1096
     -- ^ MSM header.
   , _msg1096_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1096_signalData    :: Msm6SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1096)
@@ -494,11 +706,13 @@ instance Binary Msg1096 where
   get = B.runBitGet $ do
     _msg1096_header        <- getBits 0
     _msg1096_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1096_header ^. msmHeader_satelliteMask
+    _msg1096_signalData    <- getBitsMsm6SignalData $ popCount $ _msg1096_header ^. msmHeader_cellMask
     pure Msg1096 {..}
 
   put Msg1096 {..} = B.runBitPut $ do
     putBits 0                 _msg1096_header
     putBitsMsm46SatelliteData _msg1096_satelliteData
+    putBitsMsm6SignalData     _msg1096_signalData
 
 $(deriveRTCM3 ''Msg1096)
 
@@ -516,6 +730,8 @@ data Msg1097 = Msg1097
     -- ^ MSM header.
   , _msg1097_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1097_signalData    :: Msm7SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1097)
@@ -525,11 +741,13 @@ instance Binary Msg1097 where
   get = B.runBitGet $ do
     _msg1097_header        <- getBits 0
     _msg1097_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1097_header ^. msmHeader_satelliteMask
+    _msg1097_signalData    <- getBitsMsm7SignalData $ popCount $ _msg1097_header ^. msmHeader_cellMask
     pure Msg1097 {..}
 
   put Msg1097 {..} = B.runBitPut $ do
     putBits 0                 _msg1097_header
     putBitsMsm57SatelliteData _msg1097_satelliteData
+    putBitsMsm7SignalData     _msg1097_signalData
 
 $(deriveRTCM3 ''Msg1097)
 
@@ -547,6 +765,8 @@ data Msg1104 = Msg1104
     -- ^ MSM header.
   , _msg1104_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1104_signalData    :: Msm4SignalData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1104)
@@ -556,11 +776,13 @@ instance Binary Msg1104 where
   get = B.runBitGet $ do
     _msg1104_header        <- getBits 0
     _msg1104_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1104_header ^. msmHeader_satelliteMask
+    _msg1104_signalData    <- getBitsMsm4SignalData $ popCount $ _msg1104_header ^. msmHeader_cellMask
     pure Msg1104 {..}
 
   put Msg1104 {..} = B.runBitPut $ do
     putBits 0                 _msg1104_header
     putBitsMsm46SatelliteData _msg1104_satelliteData
+    putBitsMsm4SignalData     _msg1104_signalData
 
 $(deriveRTCM3 ''Msg1104)
 
@@ -578,6 +800,8 @@ data Msg1105 = Msg1105
     -- ^ MSM header.
   , _msg1105_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1105_signalData    :: Msm5SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1105)
@@ -587,11 +811,13 @@ instance Binary Msg1105 where
   get = B.runBitGet $ do
     _msg1105_header        <- getBits 0
     _msg1105_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1105_header ^. msmHeader_satelliteMask
+    _msg1105_signalData    <- getBitsMsm5SignalData $ popCount $ _msg1105_header ^. msmHeader_cellMask
     pure Msg1105 {..}
 
   put Msg1105 {..} = B.runBitPut $ do
     putBits 0                 _msg1105_header
     putBitsMsm57SatelliteData _msg1105_satelliteData
+    putBitsMsm5SignalData     _msg1105_signalData
 
 $(deriveRTCM3 ''Msg1105)
 
@@ -609,6 +835,8 @@ data Msg1106 = Msg1106
     -- ^ MSM header.
   , _msg1106_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1106_signalData    :: Msm6SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1106)
@@ -618,11 +846,13 @@ instance Binary Msg1106 where
   get = B.runBitGet $ do
     _msg1106_header        <- getBits 0
     _msg1106_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1106_header ^. msmHeader_satelliteMask
+    _msg1106_signalData    <- getBitsMsm6SignalData $ popCount $ _msg1106_header ^. msmHeader_cellMask
     pure Msg1106 {..}
 
   put Msg1106 {..} = B.runBitPut $ do
     putBits 0                 _msg1106_header
     putBitsMsm46SatelliteData _msg1106_satelliteData
+    putBitsMsm6SignalData     _msg1106_signalData
 
 $(deriveRTCM3 ''Msg1106)
 
@@ -640,6 +870,8 @@ data Msg1107 = Msg1107
     -- ^ MSM header.
   , _msg1107_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1107_signalData    :: Msm7SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1107)
@@ -649,11 +881,13 @@ instance Binary Msg1107 where
   get = B.runBitGet $ do
     _msg1107_header        <- getBits 0
     _msg1107_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1107_header ^. msmHeader_satelliteMask
+    _msg1107_signalData    <- getBitsMsm7SignalData $ popCount $ _msg1107_header ^. msmHeader_cellMask
     pure Msg1107 {..}
 
   put Msg1107 {..} = B.runBitPut $ do
     putBits 0                 _msg1107_header
     putBitsMsm57SatelliteData _msg1107_satelliteData
+    putBitsMsm7SignalData     _msg1107_signalData
 
 $(deriveRTCM3 ''Msg1107)
 
@@ -671,6 +905,8 @@ data Msg1114 = Msg1114
     -- ^ MSM header.
   , _msg1114_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1114_signalData    :: Msm4SignalData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1114)
@@ -680,11 +916,13 @@ instance Binary Msg1114 where
   get = B.runBitGet $ do
     _msg1114_header        <- getBits 0
     _msg1114_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1114_header ^. msmHeader_satelliteMask
+    _msg1114_signalData    <- getBitsMsm4SignalData $ popCount $ _msg1114_header ^. msmHeader_cellMask
     pure Msg1114 {..}
 
   put Msg1114 {..} = B.runBitPut $ do
     putBits 0                 _msg1114_header
     putBitsMsm46SatelliteData _msg1114_satelliteData
+    putBitsMsm4SignalData     _msg1114_signalData
 
 $(deriveRTCM3 ''Msg1114)
 
@@ -702,6 +940,8 @@ data Msg1115 = Msg1115
     -- ^ MSM header.
   , _msg1115_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1115_signalData    :: Msm5SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1115)
@@ -711,11 +951,13 @@ instance Binary Msg1115 where
   get = B.runBitGet $ do
     _msg1115_header        <- getBits 0
     _msg1115_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1115_header ^. msmHeader_satelliteMask
+    _msg1115_signalData    <- getBitsMsm5SignalData $ popCount $ _msg1115_header ^. msmHeader_cellMask
     pure Msg1115 {..}
 
   put Msg1115 {..} = B.runBitPut $ do
     putBits 0                 _msg1115_header
     putBitsMsm57SatelliteData _msg1115_satelliteData
+    putBitsMsm5SignalData     _msg1115_signalData
 
 $(deriveRTCM3 ''Msg1115)
 
@@ -733,6 +975,8 @@ data Msg1116 = Msg1116
     -- ^ MSM header.
   , _msg1116_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1116_signalData    :: Msm6SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1116)
@@ -742,11 +986,13 @@ instance Binary Msg1116 where
   get = B.runBitGet $ do
     _msg1116_header        <- getBits 0
     _msg1116_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1116_header ^. msmHeader_satelliteMask
+    _msg1116_signalData    <- getBitsMsm6SignalData $ popCount $ _msg1116_header ^. msmHeader_cellMask
     pure Msg1116 {..}
 
   put Msg1116 {..} = B.runBitPut $ do
     putBits 0                 _msg1116_header
     putBitsMsm46SatelliteData _msg1116_satelliteData
+    putBitsMsm6SignalData     _msg1116_signalData
 
 $(deriveRTCM3 ''Msg1116)
 
@@ -764,6 +1010,8 @@ data Msg1117 = Msg1117
     -- ^ MSM header.
   , _msg1117_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1117_signalData    :: Msm7SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1117)
@@ -773,11 +1021,13 @@ instance Binary Msg1117 where
   get = B.runBitGet $ do
     _msg1117_header        <- getBits 0
     _msg1117_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1117_header ^. msmHeader_satelliteMask
+    _msg1117_signalData    <- getBitsMsm7SignalData $ popCount $ _msg1117_header ^. msmHeader_cellMask
     pure Msg1117 {..}
 
   put Msg1117 {..} = B.runBitPut $ do
     putBits 0                 _msg1117_header
     putBitsMsm57SatelliteData _msg1117_satelliteData
+    putBitsMsm7SignalData     _msg1117_signalData
 
 $(deriveRTCM3 ''Msg1117)
 
@@ -795,6 +1045,8 @@ data Msg1124 = Msg1124
     -- ^ MSM header.
   , _msg1124_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1124_signalData    :: Msm4SignalData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1124)
@@ -804,11 +1056,13 @@ instance Binary Msg1124 where
   get = B.runBitGet $ do
     _msg1124_header        <- getBits 0
     _msg1124_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1124_header ^. msmHeader_satelliteMask
+    _msg1124_signalData    <- getBitsMsm4SignalData $ popCount $ _msg1124_header ^. msmHeader_cellMask
     pure Msg1124 {..}
 
   put Msg1124 {..} = B.runBitPut $ do
     putBits 0                 _msg1124_header
     putBitsMsm46SatelliteData _msg1124_satelliteData
+    putBitsMsm4SignalData     _msg1124_signalData
 
 $(deriveRTCM3 ''Msg1124)
 
@@ -826,6 +1080,8 @@ data Msg1125 = Msg1125
     -- ^ MSM header.
   , _msg1125_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1125_signalData    :: Msm5SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1125)
@@ -835,11 +1091,13 @@ instance Binary Msg1125 where
   get = B.runBitGet $ do
     _msg1125_header        <- getBits 0
     _msg1125_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1125_header ^. msmHeader_satelliteMask
+    _msg1125_signalData    <- getBitsMsm5SignalData $ popCount $ _msg1125_header ^. msmHeader_cellMask
     pure Msg1125 {..}
 
   put Msg1125 {..} = B.runBitPut $ do
     putBits 0                 _msg1125_header
     putBitsMsm57SatelliteData _msg1125_satelliteData
+    putBitsMsm5SignalData     _msg1125_signalData
 
 $(deriveRTCM3 ''Msg1125)
 
@@ -857,6 +1115,8 @@ data Msg1126 = Msg1126
     -- ^ MSM header.
   , _msg1126_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
+  , _msg1126_signalData    :: Msm6SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1126)
@@ -866,11 +1126,13 @@ instance Binary Msg1126 where
   get = B.runBitGet $ do
     _msg1126_header        <- getBits 0
     _msg1126_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1126_header ^. msmHeader_satelliteMask
+    _msg1126_signalData    <- getBitsMsm6SignalData $ popCount $ _msg1126_header ^. msmHeader_cellMask
     pure Msg1126 {..}
 
   put Msg1126 {..} = B.runBitPut $ do
     putBits 0                 _msg1126_header
     putBitsMsm46SatelliteData _msg1126_satelliteData
+    putBitsMsm6SignalData     _msg1126_signalData
 
 $(deriveRTCM3 ''Msg1126)
 
@@ -888,6 +1150,8 @@ data Msg1127 = Msg1127
     -- ^ MSM header.
   , _msg1127_satelliteData :: Msm57SatelliteData
     -- ^ MSM satellite data.
+  , _msg1127_signalData    :: Msm7SignalData
+    -- ^ MSM signal data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1127)
@@ -897,11 +1161,13 @@ instance Binary Msg1127 where
   get = B.runBitGet $ do
     _msg1127_header        <- getBits 0
     _msg1127_satelliteData <- getBitsMsm57SatelliteData $ popCount $ _msg1127_header ^. msmHeader_satelliteMask
+    _msg1127_signalData    <- getBitsMsm7SignalData $ popCount $ _msg1127_header ^. msmHeader_cellMask
     pure Msg1127 {..}
 
   put Msg1127 {..} = B.runBitPut $ do
     putBits 0                 _msg1127_header
     putBitsMsm57SatelliteData _msg1127_satelliteData
+    putBitsMsm7SignalData     _msg1127_signalData
 
 $(deriveRTCM3 ''Msg1127)
 
