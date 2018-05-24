@@ -43,16 +43,16 @@ instance Arbitrary MsmHeader where
 
 arbitraryMsm46SatelliteData :: Int -> Gen Msm46SatelliteData
 arbitraryMsm46SatelliteData n = do
-  _msm46SatelliteData_roughRanges       <- replicateM n $ arbitraryWord 8
-  _msm46SatelliteData_roughRangesModulo <- replicateM n $ arbitraryWord 10
+  _msm46SatelliteData_ranges       <- replicateM n $ arbitraryWord 8
+  _msm46SatelliteData_rangesModulo <- replicateM n $ arbitraryWord 10
   pure Msm46SatelliteData {..}
 
 arbitraryMsm57SatelliteData :: Int -> Gen Msm57SatelliteData
 arbitraryMsm57SatelliteData n = do
-  _msm57SatelliteData_roughRanges          <- replicateM n $ arbitraryWord 8
-  _msm57SatelliteData_extendeds            <- replicateM n $ arbitraryWord 4
-  _msm57SatelliteData_roughRangesModulo    <- replicateM n $ arbitraryWord 10
-  _msm57SatelliteData_roughPhaseRangeRates <- replicateM n $ arbitraryWord 14
+  _msm57SatelliteData_ranges          <- replicateM n $ arbitraryWord 8
+  _msm57SatelliteData_extendeds       <- replicateM n $ arbitraryWord 4
+  _msm57SatelliteData_rangesModulo    <- replicateM n $ arbitraryWord 10
+  _msm57SatelliteData_phaseRangeRates <- replicateM n $ arbitraryWord 14
   pure Msm57SatelliteData {..}
 
 arbitraryMsm4SignalData :: Int -> Gen Msm4SignalData

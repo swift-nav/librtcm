@@ -103,9 +103,9 @@ instance BinaryBit MsmHeader where
 --
 -- MSM46 satellite data.
 data Msm46SatelliteData = Msm46SatelliteData
-  { _msm46SatelliteData_roughRanges       :: [Word8]
+  { _msm46SatelliteData_ranges       :: [Word8]
     -- ^ The number of integer milliseconds in GNSS Satellite rough ranges.
-  , _msm46SatelliteData_roughRangesModulo :: [Word16]
+  , _msm46SatelliteData_rangesModulo :: [Word16]
     -- ^ GNSS Satellite rough ranges modulo 1 millisecond.
   } deriving ( Show, Read, Eq )
 
@@ -116,28 +116,28 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msm46SatelliteData
 --
 getBitsMsm46SatelliteData :: Int -> B.BitGet Msm46SatelliteData
 getBitsMsm46SatelliteData n = do
-  _msm46SatelliteData_roughRanges       <- replicateM n $ B.getWord8 8
-  _msm46SatelliteData_roughRangesModulo <- replicateM n $ B.getWord16be 10
+  _msm46SatelliteData_ranges       <- replicateM n $ B.getWord8 8
+  _msm46SatelliteData_rangesModulo <- replicateM n $ B.getWord16be 10
   pure Msm46SatelliteData {..}
 
 -- | Put Bits for Msm46SatelliteData.
 --
 putBitsMsm46SatelliteData :: Msm46SatelliteData -> B.BitPut ()
 putBitsMsm46SatelliteData Msm46SatelliteData {..} = do
-  forM_ _msm46SatelliteData_roughRanges $ B.putWord8 8
-  forM_ _msm46SatelliteData_roughRangesModulo $ B.putWord16be 10
+  forM_ _msm46SatelliteData_ranges $ B.putWord8 8
+  forM_ _msm46SatelliteData_rangesModulo $ B.putWord16be 10
 
 -- | Msm57SatelliteData
 --
 -- MSM57 satellite data.
 data Msm57SatelliteData = Msm57SatelliteData
-  { _msm57SatelliteData_roughRanges          :: [Word8]
+  { _msm57SatelliteData_ranges          :: [Word8]
     -- ^ The number of integer milliseconds in GNSS Satellite rough ranges.
-  , _msm57SatelliteData_extendeds            :: [Word8]
+  , _msm57SatelliteData_extendeds       :: [Word8]
     -- ^ Extended satellite information.
-  , _msm57SatelliteData_roughRangesModulo    :: [Word16]
+  , _msm57SatelliteData_rangesModulo    :: [Word16]
     -- ^ GNSS Satellite rough ranges modulo 1 millisecond.
-  , _msm57SatelliteData_roughPhaseRangeRates :: [Word16]
+  , _msm57SatelliteData_phaseRangeRates :: [Word16]
     -- ^ GNSS Satellite rough PhaseRangeRates.
   } deriving ( Show, Read, Eq )
 
@@ -148,24 +148,24 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msm57SatelliteData
 --
 getBitsMsm57SatelliteData :: Int -> B.BitGet Msm57SatelliteData
 getBitsMsm57SatelliteData n = do
-  _msm57SatelliteData_roughRanges          <- replicateM n $ B.getWord8 8
-  _msm57SatelliteData_extendeds            <- replicateM n $ B.getWord8 4
-  _msm57SatelliteData_roughRangesModulo    <- replicateM n $ B.getWord16be 10
-  _msm57SatelliteData_roughPhaseRangeRates <- replicateM n $ B.getWord16be 14
+  _msm57SatelliteData_ranges          <- replicateM n $ B.getWord8 8
+  _msm57SatelliteData_extendeds       <- replicateM n $ B.getWord8 4
+  _msm57SatelliteData_rangesModulo    <- replicateM n $ B.getWord16be 10
+  _msm57SatelliteData_phaseRangeRates <- replicateM n $ B.getWord16be 14
   pure Msm57SatelliteData {..}
 
 -- | Put Bits for Msm4SatelliteData.
 --
 putBitsMsm57SatelliteData :: Msm57SatelliteData -> B.BitPut ()
 putBitsMsm57SatelliteData Msm57SatelliteData {..} = do
-  forM_ _msm57SatelliteData_roughRanges $ B.putWord8 8
+  forM_ _msm57SatelliteData_ranges $ B.putWord8 8
   forM_ _msm57SatelliteData_extendeds $ B.putWord8 4
-  forM_ _msm57SatelliteData_roughRangesModulo $ B.putWord16be 10
-  forM_ _msm57SatelliteData_roughPhaseRangeRates $ B.putWord16be 14
+  forM_ _msm57SatelliteData_rangesModulo $ B.putWord16be 10
+  forM_ _msm57SatelliteData_phaseRangeRates $ B.putWord16be 14
 
 -- | Msm4SignalData.
 --
--- MSM4 satellite data.
+-- MSM4 signal data.
 data Msm4SignalData = Msm4SignalData
   { _msm4SignalData_pseudoranges :: [Int16]
     -- ^ GNSS signal fine pseudoranges.
@@ -205,7 +205,7 @@ putBitsMsm4SignalData Msm4SignalData {..} = do
 
 -- | Msm5SignalData.
 --
--- MSM5 satellite data.
+-- MSM5 signal data.
 data Msm5SignalData = Msm5SignalData
   { _msm5SignalData_pseudoranges    :: [Int16]
     -- ^ GNSS signal fine pseudoranges.
@@ -249,7 +249,7 @@ putBitsMsm5SignalData Msm5SignalData {..} = do
 
 -- | Msm6SignalData.
 --
--- MSM6 satellite data.
+-- MSM6 signal data.
 data Msm6SignalData = Msm6SignalData
   { _msm6SignalData_pseudoranges :: [Int32]
     -- ^ GNSS signal fine pseudoranges.
@@ -289,7 +289,7 @@ putBitsMsm6SignalData Msm6SignalData {..} = do
 
 -- | Msm7SignalData.
 --
--- MSM7 satellite data.
+-- MSM7 signal data.
 data Msm7SignalData = Msm7SignalData
   { _msm7SignalData_pseudoranges    :: [Int32]
     -- ^ GNSS signal fine pseudoranges.
@@ -338,7 +338,7 @@ msg1074 = 1074
 --
 -- RTCMv3 message 1074.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1074 = Msg1074
   { _msg1074_header        :: MsmHeader
@@ -373,7 +373,7 @@ msg1075 = 1075
 --
 -- RTCMv3 message 1075.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1075 = Msg1075
   { _msg1075_header        :: MsmHeader
@@ -408,7 +408,7 @@ msg1076 = 1076
 --
 -- RTCMv3 message 1076.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1076 = Msg1076
   { _msg1076_header        :: MsmHeader
@@ -443,7 +443,7 @@ msg1077 = 1077
 --
 -- RTCMv3 message 1077.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1077 = Msg1077
   { _msg1077_header        :: MsmHeader
@@ -478,7 +478,7 @@ msg1084 = 1084
 --
 -- RTCMv3 message 1084.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1084 = Msg1084
   { _msg1084_header        :: MsmHeader
@@ -513,7 +513,7 @@ msg1085 = 1085
 --
 -- RTCMv3 message 1085.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1085 = Msg1085
   { _msg1085_header        :: MsmHeader
@@ -548,7 +548,7 @@ msg1086 = 1086
 --
 -- RTCMv3 message 1086.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1086 = Msg1086
   { _msg1086_header        :: MsmHeader
@@ -583,7 +583,7 @@ msg1087 = 1087
 --
 -- RTCMv3 message 1087.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1087 = Msg1087
   { _msg1087_header        :: MsmHeader
@@ -618,7 +618,7 @@ msg1094 = 1094
 --
 -- RTCMv3 message 1094.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1094 = Msg1094
   { _msg1094_header        :: MsmHeader
@@ -653,7 +653,7 @@ msg1095 = 1095
 --
 -- RTCMv3 message 1095.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1095 = Msg1095
   { _msg1095_header        :: MsmHeader
@@ -688,7 +688,7 @@ msg1096 = 1096
 --
 -- RTCMv3 message 1096.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1096 = Msg1096
   { _msg1096_header        :: MsmHeader
@@ -723,7 +723,7 @@ msg1097 = 1097
 --
 -- RTCMv3 message 1097.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1097 = Msg1097
   { _msg1097_header        :: MsmHeader
@@ -758,7 +758,7 @@ msg1104 = 1104
 --
 -- RTCMv3 message 1104.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1104 = Msg1104
   { _msg1104_header        :: MsmHeader
@@ -793,7 +793,7 @@ msg1105 = 1105
 --
 -- RTCMv3 message 1105.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1105 = Msg1105
   { _msg1105_header        :: MsmHeader
@@ -828,7 +828,7 @@ msg1106 = 1106
 --
 -- RTCMv3 message 1106.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1106 = Msg1106
   { _msg1106_header        :: MsmHeader
@@ -863,7 +863,7 @@ msg1107 = 1107
 --
 -- RTCMv3 message 1107.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1107 = Msg1107
   { _msg1107_header        :: MsmHeader
@@ -898,7 +898,7 @@ msg1114 = 1114
 --
 -- RTCMv3 message 1114.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1114 = Msg1114
   { _msg1114_header        :: MsmHeader
@@ -933,7 +933,7 @@ msg1115 = 1115
 --
 -- RTCMv3 message 1115.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1115 = Msg1115
   { _msg1115_header        :: MsmHeader
@@ -968,7 +968,7 @@ msg1116 = 1116
 --
 -- RTCMv3 message 1116.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1116 = Msg1116
   { _msg1116_header        :: MsmHeader
@@ -1003,7 +1003,7 @@ msg1117 = 1117
 --
 -- RTCMv3 message 1117.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1117 = Msg1117
   { _msg1117_header        :: MsmHeader
@@ -1038,7 +1038,7 @@ msg1124 = 1124
 --
 -- RTCMv3 message 1124.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1124 = Msg1124
   { _msg1124_header        :: MsmHeader
@@ -1073,7 +1073,7 @@ msg1125 = 1125
 --
 -- RTCMv3 message 1125.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1125 = Msg1125
   { _msg1125_header        :: MsmHeader
@@ -1108,7 +1108,7 @@ msg1126 = 1126
 --
 -- RTCMv3 message 1126.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1126 = Msg1126
   { _msg1126_header        :: MsmHeader
@@ -1143,7 +1143,7 @@ msg1127 = 1127
 --
 -- RTCMv3 message 1127.
 --
--- See RTCM spec and GLONASS signal specification for more information
+-- See RTCM spec and MSM signal specification for more information
 -- about these fields.
 data Msg1127 = Msg1127
   { _msg1127_header        :: MsmHeader
