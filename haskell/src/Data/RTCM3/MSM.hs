@@ -111,6 +111,21 @@ data Msm46SatelliteData = Msm46SatelliteData
 $(makeLenses ''Msm46SatelliteData)
 $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msm46SatelliteData_" . stripPrefix "_msm46SatelliteData_"} ''Msm46SatelliteData)
 
+-- | Get Bits for Msm4SatelliteData.
+--
+getBitsMsm46SatelliteData :: Int -> B.BitGet Msm46SatelliteData
+getBitsMsm46SatelliteData n = do
+  _msm46SatelliteData_roughRanges       <- replicateM n $ B.getWord8 8
+  _msm46SatelliteData_roughRangesModulo <- replicateM n $ B.getWord16be 10
+  pure Msm46SatelliteData {..}
+
+-- | Put Bits for Msm4SatelliteData.
+--
+putBitsMsm46SatelliteData :: Msm46SatelliteData -> B.BitPut ()
+putBitsMsm46SatelliteData Msm46SatelliteData {..} = do
+    forM_ _msm46SatelliteData_roughRanges $ B.putWord8 8
+    forM_ _msm46SatelliteData_roughRangesModulo $ B.putWord16be 10
+
 instance BinaryBit Msm46SatelliteData where
   getBits n = do
     _msm46SatelliteData_roughRanges       <- replicateM n $ B.getWord8 8
@@ -143,12 +158,12 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1074_" . stripP
 instance Binary Msg1074 where
   get = B.runBitGet $ do
     _msg1074_header        <- getBits 0
-    _msg1074_satelliteData <- getBits $ popCount $ _msg1074_header ^. msmHeader_satelliteMask
+    _msg1074_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1074_header ^. msmHeader_satelliteMask
     pure Msg1074 {..}
 
   put Msg1074 {..} = B.runBitPut $ do
-    putBits 0 _msg1074_header
-    putBits 0 _msg1074_satelliteData
+    putBits 0                 _msg1074_header
+    putBitsMsm46SatelliteData _msg1074_satelliteData
 
 $(deriveRTCM3 ''Msg1074)
 
@@ -189,7 +204,7 @@ msg1076 = 1076
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1076 = Msg1076
-  { _msg1076_header :: MsmHeader
+  { _msg1076_header        :: MsmHeader
     -- ^ MSM header.
   , _msg1076_satelliteData :: Msm46SatelliteData
     -- ^ MSM satellite data.
@@ -201,12 +216,12 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1076_" . stripP
 instance Binary Msg1076 where
   get = B.runBitGet $ do
     _msg1076_header        <- getBits 0
-    _msg1076_satelliteData <- getBits $ popCount $ _msg1076_header ^. msmHeader_satelliteMask
+    _msg1076_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1076_header ^. msmHeader_satelliteMask
     pure Msg1076 {..}
 
   put Msg1076 {..} = B.runBitPut $ do
-    putBits 0 _msg1076_header
-    putBits 0 _msg1076_satelliteData
+    putBits 0                 _msg1076_header
+    putBitsMsm46SatelliteData _msg1076_satelliteData
 
 $(deriveRTCM3 ''Msg1076)
 
@@ -247,8 +262,10 @@ msg1084 = 1084
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1084 = Msg1084
-  { _msg1084_header :: MsmHeader
+  { _msg1084_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1084_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1084)
@@ -256,11 +273,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1084_" . stripP
 
 instance Binary Msg1084 where
   get = B.runBitGet $ do
-    _msg1084_header <- getBits 0
+    _msg1084_header        <- getBits 0
+    _msg1084_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1084_header ^. msmHeader_satelliteMask
     pure Msg1084 {..}
 
   put Msg1084 {..} = B.runBitPut $ do
-    putBits 0 _msg1084_header
+    putBits 0                 _msg1084_header
+    putBitsMsm46SatelliteData _msg1084_satelliteData
 
 $(deriveRTCM3 ''Msg1084)
 
@@ -301,8 +320,10 @@ msg1086 = 1086
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1086 = Msg1086
-  { _msg1086_header :: MsmHeader
+  { _msg1086_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1086_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1086)
@@ -310,11 +331,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1086_" . stripP
 
 instance Binary Msg1086 where
   get = B.runBitGet $ do
-    _msg1086_header <- getBits 0
+    _msg1086_header        <- getBits 0
+    _msg1086_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1086_header ^. msmHeader_satelliteMask
     pure Msg1086 {..}
 
   put Msg1086 {..} = B.runBitPut $ do
-    putBits 0 _msg1086_header
+    putBits 0                 _msg1086_header
+    putBitsMsm46SatelliteData _msg1086_satelliteData
 
 $(deriveRTCM3 ''Msg1086)
 
@@ -355,8 +378,10 @@ msg1094 = 1094
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1094 = Msg1094
-  { _msg1094_header :: MsmHeader
+  { _msg1094_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1094_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1094)
@@ -364,11 +389,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1094_" . stripP
 
 instance Binary Msg1094 where
   get = B.runBitGet $ do
-    _msg1094_header <- getBits 0
+    _msg1094_header        <- getBits 0
+    _msg1094_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1094_header ^. msmHeader_satelliteMask
     pure Msg1094 {..}
 
   put Msg1094 {..} = B.runBitPut $ do
-    putBits 0 _msg1094_header
+    putBits 0                 _msg1094_header
+    putBitsMsm46SatelliteData _msg1094_satelliteData
 
 $(deriveRTCM3 ''Msg1094)
 
@@ -409,8 +436,10 @@ msg1096 = 1096
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1096 = Msg1096
-  { _msg1096_header :: MsmHeader
+  { _msg1096_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1096_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1096)
@@ -418,11 +447,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1096_" . stripP
 
 instance Binary Msg1096 where
   get = B.runBitGet $ do
-    _msg1096_header <- getBits 0
+    _msg1096_header        <- getBits 0
+    _msg1096_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1096_header ^. msmHeader_satelliteMask
     pure Msg1096 {..}
 
   put Msg1096 {..} = B.runBitPut $ do
-    putBits 0 _msg1096_header
+    putBits 0                 _msg1096_header
+    putBitsMsm46SatelliteData _msg1096_satelliteData
 
 $(deriveRTCM3 ''Msg1096)
 
@@ -463,8 +494,10 @@ msg1104 = 1104
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1104 = Msg1104
-  { _msg1104_header :: MsmHeader
+  { _msg1104_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1104_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1104)
@@ -472,11 +505,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1104_" . stripP
 
 instance Binary Msg1104 where
   get = B.runBitGet $ do
-    _msg1104_header <- getBits 0
+    _msg1104_header        <- getBits 0
+    _msg1104_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1104_header ^. msmHeader_satelliteMask
     pure Msg1104 {..}
 
   put Msg1104 {..} = B.runBitPut $ do
-    putBits 0 _msg1104_header
+    putBits 0                 _msg1104_header
+    putBitsMsm46SatelliteData _msg1104_satelliteData
 
 $(deriveRTCM3 ''Msg1104)
 
@@ -517,8 +552,10 @@ msg1106 = 1106
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1106 = Msg1106
-  { _msg1106_header :: MsmHeader
+  { _msg1106_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1106_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1106)
@@ -526,11 +563,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1106_" . stripP
 
 instance Binary Msg1106 where
   get = B.runBitGet $ do
-    _msg1106_header <- getBits 0
+    _msg1106_header        <- getBits 0
+    _msg1106_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1106_header ^. msmHeader_satelliteMask
     pure Msg1106 {..}
 
   put Msg1106 {..} = B.runBitPut $ do
-    putBits 0 _msg1106_header
+    putBits 0                 _msg1106_header
+    putBitsMsm46SatelliteData _msg1106_satelliteData
 
 $(deriveRTCM3 ''Msg1106)
 
@@ -571,8 +610,10 @@ msg1114 = 1114
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1114 = Msg1114
-  { _msg1114_header :: MsmHeader
+  { _msg1114_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1114_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1114)
@@ -580,11 +621,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1114_" . stripP
 
 instance Binary Msg1114 where
   get = B.runBitGet $ do
-    _msg1114_header <- getBits 0
+    _msg1114_header        <- getBits 0
+    _msg1114_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1114_header ^. msmHeader_satelliteMask
     pure Msg1114 {..}
 
   put Msg1114 {..} = B.runBitPut $ do
-    putBits 0 _msg1114_header
+    putBits 0                 _msg1114_header
+    putBitsMsm46SatelliteData _msg1114_satelliteData
 
 $(deriveRTCM3 ''Msg1114)
 
@@ -625,8 +668,10 @@ msg1116 = 1116
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1116 = Msg1116
-  { _msg1116_header :: MsmHeader
+  { _msg1116_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1116_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1116)
@@ -634,11 +679,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1116_" . stripP
 
 instance Binary Msg1116 where
   get = B.runBitGet $ do
-    _msg1116_header <- getBits 0
+    _msg1116_header        <- getBits 0
+    _msg1116_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1116_header ^. msmHeader_satelliteMask
     pure Msg1116 {..}
 
   put Msg1116 {..} = B.runBitPut $ do
-    putBits 0 _msg1116_header
+    putBits 0                 _msg1116_header
+    putBitsMsm46SatelliteData _msg1116_satelliteData
 
 $(deriveRTCM3 ''Msg1116)
 
@@ -679,8 +726,10 @@ msg1124 = 1124
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1124 = Msg1124
-  { _msg1124_header :: MsmHeader
+  { _msg1124_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1124_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1124)
@@ -688,11 +737,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1124_" . stripP
 
 instance Binary Msg1124 where
   get = B.runBitGet $ do
-    _msg1124_header <- getBits 0
+    _msg1124_header        <- getBits 0
+    _msg1124_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1124_header ^. msmHeader_satelliteMask
     pure Msg1124 {..}
 
   put Msg1124 {..} = B.runBitPut $ do
-    putBits 0 _msg1124_header
+    putBits 0                 _msg1124_header
+    putBitsMsm46SatelliteData _msg1124_satelliteData
 
 $(deriveRTCM3 ''Msg1124)
 
@@ -733,8 +784,10 @@ msg1126 = 1126
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1126 = Msg1126
-  { _msg1126_header :: MsmHeader
+  { _msg1126_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1126_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1126)
@@ -742,11 +795,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1126_" . stripP
 
 instance Binary Msg1126 where
   get = B.runBitGet $ do
-    _msg1126_header <- getBits 0
+    _msg1126_header        <- getBits 0
+    _msg1126_satelliteData <- getBitsMsm46SatelliteData $ popCount $ _msg1126_header ^. msmHeader_satelliteMask
     pure Msg1126 {..}
 
   put Msg1126 {..} = B.runBitPut $ do
-    putBits 0 _msg1126_header
+    putBits 0                 _msg1126_header
+    putBitsMsm46SatelliteData _msg1126_satelliteData
 
 $(deriveRTCM3 ''Msg1126)
 

@@ -15,6 +15,7 @@ module Test.Data.RTCM3.MSM
   ) where
 
 import BasicPrelude
+import Control.Lens
 import Data.Binary
 import Data.Bits
 import Data.RTCM3
@@ -40,9 +41,16 @@ instance Arbitrary MsmHeader where
     _msmHeader_cellMask          <- arbitraryWord x
     pure MsmHeader {..}
 
+arbitraryMsm46SatelliteData :: Int -> Gen Msm46SatelliteData
+arbitraryMsm46SatelliteData n = do
+  _msm46SatelliteData_roughRanges       <- replicateM n $ arbitraryWord 8
+  _msm46SatelliteData_roughRangesModulo <- replicateM n $ arbitraryWord 10
+  pure Msm46SatelliteData {..}
+
 instance Arbitrary Msg1074 where
   arbitrary = do
-    _msg1074_header <- arbitrary
+    _msg1074_header        <- arbitrary
+    _msg1074_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1074_header ^. msmHeader_satelliteMask
     pure Msg1074 {..}
 
 instance Arbitrary Msg1075 where
@@ -52,7 +60,8 @@ instance Arbitrary Msg1075 where
 
 instance Arbitrary Msg1076 where
   arbitrary = do
-    _msg1076_header <- arbitrary
+    _msg1076_header        <- arbitrary
+    _msg1076_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1076_header ^. msmHeader_satelliteMask
     pure Msg1076 {..}
 
 instance Arbitrary Msg1077 where
@@ -63,6 +72,7 @@ instance Arbitrary Msg1077 where
 instance Arbitrary Msg1084 where
   arbitrary = do
     _msg1084_header <- arbitrary
+    _msg1084_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1084_header ^. msmHeader_satelliteMask
     pure Msg1084 {..}
 
 instance Arbitrary Msg1085 where
@@ -72,7 +82,8 @@ instance Arbitrary Msg1085 where
 
 instance Arbitrary Msg1086 where
   arbitrary = do
-    _msg1086_header <- arbitrary
+    _msg1086_header        <- arbitrary
+    _msg1086_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1086_header ^. msmHeader_satelliteMask
     pure Msg1086 {..}
 
 instance Arbitrary Msg1087 where
@@ -82,7 +93,8 @@ instance Arbitrary Msg1087 where
 
 instance Arbitrary Msg1094 where
   arbitrary = do
-    _msg1094_header <- arbitrary
+    _msg1094_header        <- arbitrary
+    _msg1094_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1094_header ^. msmHeader_satelliteMask
     pure Msg1094 {..}
 
 instance Arbitrary Msg1095 where
@@ -92,7 +104,8 @@ instance Arbitrary Msg1095 where
 
 instance Arbitrary Msg1096 where
   arbitrary = do
-    _msg1096_header <- arbitrary
+    _msg1096_header        <- arbitrary
+    _msg1096_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1096_header ^. msmHeader_satelliteMask
     pure Msg1096 {..}
 
 instance Arbitrary Msg1097 where
@@ -102,7 +115,8 @@ instance Arbitrary Msg1097 where
 
 instance Arbitrary Msg1104 where
   arbitrary = do
-    _msg1104_header <- arbitrary
+    _msg1104_header        <- arbitrary
+    _msg1104_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1104_header ^. msmHeader_satelliteMask
     pure Msg1104 {..}
 
 instance Arbitrary Msg1105 where
@@ -112,7 +126,8 @@ instance Arbitrary Msg1105 where
 
 instance Arbitrary Msg1106 where
   arbitrary = do
-    _msg1106_header <- arbitrary
+    _msg1106_header        <- arbitrary
+    _msg1106_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1106_header ^. msmHeader_satelliteMask
     pure Msg1106 {..}
 
 instance Arbitrary Msg1107 where
@@ -122,7 +137,8 @@ instance Arbitrary Msg1107 where
 
 instance Arbitrary Msg1114 where
   arbitrary = do
-    _msg1114_header <- arbitrary
+    _msg1114_header        <- arbitrary
+    _msg1114_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1114_header ^. msmHeader_satelliteMask
     pure Msg1114 {..}
 
 instance Arbitrary Msg1115 where
@@ -132,7 +148,8 @@ instance Arbitrary Msg1115 where
 
 instance Arbitrary Msg1116 where
   arbitrary = do
-    _msg1116_header <- arbitrary
+    _msg1116_header        <- arbitrary
+    _msg1116_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1116_header ^. msmHeader_satelliteMask
     pure Msg1116 {..}
 
 instance Arbitrary Msg1117 where
@@ -142,7 +159,8 @@ instance Arbitrary Msg1117 where
 
 instance Arbitrary Msg1124 where
   arbitrary = do
-    _msg1124_header <- arbitrary
+    _msg1124_header        <- arbitrary
+    _msg1124_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1124_header ^. msmHeader_satelliteMask
     pure Msg1124 {..}
 
 instance Arbitrary Msg1125 where
@@ -152,7 +170,8 @@ instance Arbitrary Msg1125 where
 
 instance Arbitrary Msg1126 where
   arbitrary = do
-    _msg1126_header <- arbitrary
+    _msg1126_header        <- arbitrary
+    _msg1126_satelliteData <- arbitraryMsm46SatelliteData $ popCount $ _msg1126_header ^. msmHeader_satelliteMask
     pure Msg1126 {..}
 
 instance Arbitrary Msg1127 where
