@@ -97,6 +97,30 @@ instance BinaryBit MsmHeader where
     let x = min 64 $ popCount _msmHeader_satelliteMask * popCount _msmHeader_signalMask
     B.putWord64be x  _msmHeader_cellMask
 
+
+-- | Msm4SatelliteData.
+--
+-- MSM46 satellite data.
+data Msm46SatelliteData = Msm46SatelliteData
+  { _msm46SatelliteData_roughRanges       :: [Word8]
+    -- ^ The number of integer milliseconds in GNSS Satellite rough ranges.
+  , _msm46SatelliteData_roughRangesModulo :: [Word16]
+    -- ^ GNSS Satellite rough ranges modulo 1 millisecond.
+  } deriving ( Show, Read, Eq )
+
+$(makeLenses ''Msm46SatelliteData)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msm46SatelliteData_" . stripPrefix "_msm46SatelliteData_"} ''Msm46SatelliteData)
+
+instance BinaryBit Msm46SatelliteData where
+  getBits n = do
+    _msm46SatelliteData_roughRanges       <- replicateM n $ B.getWord8 8
+    _msm46SatelliteData_roughRangesModulo <- replicateM n $ B.getWord16be 10
+    pure Msm46SatelliteData {..}
+
+  putBits _n Msm46SatelliteData {..} = do
+    forM_ _msm46SatelliteData_roughRanges $ B.putWord8 8
+    forM_ _msm46SatelliteData_roughRangesModulo $ B.putWord16be 10
+
 msg1074 :: Word16
 msg1074 = 1074
 
@@ -107,8 +131,10 @@ msg1074 = 1074
 -- See RTCM spec and GLONASS signal specification for more information
 -- about these fields.
 data Msg1074 = Msg1074
-  { _msg1074_header :: MsmHeader
+  { _msg1074_header        :: MsmHeader
     -- ^ MSM header.
+  , _msg1074_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1074)
@@ -116,11 +142,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1074_" . stripP
 
 instance Binary Msg1074 where
   get = B.runBitGet $ do
-    _msg1074_header <- getBits 0
+    _msg1074_header        <- getBits 0
+    _msg1074_satelliteData <- getBits $ popCount $ _msg1074_header ^. msmHeader_satelliteMask
     pure Msg1074 {..}
 
   put Msg1074 {..} = B.runBitPut $ do
     putBits 0 _msg1074_header
+    putBits 0 _msg1074_satelliteData
 
 $(deriveRTCM3 ''Msg1074)
 
@@ -163,6 +191,8 @@ msg1076 = 1076
 data Msg1076 = Msg1076
   { _msg1076_header :: MsmHeader
     -- ^ MSM header.
+  , _msg1076_satelliteData :: Msm46SatelliteData
+    -- ^ MSM satellite data.
   } deriving ( Show, Read, Eq )
 
 $(makeLenses ''Msg1076)
@@ -170,11 +200,13 @@ $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_msg1076_" . stripP
 
 instance Binary Msg1076 where
   get = B.runBitGet $ do
-    _msg1076_header <- getBits 0
+    _msg1076_header        <- getBits 0
+    _msg1076_satelliteData <- getBits $ popCount $ _msg1076_header ^. msmHeader_satelliteMask
     pure Msg1076 {..}
 
   put Msg1076 {..} = B.runBitPut $ do
     putBits 0 _msg1076_header
+    putBits 0 _msg1076_satelliteData
 
 $(deriveRTCM3 ''Msg1076)
 
