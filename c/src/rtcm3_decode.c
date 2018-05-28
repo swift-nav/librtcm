@@ -1123,7 +1123,9 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
 
     for (uint8_t sig = 0; sig < num_sigs; sig++) {
       if (msg->header.cell_mask[sat * num_sigs + sig]) {
-        double freq = msm_signal_frequency(&msg->header, sig, sat_info[sat]);
+        double freq;
+        bool freq_valid = msm_signal_frequency(
+            &msg->header, sig, sat_info[sat], sat_info_valid[sat], &freq);
 
         if (rough_range_valid[sat] && flags[i].valid_pr) {
           msg->signals[i].pseudorange_m = rough_range[sat] + fine_pr[i];
@@ -1131,7 +1133,7 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
           msg->signals[i].pseudorange_m = 0;
           flags[i].valid_pr = false;
         }
-        if (rough_range_valid[sat] && flags[i].valid_cp && freq > 0) {
+        if (rough_range_valid[sat] && flags[i].valid_cp && freq_valid) {
           /* convert carrier phase into cycles */
           msg->signals[i].carrier_phase_cyc =
               (rough_range[sat] + fine_cp[i]) * (freq / GPS_C);
@@ -1146,7 +1148,7 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
         } else {
           msg->signals[i].cnr = 0;
         }
-        if (rough_rate_valid[sat] && flags[i].valid_dop && freq > 0) {
+        if (rough_rate_valid[sat] && flags[i].valid_dop && freq_valid) {
           /* convert Doppler into Hz */
           msg->signals[i].range_rate_Hz =
               (rough_rate[sat] + fine_dop[i]) * (freq / GPS_C);

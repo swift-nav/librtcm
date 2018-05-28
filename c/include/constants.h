@@ -29,6 +29,7 @@
 #define MSM_DOP_INVALID -16384        /* Signed bit pattern 0x4000 */
 
 #define MSM_GLO_FCN_OFFSET 7 /* Offset for FCN coding in sat_info */
+#define MSM_GLO_MAX_FCN 13
 
 /** 2^-4 */
 #define C_1_2P4 0.0625

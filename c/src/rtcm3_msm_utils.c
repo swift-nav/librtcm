@@ -18,11 +18,15 @@
  * \param header Pointer to message header
  * \param signal_index 0-based index into the signal mask
  * \param sat_info The decoded sat info field (contains GLO FCN)
- * \return frequency [Hz], or 0 in signal was invalid
+ * \param sat_info_valid Validity flag for sat_info
+ * \param p_freq Pointer to write the frequency output to
+ * \return true if a valid frequency was returned
  */
-double msm_signal_frequency(const rtcm_msm_header *header,
-                            const uint8_t signal_index,
-                            const uint8_t sat_info) {
+bool msm_signal_frequency(const rtcm_msm_header *header,
+                          const uint8_t signal_index,
+                          const uint8_t sat_info,
+                          const bool sat_info_valid,
+                          double *p_freq) {
   code_t code = msm_signal_to_code(header, signal_index);
 
   /* TODO: use sid_to_carr_freq from LNSP */
@@ -30,62 +34,85 @@ double msm_signal_frequency(const rtcm_msm_header *header,
   switch (code) {
     case CODE_GPS_L1CA:
     case CODE_GPS_L1P:
-      return GPS_L1_HZ;
+      *p_freq = GPS_L1_HZ;
+      return true;
     case CODE_GPS_L2CM:
     case CODE_GPS_L2P:
     case CODE_GPS_L2CL:
     case CODE_GPS_L2CX:
-      return GPS_L2_HZ;
+      *p_freq = GPS_L2_HZ;
+      return true;
     case CODE_GPS_L5I:
     case CODE_GPS_L5Q:
     case CODE_GPS_L5X:
-      return GPS_L5_HZ;
-    case CODE_GLO_L1OF: {
-      int8_t fcn = sat_info - MSM_GLO_FCN_OFFSET;
-      return GLO_L1_HZ + fcn * GLO_L1_DELTA_HZ;
-    }
-    case CODE_GLO_L2OF: {
-      int8_t fcn = sat_info - MSM_GLO_FCN_OFFSET;
-      return GLO_L2_HZ + fcn * GLO_L2_DELTA_HZ;
-    }
+      *p_freq = GPS_L5_HZ;
+      return true;
+    case CODE_GLO_L1OF:
+      /* GLO FCN given in the sat info field, see Table 3.4-6 */
+      if (sat_info_valid && sat_info <= MSM_GLO_MAX_FCN) {
+        int8_t fcn = sat_info - MSM_GLO_FCN_OFFSET;
+        *p_freq = GLO_L1_HZ + fcn * GLO_L1_DELTA_HZ;
+        return true;
+      } else {
+        return false;
+      }
+    case CODE_GLO_L2OF:
+      if (sat_info_valid && sat_info <= MSM_GLO_MAX_FCN) {
+        int8_t fcn = sat_info - MSM_GLO_FCN_OFFSET;
+        *p_freq = GLO_L2_HZ + fcn * GLO_L2_DELTA_HZ;
+        return true;
+      } else {
+        return false;
+      }
     case CODE_BDS2_B11:
-      return BDS2_B11_HZ;
+      *p_freq = BDS2_B11_HZ;
+      return true;
     case CODE_BDS2_B2:
-      return BDS2_B2_HZ;
+      *p_freq = BDS2_B2_HZ;
+      return true;
     case CODE_SBAS_L1CA:
-      return SBAS_L1_HZ;
+      *p_freq = SBAS_L1_HZ;
+      return true;
     case CODE_GAL_E1B:
     case CODE_GAL_E1C:
     case CODE_GAL_E1X:
-      return GAL_E1_HZ;
+      *p_freq = GAL_E1_HZ;
+      return true;
     case CODE_GAL_E7I:
     case CODE_GAL_E7Q:
     case CODE_GAL_E7X:
-      return GAL_E7_HZ;
+      *p_freq = GAL_E7_HZ;
+      return true;
     case CODE_GAL_E5I:
     case CODE_GAL_E5Q:
     case CODE_GAL_E5X:
-      return GAL_E5_HZ;
+      *p_freq = GAL_E5_HZ;
+      return true;
     case CODE_GAL_E6B:
     case CODE_GAL_E6C:
     case CODE_GAL_E6X:
-      return GAL_E6_HZ;
+      *p_freq = GAL_E6_HZ;
+      return true;
     case CODE_GAL_E8:
-      return GAL_E8_HZ;
+      *p_freq = GAL_E8_HZ;
+      return true;
     case CODE_QZS_L1CA:
-      return QZS_L1_HZ;
+      *p_freq = QZS_L1_HZ;
+      return true;
     case CODE_QZS_L2CM:
     case CODE_QZS_L2CL:
     case CODE_QZS_L2CX:
-      return QZS_L2_HZ;
+      *p_freq = QZS_L2_HZ;
+      return true;
     case CODE_QZS_L5I:
     case CODE_QZS_L5Q:
     case CODE_QZS_L5X:
-      return QZS_L5_HZ;
+      *p_freq = QZS_L5_HZ;
+      return true;
     case CODE_INVALID:
     case CODE_COUNT:
     default:
-      return 0;
+      return false;
   }
 }
 

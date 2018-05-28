@@ -749,7 +749,8 @@ static uint16_t rtcm3_encode_msm_header(const rtcm_msm_header *header,
   }
   uint8_t num_sats =
       count_mask_values(MSM_SATELLITE_MASK_SIZE, header->satellite_mask);
-  uint8_t num_sigs = count_mask_values(MSM_SIGNAL_MASK_SIZE, header->signal_mask);
+  uint8_t num_sigs =
+      count_mask_values(MSM_SIGNAL_MASK_SIZE, header->signal_mask);
   uint8_t cell_mask_size = num_sats * num_sigs;
 
   for (uint8_t i = 0; i < cell_mask_size; i++) {
@@ -878,7 +879,8 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
 
   uint8_t num_sats =
       count_mask_values(MSM_SATELLITE_MASK_SIZE, header->satellite_mask);
-  uint8_t num_sigs = count_mask_values(MSM_SIGNAL_MASK_SIZE, header->signal_mask);
+  uint8_t num_sigs =
+      count_mask_values(MSM_SIGNAL_MASK_SIZE, header->signal_mask);
   uint8_t cell_mask_size = num_sats * num_sigs;
   uint8_t num_cells = count_mask_values(cell_mask_size, header->cell_mask);
 
@@ -943,16 +945,19 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
   for (uint8_t sat = 0; sat < num_sats; sat++) {
     for (uint8_t sig = 0; sig < num_sigs; sig++) {
       if (header->cell_mask[sat * num_sigs + sig]) {
-        double freq =
-            msm_signal_frequency(&msg->header, sig, msg->sats[sat].sat_info);
+        double freq;
+        bool freq_valid = msm_signal_frequency(
+            &msg->header, sig, msg->sats[sat].sat_info, true, &freq);
 
         flags[i] = msg->signals[i].flags;
         if (flags[i].valid_pr) {
           fine_pr[i] = msg->signals[i].pseudorange_m - rough_range_m[sat];
         }
-        if (flags[i].valid_cp) {
+        if (flags[i].valid_cp && freq_valid) {
           fine_cp[i] = msg->signals[i].carrier_phase_cyc * (GPS_C / freq) -
                        rough_range_m[sat];
+        } else {
+          flags[i].valid_cp = false;
         }
         if (flags[i].valid_lock) {
           lock_time[i] = msg->signals[i].lock_time_s;
@@ -963,9 +968,11 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
         } else {
           cnr[i] = 0;
         }
-        if (MSM5 == msm_type) {
+        if (MSM5 == msm_type && flags[i].valid_dop && freq_valid) {
           fine_dop[i] = msg->signals[i].range_rate_Hz * (GPS_C / freq) -
                         rough_rate_m_s[sat];
+        } else {
+          flags[i].valid_dop = false;
         }
         i++;
       }

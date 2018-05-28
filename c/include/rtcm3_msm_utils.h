@@ -15,9 +15,11 @@
 
 #include "rtcm3_messages.h"
 
-double msm_signal_frequency(const rtcm_msm_header *header,
-                            const uint8_t signal_index,
-                            const uint8_t sat_info);
+bool msm_signal_frequency(const rtcm_msm_header *header,
+                          const uint8_t signal_index,
+                          const uint8_t sat_info,
+                          const bool sat_info_valid,
+                          double *p_freq);
 msm_enum to_msm_type(uint16_t msg_num);
 constellation_t to_constellation(uint16_t msg_num);
 uint8_t count_mask_values(uint8_t mask_size, const bool mask[]);

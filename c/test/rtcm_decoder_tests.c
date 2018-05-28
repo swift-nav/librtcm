@@ -1651,8 +1651,11 @@ void test_msm_sid_conversion(void) {
   assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
   assert(msm_signal_to_code(&header, 0) == CODE_GPS_L1CA);
   assert(msm_signal_to_code(&header, 1) == CODE_GPS_L2CM);
-  assert(msm_signal_frequency(&header, 0, 0) == GPS_L1_HZ);
-  assert(msm_signal_frequency(&header, 1, 0) == GPS_L2_HZ);
+  double freq;
+  assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
+         freq == GPS_L1_HZ);
+  assert(msm_signal_frequency(&header, 1, 0, false, &freq) &&
+         freq == GPS_L2_HZ);
 
   /* GLO */
   header.msg_num = 1084;
@@ -1663,8 +1666,11 @@ void test_msm_sid_conversion(void) {
   assert(msm_signal_to_code(&header, 0) == CODE_GLO_L1OF);
   assert(msm_signal_to_code(&header, 1) == CODE_INVALID);
   uint8_t fcn = 3;
-  assert(msm_signal_frequency(&header, 0, fcn + MSM_GLO_FCN_OFFSET) ==
-         GLO_L1_HZ + fcn * GLO_L1_DELTA_HZ);
+  assert(
+      msm_signal_frequency(&header, 0, fcn + MSM_GLO_FCN_OFFSET, true, &freq) &&
+      freq == GLO_L1_HZ + fcn * GLO_L1_DELTA_HZ);
+  assert(
+      !msm_signal_frequency(&header, 1, fcn + MSM_GLO_FCN_OFFSET, true, &freq));
 
   /* GAL */
   header.msg_num = 1094;
@@ -1674,8 +1680,10 @@ void test_msm_sid_conversion(void) {
   assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
   assert(msm_signal_to_code(&header, 0) == CODE_GAL_E1C);
   assert(msm_signal_to_code(&header, 1) == CODE_GAL_E7Q);
-  assert(msm_signal_frequency(&header, 0, 0) == GAL_E1_HZ);
-  assert(msm_signal_frequency(&header, 1, 0) == GAL_E7_HZ);
+  assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
+         freq == GAL_E1_HZ);
+  assert(msm_signal_frequency(&header, 1, 0, false, &freq) &&
+         freq == GAL_E7_HZ);
 
   /* SBAS */
   header.msg_num = 1104;
@@ -1684,7 +1692,8 @@ void test_msm_sid_conversion(void) {
   assert(msm_sat_to_prn(&header, 1) == 121);
   assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
   assert(msm_signal_to_code(&header, 0) == CODE_SBAS_L1CA);
-  assert(msm_signal_frequency(&header, 0, 0) == SBAS_L1_HZ);
+  assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
+         freq == SBAS_L1_HZ);
 
   /* QZS PRNs start from 193 */
   header.msg_num = 1114;
@@ -1694,8 +1703,10 @@ void test_msm_sid_conversion(void) {
   assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
   assert(msm_signal_to_code(&header, 0) == CODE_QZS_L1CA);
   assert(msm_signal_to_code(&header, 1) == CODE_QZS_L2CM);
-  assert(msm_signal_frequency(&header, 0, 0) == QZS_L1_HZ);
-  assert(msm_signal_frequency(&header, 1, 0) == QZS_L2_HZ);
+  assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
+         freq == QZS_L1_HZ);
+  assert(msm_signal_frequency(&header, 1, 0, false, &freq) &&
+         freq == QZS_L2_HZ);
 
   /* BDS2 */
   header.msg_num = 1124;
@@ -1706,6 +1717,8 @@ void test_msm_sid_conversion(void) {
   assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
   assert(msm_signal_to_code(&header, 0) == CODE_BDS2_B11);
   assert(msm_signal_to_code(&header, 1) == CODE_BDS2_B2);
-  assert(msm_signal_frequency(&header, 0, 0) == BDS2_B11_HZ);
-  assert(msm_signal_frequency(&header, 1, 0) == BDS2_B2_HZ);
+  assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
+         freq == BDS2_B11_HZ);
+  assert(msm_signal_frequency(&header, 1, 0, false, &freq) &&
+         freq == BDS2_B2_HZ);
 }
