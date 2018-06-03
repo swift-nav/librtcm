@@ -31,6 +31,9 @@
 #define MSM_GLO_FCN_OFFSET 7 /* Offset for FCN coding in sat_info */
 #define MSM_GLO_MAX_FCN 13
 
+#define MT1012_GLO_FCN_OFFSET 7
+#define MT1012_GLO_MAX_FCN 20
+
 /** 2^-4 */
 #define C_1_2P4 0.0625
 /** 2^-24 */
