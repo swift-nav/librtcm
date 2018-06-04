@@ -612,10 +612,11 @@ rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
 
     l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
 
-    int8_t glo_fcn = msg_1010->sats[i].fcn - 7;
+    int8_t glo_fcn = msg_1010->sats[i].fcn - MT1012_GLO_FCN_OFFSET;
     l1_freq_data->flags.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, PRUNIT_GLO * amb);
-    l1_freq_data->flags.valid_cp = construct_L1_phase(
+    l1_freq_data->flags.valid_cp =
+        (msg_1010->sats[i].fcn <= MT1012_GLO_MAX_FCN) && construct_L1_phase(
         l1_freq_data, phr_pr_diff, GLO_L1_HZ + glo_fcn * GLO_L1_DELTA_HZ);
   }
 
@@ -654,11 +655,12 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
     uint8_t amb = getbitu(buff, bit, 7);
     bit += 7;
 
-    int8_t glo_fcn = msg_1012->sats[i].fcn - 7;
+    int8_t glo_fcn = msg_1012->sats[i].fcn - MT1012_GLO_FCN_OFFSET;
     l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
     l1_freq_data->flags.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GLO);
-    l1_freq_data->flags.valid_cp = construct_L1_phase(
+    l1_freq_data->flags.valid_cp =
+        (msg_1012->sats[i].fcn <= MT1012_GLO_MAX_FCN) && construct_L1_phase(
         l1_freq_data, phr_pr_diff, GLO_L1_HZ + glo_fcn * GLO_L1_DELTA_HZ);
 
     rtcm_freq_data *l2_freq_data = &msg_1012->sats[i].obs[L2_FREQ];
