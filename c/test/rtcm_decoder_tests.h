@@ -34,6 +34,7 @@ static void test_rtcm_msm7(void);
 static void test_rtcm_random_bits(void);
 static void test_msm_bit_utils(void);
 static void test_msm_sid_conversion(void);
+static void test_msm_glo_fcn(void);
 
 bool msgobs_equals(const rtcm_obs_message *msg_in,
                    const rtcm_obs_message *msg_out);

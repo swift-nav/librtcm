@@ -12,6 +12,7 @@
 
 #include "rtcm3_decode.h"
 #include <math.h>
+#include <stdio.h>
 #include "bits.h"
 
 void init_sat_data(rtcm_sat_data *sat_data) {
@@ -616,8 +617,9 @@ rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
     l1_freq_data->flags.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, PRUNIT_GLO * amb);
     l1_freq_data->flags.valid_cp =
-        (msg_1010->sats[i].fcn <= MT1012_GLO_MAX_FCN) && construct_L1_phase(
-        l1_freq_data, phr_pr_diff, GLO_L1_HZ + glo_fcn * GLO_L1_DELTA_HZ);
+        (msg_1010->sats[i].fcn <= MT1012_GLO_MAX_FCN) &&
+        construct_L1_phase(
+            l1_freq_data, phr_pr_diff, GLO_L1_HZ + glo_fcn * GLO_L1_DELTA_HZ);
   }
 
   return RC_OK;
@@ -660,8 +662,9 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
     l1_freq_data->flags.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GLO);
     l1_freq_data->flags.valid_cp =
-        (msg_1012->sats[i].fcn <= MT1012_GLO_MAX_FCN) && construct_L1_phase(
-        l1_freq_data, phr_pr_diff, GLO_L1_HZ + glo_fcn * GLO_L1_DELTA_HZ);
+        (msg_1012->sats[i].fcn <= MT1012_GLO_MAX_FCN) &&
+        construct_L1_phase(
+            l1_freq_data, phr_pr_diff, GLO_L1_HZ + glo_fcn * GLO_L1_DELTA_HZ);
 
     rtcm_freq_data *l2_freq_data = &msg_1012->sats[i].obs[L2_FREQ];
 
@@ -1012,15 +1015,17 @@ static void decode_msm_fine_phaserangerates(const uint8_t buff[],
 /** Decode an RTCMv3 Multi System Messages 4-7
  *
  * \param buff The input data buffer
- * \param RTCM message struct
  * \param msm_type MSM4, MSM5, MSM6 or MSM7
+ * \param glo_sv_id_fcn_map Optional GLO FCN table (size MAX_GLO_PRN + 1)
+ * \param msg The parsed RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large
  */
 static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
-                                          rtcm_msm_message *msg,
-                                          uint16_t msm_type) {
+                                          const uint16_t msm_type,
+                                          const uint8_t glo_sv_id_fcn_map[],
+                                          rtcm_msm_message *msg) {
   if (MSM4 != msm_type && MSM5 != msm_type && MSM6 != msm_type &&
       MSM7 != msm_type) {
     /* Invalid message type requested */
@@ -1125,9 +1130,18 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
 
     for (uint8_t sig = 0; sig < num_sigs; sig++) {
       if (msg->header.cell_mask[sat * num_sigs + sig]) {
+        /* get GLO FCN */
+        uint8_t glo_fcn = MSM_GLO_FCN_UNKNOWN;
+        bool glo_fcn_valid = get_glo_fcn(&msg->header,
+                                         sat,
+                                         sat_info,
+                                         sat_info_valid,
+                                         glo_sv_id_fcn_map,
+                                         &glo_fcn);
+
         double freq;
         bool freq_valid = msm_signal_frequency(
-            &msg->header, sig, sat_info[sat], sat_info_valid[sat], &freq);
+            &msg->header, sig, glo_fcn, glo_fcn_valid, &freq);
 
         if (rough_range_valid[sat] && flags[i].valid_pr) {
           msg->signals[i].pseudorange_m = rough_range[sat] + fine_pr[i];
@@ -1170,13 +1184,16 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
 /** Decode an RTCMv3 Multi System Message 4
  *
  * \param buff The input data buffer
+ * \param glo_sv_id_fcn_map Optional GLO FCN table (size MAX_GLO_PRN + 1)
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large
  */
-rtcm3_rc rtcm3_decode_msm4(const uint8_t buff[], rtcm_msm_message *msg) {
-  return rtcm3_decode_msm_internal(buff, msg, MSM4);
+rtcm3_rc rtcm3_decode_msm4(const uint8_t buff[],
+                           const uint8_t glo_sv_id_fcn_map[],
+                           rtcm_msm_message *msg) {
+  return rtcm3_decode_msm_internal(buff, MSM4, glo_sv_id_fcn_map, msg);
 }
 
 /** Decode an RTCMv3 Multi System Message 5
@@ -1188,19 +1205,22 @@ rtcm3_rc rtcm3_decode_msm4(const uint8_t buff[], rtcm_msm_message *msg) {
  *          - RC_INVALID_MESSAGE : Cell mask too large
  */
 rtcm3_rc rtcm3_decode_msm5(const uint8_t buff[], rtcm_msm_message *msg) {
-  return rtcm3_decode_msm_internal(buff, msg, MSM5);
+  return rtcm3_decode_msm_internal(buff, MSM5, NULL, msg);
 }
 
 /** Decode an RTCMv3 Multi System Message 6
  *
  * \param buff The input data buffer
+ * \param glo_sv_id_fcn_map Optional GLO FCN table (size MAX_GLO_PRN + 1)
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large
  */
-rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[], rtcm_msm_message *msg) {
-  return rtcm3_decode_msm_internal(buff, msg, MSM6);
+rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[],
+                           const uint8_t glo_sv_id_fcn_map[],
+                           rtcm_msm_message *msg) {
+  return rtcm3_decode_msm_internal(buff, MSM6, glo_sv_id_fcn_map, msg);
 }
 
 /** Decode an RTCMv3 Multi System Message 7
@@ -1212,5 +1232,5 @@ rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[], rtcm_msm_message *msg) {
  *          - RC_INVALID_MESSAGE : Cell mask too large
  */
 rtcm3_rc rtcm3_decode_msm7(const uint8_t buff[], rtcm_msm_message *msg) {
-  return rtcm3_decode_msm_internal(buff, msg, MSM7);
+  return rtcm3_decode_msm_internal(buff, MSM7, NULL, msg);
 }

@@ -12,20 +12,21 @@
 
 #include "rtcm3_msm_utils.h"
 #include <assert.h>
+#include <stdio.h>
 
 /** Find the frequency of an MSM signal
  *
  * \param header Pointer to message header
  * \param signal_index 0-based index into the signal mask
- * \param sat_info The decoded sat info field (contains GLO FCN)
- * \param sat_info_valid Validity flag for sat_info
+ * \param glo_fcn The FCN value for GLO satellites
+ * \param glo_fcn_valid Validity flag for glo_fcn
  * \param p_freq Pointer to write the frequency output to
  * \return true if a valid frequency was returned
  */
 bool msm_signal_frequency(const rtcm_msm_header *header,
                           const uint8_t signal_index,
-                          const uint8_t sat_info,
-                          const bool sat_info_valid,
+                          const uint8_t glo_fcn,
+                          const bool glo_fcn_valid,
                           double *p_freq) {
   code_t code = msm_signal_to_code(header, signal_index);
 
@@ -49,17 +50,15 @@ bool msm_signal_frequency(const rtcm_msm_header *header,
       return true;
     case CODE_GLO_L1OF:
       /* GLO FCN given in the sat info field, see Table 3.4-6 */
-      if (sat_info_valid && sat_info <= MSM_GLO_MAX_FCN) {
-        int8_t fcn = sat_info - MSM_GLO_FCN_OFFSET;
-        *p_freq = GLO_L1_HZ + fcn * GLO_L1_DELTA_HZ;
+      if (glo_fcn_valid) {
+        *p_freq = GLO_L1_HZ + (glo_fcn - MSM_GLO_FCN_OFFSET) * GLO_L1_DELTA_HZ;
         return true;
       } else {
         return false;
       }
     case CODE_GLO_L2OF:
-      if (sat_info_valid && sat_info <= MSM_GLO_MAX_FCN) {
-        int8_t fcn = sat_info - MSM_GLO_FCN_OFFSET;
-        *p_freq = GLO_L2_HZ + fcn * GLO_L2_DELTA_HZ;
+      if (glo_fcn_valid) {
+        *p_freq = GLO_L2_HZ + (glo_fcn - MSM_GLO_FCN_OFFSET) * GLO_L2_DELTA_HZ;
         return true;
       } else {
         return false;
@@ -460,4 +459,38 @@ uint8_t msm_sat_to_prn(const rtcm_msm_header *header, uint8_t satellite_index) {
     default:
       return PRN_INVALID;
   }
+}
+
+/** Find the frequency channel number (FCN) of a GLO signal
+ *
+ * \param header Pointer to message header
+ * \param sat_index 0-based index into the satellite mask
+ * \param sat_info Array of satellite info
+ * \param sat_info_valid Array of satellite info validity flags
+ * \param glo_sv_id_fcn_map Optional GLO FCN table (size MAX_GLO_PRN + 1)
+ * \param glo_fcn Output pointer for the FCN value
+ * \return true if a valid FCN was returned
+ */
+bool get_glo_fcn(const rtcm_msm_header *header,
+                 const uint8_t sat,
+                 const uint8_t sat_info[],
+                 const bool sat_info_valid[],
+                 const uint8_t glo_sv_id_fcn_map[],
+                 uint8_t *glo_fcn) {
+  if (CONSTELLATION_GLO != to_constellation(header->msg_num)) {
+    return false;
+  }
+
+  *glo_fcn = MSM_GLO_FCN_UNKNOWN;
+  if (sat_info_valid[sat]) {
+    /* get FCN from sat_info if given */
+    *glo_fcn = sat_info[sat];
+  } else if (NULL != glo_sv_id_fcn_map) {
+    /* use the lookup table if given */
+    uint8_t sat_id = msm_sat_to_prn(header, sat);
+    *glo_fcn = glo_sv_id_fcn_map[sat_id];
+  }
+
+  /* valid values are from 0 to MSM_GLO_MAX_FCN */
+  return (*glo_fcn <= MSM_GLO_MAX_FCN);
 }

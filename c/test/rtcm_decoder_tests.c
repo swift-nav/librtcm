@@ -41,6 +41,7 @@ int main(void) {
   test_rtcm_msm7();
   test_rtcm_random_bits();
   test_msm_sid_conversion();
+  test_msm_glo_fcn();
 }
 
 void test_rtcm_1001(void) {
@@ -1422,7 +1423,7 @@ void test_rtcm_msm4(void) {
   assert(num_bytes > 0 && num_bytes < 1024);
 
   rtcm_msm_message msg_msm4_out;
-  int8_t ret = rtcm3_decode_msm4(buff, &msg_msm4_out);
+  int8_t ret = rtcm3_decode_msm4(buff, NULL, &msg_msm4_out);
 
   assert(RC_OK == ret && msg_msm_equals(&msg_msm4, &msg_msm4_out));
 }
@@ -1567,9 +1568,9 @@ void test_rtcm_random_bits(void) {
       }
     }
 
-    rtcm3_decode_msm4(buff, &msg_msm);
+    rtcm3_decode_msm4(buff, NULL, &msg_msm);
     rtcm3_decode_msm5(buff, &msg_msm);
-    rtcm3_decode_msm6(buff, &msg_msm);
+    rtcm3_decode_msm6(buff, NULL, &msg_msm);
     rtcm3_decode_msm7(buff, &msg_msm);
   }
 }
@@ -1721,4 +1722,57 @@ void test_msm_sid_conversion(void) {
          freq == BDS2_B11_HZ);
   assert(msm_signal_frequency(&header, 1, 0, false, &freq) &&
          freq == BDS2_B2_HZ);
+}
+
+void test_msm_glo_fcn(void) {
+  rtcm_msm_header header;
+
+  header.msg_num = 1084;
+  memset((void *)&header.satellite_mask, 0, sizeof(header.satellite_mask));
+  header.satellite_mask[0] = true;  /* PRN 1 */
+  header.satellite_mask[2] = true;  /* PRN 3 */
+  header.satellite_mask[63] = true; /* invalid PRN 64 */
+  /* signal id 2 (L1CA)) */
+  memset((void *)&header.signal_mask, 0, sizeof(header.signal_mask));
+  header.signal_mask[1] = true;
+
+  uint8_t sat_info[2] = {3 + MSM_GLO_FCN_OFFSET, -6 + MSM_GLO_FCN_OFFSET};
+  bool sat_info_valid[2] = {true, true};
+
+  uint8_t glo_fcn;
+
+  /* FCN for both satellites available in sat_info */
+  assert(get_glo_fcn(&header, 0, sat_info, sat_info_valid, NULL, &glo_fcn));
+  assert(glo_fcn == 3 + MSM_GLO_FCN_OFFSET);
+
+  assert(get_glo_fcn(&header, 1, sat_info, sat_info_valid, NULL, &glo_fcn));
+  assert(glo_fcn == -6 + MSM_GLO_FCN_OFFSET);
+
+  /* sat info invalid for first satellite, FCN not available */
+  sat_info_valid[0] = false;
+  assert(!get_glo_fcn(&header, 0, sat_info, sat_info_valid, NULL, &glo_fcn));
+
+  /* FCN map indexed by PRN */
+  uint8_t fcn_map[RTCM_MAX_SATS];
+  fcn_map[0] = MSM_GLO_FCN_UNKNOWN;
+  fcn_map[1] = 2 + MSM_GLO_FCN_OFFSET; /* PRN 1 */
+  fcn_map[2] = MSM_GLO_FCN_UNKNOWN;
+  fcn_map[3] = MSM_GLO_FCN_UNKNOWN; /* PRN 3 */
+
+  /* FCN for first satellite from FCN MAP */
+  assert(get_glo_fcn(&header, 0, sat_info, sat_info_valid, fcn_map, &glo_fcn));
+  assert(glo_fcn == 2 + MSM_GLO_FCN_OFFSET);
+
+  /* FCN MAP invalid for second satellite, value in sat_info used */
+  assert(get_glo_fcn(&header, 1, sat_info, sat_info_valid, fcn_map, &glo_fcn));
+  assert(glo_fcn == -6 + MSM_GLO_FCN_OFFSET);
+
+  /* both FCN map and sat_info invalid, invalid FCN returned */
+  sat_info_valid[1] = false;
+  assert(!get_glo_fcn(&header, 1, sat_info, sat_info_valid, fcn_map, &glo_fcn));
+
+  /* add valid value in the FCN map */
+  fcn_map[3] = -5 + MSM_GLO_FCN_OFFSET;
+  assert(get_glo_fcn(&header, 1, sat_info, sat_info_valid, fcn_map, &glo_fcn));
+  assert(glo_fcn == -5 + MSM_GLO_FCN_OFFSET);
 }
