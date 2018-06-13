@@ -184,11 +184,13 @@ static code_t get_msm_gps_code(uint8_t signal_id) {
       return CODE_GPS_L1CA;
     case 3: /* 1P */
       return CODE_GPS_L1P;
-    /* case 4: 1W */
+    case 4: /* 1W */
+      return CODE_GPS_L1P;
     /* case 8: 2C */
     case 9: /* 2P */
       return CODE_GPS_L2P;
-    /* case 10: 2W */
+    case 10: /* 2W */
+      return CODE_GPS_L2P;
     case 15: /* 2S */
       return CODE_GPS_L2CM;
     case 16: /* 2L */
