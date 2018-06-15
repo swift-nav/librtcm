@@ -291,7 +291,6 @@ rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001) {
   for (uint8_t i = 0; i < msg_1001->header.n_sat; i++) {
     init_sat_data(&msg_1001->sats[i]);
 
-    /* TODO: Handle SBAS prns properly, numbered differently in RTCM? */
     msg_1001->sats[i].svId = getbitu(buff, bit, 6);
     bit += 6;
 
@@ -327,7 +326,6 @@ rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
   for (uint8_t i = 0; i < msg_1002->header.n_sat; i++) {
     init_sat_data(&msg_1002->sats[i]);
 
-    /* TODO: Handle SBAS prns properly, numbered differently in RTCM? */
     msg_1002->sats[i].svId = getbitu(buff, bit, 6);
     bit += 6;
 
@@ -367,7 +365,6 @@ rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
   for (uint8_t i = 0; i < msg_1003->header.n_sat; i++) {
     init_sat_data(&msg_1003->sats[i]);
 
-    /* TODO: Handle SBAS prns properly, numbered differently in RTCM? */
     msg_1003->sats[i].svId = getbitu(buff, bit, 6);
     bit += 6;
 
@@ -413,7 +410,6 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
   for (uint8_t i = 0; i < msg_1004->header.n_sat; i++) {
     init_sat_data(&msg_1004->sats[i]);
 
-    /* TODO: Handle SBAS prns properly, numbered differently in RTCM? */
     msg_1004->sats[i].svId = getbitu(buff, bit, 6);
     bit += 6;
 
@@ -642,7 +638,6 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
   for (uint8_t i = 0; i < msg_1012->header.n_sat; i++) {
     init_sat_data(&msg_1012->sats[i]);
 
-    /* TODO: Handle SBAS prns properly, numbered differently in RTCM? */
     msg_1012->sats[i].svId = getbitu(buff, bit, 6);
     bit += 6;
 
