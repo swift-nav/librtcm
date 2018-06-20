@@ -221,11 +221,11 @@ static code_t get_msm_glo_code(uint8_t signal_id) {
   /* RTCM 10403.3 Table 3.5-96 */
   switch (signal_id) {
     case 2: /* 1C */
+    case 3: /* 1P */
       return CODE_GLO_L1OF;
-    /* case 3: 1P */
     case 8: /* 2C */
+    case 9: /* 2P */
       return CODE_GLO_L2OF;
-    /* case 9: 2P */
     default:
       return CODE_INVALID;
   }
