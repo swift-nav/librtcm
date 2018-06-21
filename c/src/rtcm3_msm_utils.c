@@ -13,6 +13,8 @@
 #include "rtcm3_msm_utils.h"
 #include <assert.h>
 #include <stdio.h>
+
+#define LIBRTCM_LOG_INTERNAL
 #include "rtcm_logging.h"
 
 /** Find the frequency of an MSM signal
