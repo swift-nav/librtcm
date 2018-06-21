@@ -13,6 +13,7 @@
 #include "rtcm3_msm_utils.h"
 #include <assert.h>
 #include <stdio.h>
+#include "rtcm_logging.h"
 
 /** Find the frequency of an MSM signal
  *
@@ -217,15 +218,20 @@ static uint8_t get_msm_glo_prn(uint8_t sat_id) {
   return (prn <= GLO_LAST_PRN) ? prn : PRN_INVALID;
 }
 
+#define MSM_L1P_WARN_MSG "Received GLO L1P MSM Message from base station"
+#define MSM_L2P_WARN_MSG "Received GLO L2P MSM Message from base station"
+
 static code_t get_msm_glo_code(uint8_t signal_id) {
   /* RTCM 10403.3 Table 3.5-96 */
   switch (signal_id) {
+    case 3: /* 1P */
+      rtcm_log(LOG_WARNING, (uint8_t *)MSM_L1P_WARN_MSG, sizeof(MSM_L1P_WARN_MSG));
     case 2: /* 1C */
       return CODE_GLO_L1OF;
-    /* case 3: 1P */
+    case 9: /* 2P */
+      rtcm_log(LOG_WARNING, (uint8_t *)MSM_L2P_WARN_MSG, sizeof(MSM_L2P_WARN_MSG));
     case 8: /* 2C */
       return CODE_GLO_L2OF;
-    /* case 9: 2P */
     default:
       return CODE_INVALID;
   }

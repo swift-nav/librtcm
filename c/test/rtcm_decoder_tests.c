@@ -13,8 +13,10 @@
 #include "rtcm_decoder_tests.h"
 #include <assert.h>
 #include <math.h>
+#include <string.h>
 #include <rtcm3_decode.h>
 #include <rtcm3_messages.h>
+#include <rtcm_logging.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,6 +44,7 @@ int main(void) {
   test_rtcm_random_bits();
   test_msm_sid_conversion();
   test_msm_glo_fcn();
+  test_logging();
 }
 
 void test_rtcm_1001(void) {
@@ -1776,3 +1779,31 @@ void test_msm_glo_fcn(void) {
   assert(get_glo_fcn(&header, 1, sat_info, sat_info_valid, fcn_map, &glo_fcn));
   assert(glo_fcn == -5 + MSM_GLO_FCN_OFFSET);
 }
+
+#define TEST_LOG_LEVEL LOG_WARNING
+#define TEST_LOG_MSG "A message of length 22"
+#define TEST_LOG_LEN sizeof(TEST_LOG_MSG)
+
+static int callback_count = 0;
+
+static void test_rtcm_log_callback(uint8_t level, uint8_t *msg, uint16_t length)
+{
+  assert(level == TEST_LOG_LEVEL);
+  assert(length == TEST_LOG_LEN);
+  assert(strcmp((char *)msg, TEST_LOG_MSG) == 0);
+  callback_count++;
+}
+
+void test_logging(void)
+{
+  rtcm_init_logging(NULL);
+  rtcm_log(0, NULL, 0);
+  assert(callback_count == 0);
+  rtcm_init_logging(test_rtcm_log_callback);
+  rtcm_log(TEST_LOG_LEVEL, (uint8_t *)TEST_LOG_MSG, TEST_LOG_LEN);
+  assert(callback_count == 1);
+}
+
+#undef TEST_LOG_LEVEL
+#undef TEST_LOG_MSG
+#undef TEST_LOG_LEN
