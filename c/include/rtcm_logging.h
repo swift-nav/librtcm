@@ -27,9 +27,9 @@
 #define LOG_INFO    6 /* informational */
 #define LOG_DEBUG   7 /* debug-level messages */
 
-typedef void (*rtcm_log_callback)(uint8_t level, uint8_t *msg, uint16_t len);
+typedef void (*rtcm_log_callback)(uint8_t level, uint8_t *msg, uint16_t len, void *context);
 
-void rtcm_init_logging(rtcm_log_callback callback);
+void rtcm_init_logging(rtcm_log_callback callback, void *context);
 void rtcm_log(uint8_t level, uint8_t *msg, uint16_t len);
 
 #endif /* LIBRTCM_LOGGING_H */

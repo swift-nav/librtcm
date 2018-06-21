@@ -1784,22 +1784,23 @@ void test_msm_glo_fcn(void) {
 #define TEST_LOG_MSG "A message of length 22"
 #define TEST_LOG_LEN sizeof(TEST_LOG_MSG)
 
-static int callback_count = 0;
 
-static void test_rtcm_log_callback(uint8_t level, uint8_t *msg, uint16_t length)
+static void test_rtcm_log_callback(uint8_t level, uint8_t *msg, uint16_t length, void *context)
 {
+  int *callback_count = (int *)context;
   assert(level == TEST_LOG_LEVEL);
   assert(length == TEST_LOG_LEN);
   assert(strcmp((char *)msg, TEST_LOG_MSG) == 0);
-  callback_count++;
+  (*callback_count)++;
 }
 
 void test_logging(void)
 {
-  rtcm_init_logging(NULL);
+  int callback_count = 0;
+  rtcm_init_logging(NULL, NULL);
   rtcm_log(0, NULL, 0);
   assert(callback_count == 0);
-  rtcm_init_logging(test_rtcm_log_callback);
+  rtcm_init_logging(test_rtcm_log_callback, &callback_count);
   rtcm_log(TEST_LOG_LEVEL, (uint8_t *)TEST_LOG_MSG, TEST_LOG_LEN);
   assert(callback_count == 1);
 }
