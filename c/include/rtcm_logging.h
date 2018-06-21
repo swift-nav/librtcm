@@ -15,6 +15,7 @@
 
 #include <stdint.h>
 
+#ifdef LIBRTCM_LOG_INTERNAL
 /*
  * from syslog.h
  */
@@ -26,6 +27,8 @@
 #define LOG_NOTICE  5 /* normal but significant condition */
 #define LOG_INFO    6 /* informational */
 #define LOG_DEBUG   7 /* debug-level messages */
+
+#endif /* RCTM_LOG_INTERNAL */
 
 typedef void (*rtcm_log_callback)(uint8_t level, uint8_t *msg, uint16_t len, void *context);
 

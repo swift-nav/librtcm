@@ -16,12 +16,13 @@
 #include <string.h>
 #include <rtcm3_decode.h>
 #include <rtcm3_messages.h>
-#include <rtcm_logging.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "bits.h"
 #include "rtcm_encoder.h"
+#define LIBRTCM_LOG_INTERNAL
+#include <rtcm_logging.h>
 
 int main(void) {
   test_msm_bit_utils();
