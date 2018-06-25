@@ -228,10 +228,12 @@ static code_t get_msm_glo_code(uint8_t signal_id) {
   switch (signal_id) {
     case 3: /* 1P */
       rtcm_log(LOG_WARNING, (uint8_t *)MSM_L1P_WARN_MSG, sizeof(MSM_L1P_WARN_MSG));
+      return CODE_INVALID;
     case 2: /* 1C */
       return CODE_GLO_L1OF;
     case 9: /* 2P */
       rtcm_log(LOG_WARNING, (uint8_t *)MSM_L2P_WARN_MSG, sizeof(MSM_L2P_WARN_MSG));
+      return CODE_INVALID;
     case 8: /* 2C */
       return CODE_GLO_L2OF;
     default:
