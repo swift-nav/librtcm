@@ -35,6 +35,11 @@
 #define MT1012_GLO_FCN_OFFSET 7
 #define MT1012_GLO_MAX_FCN 20
 
+/* maximum value for time-of-week in integer milliseconds */
+#define RTCM_MAX_TOW_MS (7 * 24 * 3600 * 1000 - 1)
+/* maximum value for time-of-day in integer milliseconds */
+#define RTCM_GLO_MAX_TOW_MS (24 * 3600 * 1000 - 1)
+
 /** 2^-4 */
 #define C_1_2P4 0.0625
 /** 2^-24 */

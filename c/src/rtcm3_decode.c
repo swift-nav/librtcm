@@ -280,6 +280,7 @@ uint8_t get_cnr(rtcm_freq_data *freq_data,
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
 rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001) {
   uint16_t bit = 0;
@@ -287,6 +288,10 @@ rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001) {
 
   if (msg_1001->header.msg_num != 1001) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+
+  if (msg_1001->header.tow_ms > RTCM_MAX_TOW_MS) {
+    return RC_INVALID_MESSAGE;
+  }
 
   for (uint8_t i = 0; i < msg_1001->header.n_sat; i++) {
     init_sat_data(&msg_1001->sats[i]);
@@ -315,6 +320,7 @@ rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
 rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
   uint16_t bit = 0;
@@ -322,6 +328,10 @@ rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
 
   if (msg_1002->header.msg_num != 1002) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+
+  if (msg_1002->header.tow_ms > RTCM_MAX_TOW_MS) {
+    return RC_INVALID_MESSAGE;
+  }
 
   for (uint8_t i = 0; i < msg_1002->header.n_sat; i++) {
     init_sat_data(&msg_1002->sats[i]);
@@ -354,6 +364,7 @@ rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
 rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
   uint16_t bit = 0;
@@ -361,6 +372,10 @@ rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
 
   if (msg_1003->header.msg_num != 1003) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+
+  if (msg_1003->header.tow_ms > RTCM_MAX_TOW_MS) {
+    return RC_INVALID_MESSAGE;
+  }
 
   for (uint8_t i = 0; i < msg_1003->header.n_sat; i++) {
     init_sat_data(&msg_1003->sats[i]);
@@ -399,6 +414,7 @@ rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
 rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
   uint16_t bit = 0;
@@ -406,6 +422,10 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
 
   if (msg_1004->header.msg_num != 1004) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+
+  if (msg_1004->header.tow_ms > RTCM_MAX_TOW_MS) {
+    return RC_INVALID_MESSAGE;
+  }
 
   for (uint8_t i = 0; i < msg_1004->header.n_sat; i++) {
     init_sat_data(&msg_1004->sats[i]);
@@ -583,6 +603,7 @@ rtcm3_rc rtcm3_decode_1008(const uint8_t buff[], rtcm_msg_1008 *msg_1008) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
 rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
   uint16_t bit = 0;
@@ -590,6 +611,10 @@ rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
 
   if (msg_1010->header.msg_num != 1010) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+
+  if (msg_1010->header.tow_ms > RTCM_GLO_MAX_TOW_MS) {
+    return RC_INVALID_MESSAGE;
+  }
 
   for (uint8_t i = 0; i < msg_1010->header.n_sat; i++) {
     init_sat_data(&msg_1010->sats[i]);
@@ -627,6 +652,7 @@ rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
 rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
   uint16_t bit = 0;
@@ -634,6 +660,10 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
 
   if (msg_1012->header.msg_num != 1012) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+
+  if (msg_1012->header.tow_ms > RTCM_GLO_MAX_TOW_MS) {
+    return RC_INVALID_MESSAGE;
+  }
 
   for (uint8_t i = 0; i < msg_1012->header.n_sat; i++) {
     init_sat_data(&msg_1012->sats[i]);
@@ -1015,7 +1045,7 @@ static void decode_msm_fine_phaserangerates(const uint8_t buff[],
  * \param msg The parsed RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large
+ *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
                                           const uint16_t msm_type,
@@ -1042,6 +1072,14 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
 
   uint16_t bit = 0;
   bit += rtcm3_read_msm_header(buff, cons, &msg->header);
+
+  if (CONSTELLATION_GLO != cons) {
+    if (msg->header.tow_ms > RTCM_MAX_TOW_MS) {
+      return RC_INVALID_MESSAGE;
+    }
+  } else if (msg->header.tow_ms > RTCM_GLO_MAX_TOW_MS) { /* GLO */
+    return RC_INVALID_MESSAGE;
+  }
 
   uint8_t num_sats =
       count_mask_values(MSM_SATELLITE_MASK_SIZE, msg->header.satellite_mask);
@@ -1183,7 +1221,7 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large
+ *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 rtcm3_rc rtcm3_decode_msm4(const uint8_t buff[],
                            const uint8_t glo_sv_id_fcn_map[],
@@ -1197,7 +1235,7 @@ rtcm3_rc rtcm3_decode_msm4(const uint8_t buff[],
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large
+ *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 rtcm3_rc rtcm3_decode_msm5(const uint8_t buff[], rtcm_msm_message *msg) {
   return rtcm3_decode_msm_internal(buff, MSM5, NULL, msg);
@@ -1210,7 +1248,7 @@ rtcm3_rc rtcm3_decode_msm5(const uint8_t buff[], rtcm_msm_message *msg) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large
+ *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[],
                            const uint8_t glo_sv_id_fcn_map[],
@@ -1224,7 +1262,7 @@ rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[],
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large
+ *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 rtcm3_rc rtcm3_decode_msm7(const uint8_t buff[], rtcm_msm_message *msg) {
   return rtcm3_decode_msm_internal(buff, MSM7, NULL, msg);
