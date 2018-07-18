@@ -164,6 +164,15 @@ uint16_t rtcm3_read_glo_header(const uint8_t buff[], rtcm_obs_header *header) {
   return bit;
 }
 
+/* unwrap underflowed uint30 value to a wrapped tow_ms value */
+static uint32_t normalize_bds2_tow(const uint32_t tow_ms) {
+  if (tow_ms >= C_2P30 - BDS_SECOND_TO_GPS_SECOND * 1000) {
+    uint32_t negative_tow_ms = C_2P30 - tow_ms;
+    return RTCM_MAX_TOW_MS + 1 - negative_tow_ms;
+  }
+  return tow_ms;
+}
+
 static uint16_t rtcm3_read_msm_header(const uint8_t buff[],
                                       const constellation_t cons,
                                       rtcm_msm_header *header) {
@@ -178,6 +187,11 @@ static uint16_t rtcm3_read_msm_header(const uint8_t buff[],
     /* for GLONASS, the epoch time is the time of day in ms */
     header->tow_ms = getbitu(buff, bit, 27);
     bit += 27;
+  } else if (CONSTELLATION_BDS2) {
+    /* Beidou time can be negative (at least for some Septentrio base stations),
+     * so normalize it first */
+    header->tow_ms = normalize_bds2_tow(getbitu(buff, bit, 30));
+    bit += 30;
   } else {
     /* for other systems, epoch time is the time of week in ms */
     header->tow_ms = getbitu(buff, bit, 30);

@@ -48,6 +48,11 @@
 #define C_1_2P29 1.862645149230957e-09
 /** 2^-31 */
 #define C_1_2P31 4.656612873077393e-10
+/** 2^30 */
+#define C_2P30 1073741824
+
+/** Constant difference of Beidou time from GPS time */
+#define BDS_SECOND_TO_GPS_SECOND 14
 
 /** The official GPS value of the speed of light in m / s.
  * \note This is the exact value of the speed of light in vacuum (by the
