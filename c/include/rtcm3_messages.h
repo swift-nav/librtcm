@@ -347,4 +347,83 @@ typedef struct {
   };
 } rtcm_msg_eph;
 
+
+#define MAX_SSR_SATELLITES 64
+#define MAX_SSR_SIGNALS 32
+
+typedef struct {
+    uint16_t message_num;
+    uint32_t epoch_time;
+    uint8_t update_interval;
+    bool multi_message;
+    bool sat_ref_datum;
+    uint8_t iod_ssr;
+    uint16_t ssr_provider_id;
+    uint16_t ssr_solution_id;
+    bool dispersive_bias_consistency;
+    bool melbourne_wubbena_consistency;
+    uint8_t num_sats;
+} rtcm_msg_ssr_header;
+
+typedef struct {
+    uint8_t sat_id;
+    int32_t c0;
+    int32_t c1;
+    int32_t c2;
+} rtcm_msg_ssr_clock_corr;
+
+typedef struct {
+    uint8_t sat_id;
+    uint8_t iode;
+    int32_t radial;
+    int32_t along_track;
+    int32_t cross_track;
+    int32_t dot_radial;
+    int32_t dot_along_track;
+    int32_t dot_cross_track;
+} rtcm_msg_ssr_orbit_corr;
+
+typedef struct {
+    uint8_t signal_id;
+    int16_t code_bias;
+} rtcm_msg_ssr_code_bias_sig;
+
+typedef struct {
+    uint8_t sat_id;
+    uint8_t num_code_biases;
+    rtcm_msg_ssr_code_bias_sig signals[MAX_SSR_SIGNALS];
+} rtcm_msg_ssr_code_bias_sat;
+
+typedef struct {
+    uint8_t signal_id;
+    bool integer_indicator;
+    uint8_t widelane_indicator;
+    uint8_t discontinuity_indicator;
+    int32_t phase_bias;
+} rtcm_msg_ssr_phase_bias_sig;
+
+typedef struct {
+    uint8_t sat_id;
+    uint8_t num_phase_biases;
+    uint16_t yaw_angle;
+    int8_t yaw_rate;
+    rtcm_msg_ssr_phase_bias_sig signals[MAX_SSR_SIGNALS];
+} rtcm_msg_ssr_phase_bias_sat;
+
+typedef struct {
+    rtcm_msg_ssr_header header;
+    rtcm_msg_ssr_orbit_corr orbit[MAX_SSR_SATELLITES];
+    rtcm_msg_ssr_clock_corr clock[MAX_SSR_SATELLITES];
+} rtcm_msg_orbit_clock;
+
+typedef struct {
+    rtcm_msg_ssr_header header;
+    rtcm_msg_ssr_code_bias_sat sats[MAX_SSR_SATELLITES];
+} rtcm_msg_code_bias;
+
+typedef struct {
+    rtcm_msg_ssr_header header;
+    rtcm_msg_ssr_phase_bias_sat sats[MAX_SSR_SATELLITES];
+} rtcm_msg_phase_bias;
+
 #endif /* PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H */
