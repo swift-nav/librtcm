@@ -13,6 +13,10 @@
 #ifndef SWIFTNAV_RTCM3_DECODE_H
 #define SWIFTNAV_RTCM3_DECODE_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "rtcm3_messages.h"
 #include "rtcm3_msm_utils.h"
 
@@ -37,5 +41,9 @@ rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[],
                            const uint8_t glo_sv_id_fcn_map[],
                            rtcm_msm_message *msg);
 rtcm3_rc rtcm3_decode_msm7(const uint8_t buff[], rtcm_msm_message *msg_msm7);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SWIFTNAV_RTCM3_DECODE_H */
