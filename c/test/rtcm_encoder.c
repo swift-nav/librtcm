@@ -83,19 +83,19 @@ void encode_basic_freq_data(const rtcm_freq_data *freq_data,
   int32_t ppr = roundl(cp_pr * (GPS_C / freq) / 0.0005);
 
   if (fabs(freq - GPS_L1_HZ) < 0.01) {
-    setbitu(buff, *bit, 1, 0);
+    rtcm_setbitu(buff, *bit, 1, 0);
     *bit += 1;
-    setbitu(buff, *bit, 24, pr);
+    rtcm_setbitu(buff, *bit, 24, pr);
     *bit += 24;
   } else {
-    setbitu(buff, *bit, 2, 0);
+    rtcm_setbitu(buff, *bit, 2, 0);
     *bit += 2;
-    setbits(buff, *bit, 14, (int32_t)pr - (int32_t)calc_l1_pr);
+    rtcm_setbits(buff, *bit, 14, (int32_t)pr - (int32_t)calc_l1_pr);
     *bit += 14;
   }
-  setbits(buff, *bit, 20, ppr);
+  rtcm_setbits(buff, *bit, 20, ppr);
   *bit += 20;
-  setbitu(buff,
+  rtcm_setbitu(buff,
           *bit,
           7,
           freq_data->flags.valid_lock ? to_lock_ind(freq_data->lock) : 0);
@@ -135,21 +135,21 @@ void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data,
   int32_t ppr = roundl(cp_pr * (GPS_C / glo_freq) / 0.0005);
 
   if (L1) {
-    setbitu(buff, *bit, 1, 0);
+    rtcm_setbitu(buff, *bit, 1, 0);
     *bit += 1;
-    setbitu(buff, *bit, 5, fcn);
+    rtcm_setbitu(buff, *bit, 5, fcn);
     *bit += 5;
-    setbitu(buff, *bit, 25, pr);
+    rtcm_setbitu(buff, *bit, 25, pr);
     *bit += 25;
   } else {
-    setbitu(buff, *bit, 2, 0);
+    rtcm_setbitu(buff, *bit, 2, 0);
     *bit += 2;
-    setbits(buff, *bit, 14, (int32_t)pr - (int32_t)calc_l1_pr);
+    rtcm_setbits(buff, *bit, 14, (int32_t)pr - (int32_t)calc_l1_pr);
     *bit += 14;
   }
-  setbits(buff, *bit, 20, ppr);
+  rtcm_setbits(buff, *bit, 20, ppr);
   *bit += 20;
-  setbitu(buff,
+  rtcm_setbitu(buff,
           *bit,
           7,
           freq_data->flags.valid_lock ? to_lock_ind(freq_data->lock) : 0);
@@ -199,19 +199,19 @@ uint16_t rtcm3_write_header(const rtcm_obs_header *header,
                             uint8_t num_sats,
                             uint8_t buff[]) {
   uint16_t bit = 0;
-  setbitu(buff, bit, 12, header->msg_num);
+  rtcm_setbitu(buff, bit, 12, header->msg_num);
   bit += 12;
-  setbitu(buff, bit, 12, header->stn_id);
+  rtcm_setbitu(buff, bit, 12, header->stn_id);
   bit += 12;
-  setbitu(buff, bit, 30, (uint32_t)round(header->tow_ms));
+  rtcm_setbitu(buff, bit, 30, (uint32_t)round(header->tow_ms));
   bit += 30;
-  setbitu(buff, bit, 1, header->sync);
+  rtcm_setbitu(buff, bit, 1, header->sync);
   bit += 1;
-  setbitu(buff, bit, 5, num_sats);
+  rtcm_setbitu(buff, bit, 5, num_sats);
   bit += 5;
-  setbitu(buff, bit, 1, header->div_free);
+  rtcm_setbitu(buff, bit, 1, header->div_free);
   bit += 1;
-  setbitu(buff, bit, 3, header->smooth);
+  rtcm_setbitu(buff, bit, 3, header->smooth);
   bit += 3;
   return bit;
 }
@@ -259,19 +259,19 @@ uint16_t rtcm3_write_glo_header(const rtcm_obs_header *header,
                                 uint8_t num_sats,
                                 uint8_t buff[]) {
   uint16_t bit = 0;
-  setbitu(buff, bit, 12, header->msg_num);
+  rtcm_setbitu(buff, bit, 12, header->msg_num);
   bit += 12;
-  setbitu(buff, bit, 12, header->stn_id);
+  rtcm_setbitu(buff, bit, 12, header->stn_id);
   bit += 12;
-  setbitu(buff, bit, 27, (uint32_t)round(header->tow_ms));
+  rtcm_setbitu(buff, bit, 27, (uint32_t)round(header->tow_ms));
   bit += 27;
-  setbitu(buff, bit, 1, header->sync);
+  rtcm_setbitu(buff, bit, 1, header->sync);
   bit += 1;
-  setbitu(buff, bit, 5, num_sats);
+  rtcm_setbitu(buff, bit, 5, num_sats);
   bit += 5;
-  setbitu(buff, bit, 1, header->div_free);
+  rtcm_setbitu(buff, bit, 1, header->div_free);
   bit += 1;
-  setbitu(buff, bit, 3, header->smooth);
+  rtcm_setbitu(buff, bit, 3, header->smooth);
   bit += 3;
   return bit;
 }
@@ -283,7 +283,7 @@ uint16_t rtcm3_encode_1001(const rtcm_obs_message *msg_1001, uint8_t buff[]) {
   for (uint8_t i = 0; i < msg_1001->header.n_sat; i++) {
     if (msg_1001->sats[i].obs[L1_FREQ].flags.valid_pr &&
         msg_1001->sats[i].obs[L1_FREQ].flags.valid_cp) {
-      setbitu(buff, bit, 6, msg_1001->sats[i].svId);
+      rtcm_setbitu(buff, bit, 6, msg_1001->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1001->sats[i].obs[L1_FREQ],
                              GPS_L1_HZ,
@@ -319,7 +319,7 @@ uint16_t rtcm3_encode_1002(const rtcm_obs_message *msg_1002, uint8_t buff[]) {
   for (uint8_t i = 0; i < msg_1002->header.n_sat; i++) {
     if (msg_1002->sats[i].obs[L1_FREQ].flags.valid_pr &&
         msg_1002->sats[i].obs[L1_FREQ].flags.valid_cp) {
-      setbitu(buff, bit, 6, msg_1002->sats[i].svId);
+      rtcm_setbitu(buff, bit, 6, msg_1002->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1002->sats[i].obs[L1_FREQ],
                              GPS_L1_HZ,
@@ -331,9 +331,9 @@ uint16_t rtcm3_encode_1002(const rtcm_obs_message *msg_1002, uint8_t buff[]) {
       uint8_t amb =
           (uint8_t)(msg_1002->sats[i].obs[L1_FREQ].pseudorange / PRUNIT_GPS);
 
-      setbitu(buff, bit, 8, amb);
+      rtcm_setbitu(buff, bit, 8, amb);
       bit += 8;
-      setbitu(buff,
+      rtcm_setbitu(buff,
               bit,
               8,
               (uint8_t)roundl(msg_1002->sats[i].obs[L1_FREQ].cnr * 4.0));
@@ -357,7 +357,7 @@ uint16_t rtcm3_encode_1003(const rtcm_obs_message *msg_1003, uint8_t buff[]) {
     flag_bf l2_flags = msg_1003->sats[i].obs[L2_FREQ].flags;
     if (l1_flags.valid_pr && l1_flags.valid_cp && l2_flags.valid_pr &&
         l2_flags.valid_cp) {
-      setbitu(buff, bit, 6, msg_1003->sats[i].svId);
+      rtcm_setbitu(buff, bit, 6, msg_1003->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1003->sats[i].obs[L1_FREQ],
                              GPS_L1_HZ,
@@ -388,7 +388,7 @@ uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
     flag_bf l2_flags = msg_1004->sats[i].obs[L2_FREQ].flags;
     if (l1_flags.valid_pr && l1_flags.valid_cp && l2_flags.valid_pr &&
         l2_flags.valid_cp) {
-      setbitu(buff, bit, 6, msg_1004->sats[i].svId);
+      rtcm_setbitu(buff, bit, 6, msg_1004->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1004->sats[i].obs[L1_FREQ],
                              GPS_L1_HZ,
@@ -400,9 +400,9 @@ uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
       uint8_t amb =
           (uint8_t)(msg_1004->sats[i].obs[L1_FREQ].pseudorange / PRUNIT_GPS);
 
-      setbitu(buff, bit, 8, amb);
+      rtcm_setbitu(buff, bit, 8, amb);
       bit += 8;
-      setbitu(buff,
+      rtcm_setbitu(buff,
               bit,
               8,
               (uint8_t)roundl(msg_1004->sats[i].obs[L1_FREQ].cnr * 4.0));
@@ -413,7 +413,7 @@ uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
                              &msg_1004->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
-      setbitu(buff,
+      rtcm_setbitu(buff,
               bit,
               8,
               (uint8_t)roundl(msg_1004->sats[i].obs[L2_FREQ].cnr * 4.0));
@@ -431,29 +431,29 @@ uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
 uint16_t rtcm3_encode_1005_base(const rtcm_msg_1005 *msg_1005,
                                 uint8_t buff[],
                                 uint16_t *bit) {
-  setbitu(buff, *bit, 12, msg_1005->stn_id);
+  rtcm_setbitu(buff, *bit, 12, msg_1005->stn_id);
   *bit += 12;
-  setbitu(buff, *bit, 6, msg_1005->ITRF);
+  rtcm_setbitu(buff, *bit, 6, msg_1005->ITRF);
   *bit += 6;
-  setbitu(buff, *bit, 1, msg_1005->GPS_ind);
+  rtcm_setbitu(buff, *bit, 1, msg_1005->GPS_ind);
   *bit += 1;
-  setbitu(buff, *bit, 1, msg_1005->GLO_ind);
+  rtcm_setbitu(buff, *bit, 1, msg_1005->GLO_ind);
   *bit += 1;
-  setbitu(buff, *bit, 1, msg_1005->GAL_ind);
+  rtcm_setbitu(buff, *bit, 1, msg_1005->GAL_ind);
   *bit += 1;
-  setbitu(buff, *bit, 1, msg_1005->ref_stn_ind);
+  rtcm_setbitu(buff, *bit, 1, msg_1005->ref_stn_ind);
   *bit += 1;
-  setbitsl(buff, *bit, 38, (int64_t)roundl(msg_1005->arp_x * 10000.0));
+  rtcm_setbitsl(buff, *bit, 38, (int64_t)roundl(msg_1005->arp_x * 10000.0));
   *bit += 38;
-  setbitu(buff, *bit, 1, msg_1005->osc_ind);
+  rtcm_setbitu(buff, *bit, 1, msg_1005->osc_ind);
   *bit += 1;
-  setbitu(buff, *bit, 1, 0);
+  rtcm_setbitu(buff, *bit, 1, 0);
   *bit += 1;
-  setbitsl(buff, *bit, 38, (int64_t)roundl(msg_1005->arp_y * 10000.0));
+  rtcm_setbitsl(buff, *bit, 38, (int64_t)roundl(msg_1005->arp_y * 10000.0));
   *bit += 38;
-  setbitu(buff, *bit, 2, msg_1005->quart_cycle_ind);
+  rtcm_setbitu(buff, *bit, 2, msg_1005->quart_cycle_ind);
   *bit += 2;
-  setbitsl(buff, *bit, 38, (int64_t)roundl(msg_1005->arp_z * 10000.0));
+  rtcm_setbitsl(buff, *bit, 38, (int64_t)roundl(msg_1005->arp_z * 10000.0));
   *bit += 38;
 
   /* Round number of bits up to nearest whole byte. */
@@ -462,17 +462,17 @@ uint16_t rtcm3_encode_1005_base(const rtcm_msg_1005 *msg_1005,
 
 uint16_t rtcm3_encode_1005(const rtcm_msg_1005 *msg_1005, uint8_t buff[]) {
   uint16_t bit = 0;
-  setbitu(buff, bit, 12, 1005);
+  rtcm_setbitu(buff, bit, 12, 1005);
   bit += 12;
   return rtcm3_encode_1005_base(msg_1005, buff, &bit);
 }
 
 uint16_t rtcm3_encode_1006(const rtcm_msg_1006 *msg_1006, uint8_t buff[]) {
   uint16_t bit = 0;
-  setbitu(buff, bit, 12, 1006);
+  rtcm_setbitu(buff, bit, 12, 1006);
   bit += 12;
   rtcm3_encode_1005_base(&msg_1006->msg_1005, buff, &bit);
-  setbitu(buff, bit, 16, (uint16_t)roundl(msg_1006->ant_height * 10000.0));
+  rtcm_setbitu(buff, bit, 16, (uint16_t)roundl(msg_1006->ant_height * 10000.0));
   bit += 16;
 
   /* Round number of bits up to nearest whole byte. */
@@ -482,15 +482,15 @@ uint16_t rtcm3_encode_1006(const rtcm_msg_1006 *msg_1006, uint8_t buff[]) {
 uint16_t rtcm3_encode_1007_base(const rtcm_msg_1007 *msg_1007,
                                 uint8_t buff[],
                                 uint16_t *bit) {
-  setbitu(buff, *bit, 12, msg_1007->stn_id);
+  rtcm_setbitu(buff, *bit, 12, msg_1007->stn_id);
   *bit += 12;
-  setbitu(buff, *bit, 8, msg_1007->desc_count);
+  rtcm_setbitu(buff, *bit, 8, msg_1007->desc_count);
   *bit += 8;
   for (uint8_t i = 0; i < msg_1007->desc_count; ++i) {
-    setbitu(buff, *bit, 8, msg_1007->desc[i]);
+    rtcm_setbitu(buff, *bit, 8, msg_1007->desc[i]);
     *bit += 8;
   }
-  setbitu(buff, *bit, 8, msg_1007->ant_id);
+  rtcm_setbitu(buff, *bit, 8, msg_1007->ant_id);
   *bit += 8;
 
   /* Round number of bits up to nearest whole byte. */
@@ -499,20 +499,20 @@ uint16_t rtcm3_encode_1007_base(const rtcm_msg_1007 *msg_1007,
 
 uint16_t rtcm3_encode_1007(const rtcm_msg_1007 *msg_1007, uint8_t buff[]) {
   uint16_t bit = 0;
-  setbitu(buff, bit, 12, 1007);
+  rtcm_setbitu(buff, bit, 12, 1007);
   bit += 12;
   return rtcm3_encode_1007_base(msg_1007, buff, &bit);
 }
 
 uint16_t rtcm3_encode_1008(const rtcm_msg_1008 *msg_1008, uint8_t buff[]) {
   uint16_t bit = 0;
-  setbitu(buff, bit, 12, 1008);
+  rtcm_setbitu(buff, bit, 12, 1008);
   bit += 12;
   rtcm3_encode_1007_base(&msg_1008->msg_1007, buff, &bit);
-  setbitu(buff, bit, 8, msg_1008->serial_count);
+  rtcm_setbitu(buff, bit, 8, msg_1008->serial_count);
   bit += 8;
   for (uint8_t i = 0; i < msg_1008->serial_count; ++i) {
-    setbitu(buff, bit, 8, msg_1008->serial_num[i]);
+    rtcm_setbitu(buff, bit, 8, msg_1008->serial_num[i]);
     bit += 8;
   }
 
@@ -528,7 +528,7 @@ uint16_t rtcm3_encode_1010(const rtcm_obs_message *msg_1010, uint8_t buff[]) {
     if (msg_1010->sats[i].obs[L1_FREQ].flags.valid_pr &&
         msg_1010->sats[i].obs[L1_FREQ].flags.valid_cp) {
       const rtcm_sat_data *sat_obs = &msg_1010->sats[i];
-      setbitu(buff, bit, 6, sat_obs->svId);
+      rtcm_setbitu(buff, bit, 6, sat_obs->svId);
       bit += 6;
       encode_basic_glo_freq_data(&sat_obs->obs[L1_FREQ],
                                  GLO_L1_HZ,
@@ -540,9 +540,9 @@ uint16_t rtcm3_encode_1010(const rtcm_obs_message *msg_1010, uint8_t buff[]) {
       /* Calculate GPS Integer L1 Pseudorange Modulus Ambiguity (DF014). */
       uint8_t amb = (uint8_t)(sat_obs->obs[L1_FREQ].pseudorange / PRUNIT_GLO);
 
-      setbitu(buff, bit, 7, amb);
+      rtcm_setbitu(buff, bit, 7, amb);
       bit += 7;
-      setbitu(buff, bit, 8, (uint8_t)roundl(sat_obs->obs[L1_FREQ].cnr * 4.0));
+      rtcm_setbitu(buff, bit, 8, (uint8_t)roundl(sat_obs->obs[L1_FREQ].cnr * 4.0));
       bit += 8;
       ++num_sats;
     }
@@ -564,7 +564,7 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
     if (l1_flags.valid_pr && l1_flags.valid_cp && l2_flags.valid_pr &&
         l2_flags.valid_cp) {
       const rtcm_sat_data *sat_obs = &msg_1012->sats[i];
-      setbitu(buff, bit, 6, sat_obs->svId);
+      rtcm_setbitu(buff, bit, 6, sat_obs->svId);
       bit += 6;
       encode_basic_glo_freq_data(&sat_obs->obs[L1_FREQ],
                                  GLO_L1_HZ,
@@ -576,9 +576,9 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
       /* Calculate GLO Integer L1 Pseudorange Modulus Ambiguity (DF014). */
       uint8_t amb = (uint8_t)(sat_obs->obs[L1_FREQ].pseudorange / PRUNIT_GLO);
 
-      setbitu(buff, bit, 7, amb);
+      rtcm_setbitu(buff, bit, 7, amb);
       bit += 7;
-      setbitu(buff, bit, 8, (uint8_t)roundl(sat_obs->obs[L1_FREQ].cnr * 4.0));
+      rtcm_setbitu(buff, bit, 8, (uint8_t)roundl(sat_obs->obs[L1_FREQ].cnr * 4.0));
       bit += 8;
 
       encode_basic_glo_freq_data(&sat_obs->obs[L2_FREQ],
@@ -587,7 +587,7 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
                                  sat_obs->fcn,
                                  buff,
                                  &bit);
-      setbitu(buff, bit, 8, (uint8_t)roundl(sat_obs->obs[L2_FREQ].cnr * 4.0));
+      rtcm_setbitu(buff, bit, 8, (uint8_t)roundl(sat_obs->obs[L2_FREQ].cnr * 4.0));
       bit += 8;
       ++num_sats;
     }
@@ -602,19 +602,19 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
 uint16_t rtcm3_encode_1029(const rtcm_msg_1029 *msg_1029, uint8_t buff[]) {
   uint16_t bit = 0, byte = 0;
 
-  setbitu(buff, bit, 12, 1029);
+  rtcm_setbitu(buff, bit, 12, 1029);
   bit += 12;
 
-  setbitu(buff, bit, 12, msg_1029->stn_id);
+  rtcm_setbitu(buff, bit, 12, msg_1029->stn_id);
   bit += 12;
 
-  setbitu(buff, bit, 16, msg_1029->mjd_num);
+  rtcm_setbitu(buff, bit, 16, msg_1029->mjd_num);
   bit += 16;
 
-  setbitu(buff, bit, 17, msg_1029->utc_sec_of_day);
+  rtcm_setbitu(buff, bit, 17, msg_1029->utc_sec_of_day);
   bit += 17;
 
-  setbitu(buff, bit, 7, msg_1029->unicode_chars);
+  rtcm_setbitu(buff, bit, 7, msg_1029->unicode_chars);
   bit += 7;
 
   byte = bit / 8;
@@ -630,47 +630,47 @@ uint16_t rtcm3_encode_1029(const rtcm_msg_1029 *msg_1029, uint8_t buff[]) {
 
 uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t buff[]) {
   uint16_t bit = 0;
-  setbitu(buff, bit, 12, 1033);
+  rtcm_setbitu(buff, bit, 12, 1033);
   bit += 12;
 
-  setbitu(buff, bit, 12, msg_1033->stn_id);
+  rtcm_setbitu(buff, bit, 12, msg_1033->stn_id);
   bit += 12;
 
-  setbitu(buff, bit, 8, msg_1033->antenna_desc_counter);
+  rtcm_setbitu(buff, bit, 8, msg_1033->antenna_desc_counter);
   bit += 8;
   for (uint8_t i = 0; i < msg_1033->antenna_desc_counter; ++i) {
-    setbitu(buff, bit, 8, msg_1033->antenna_descriptor[i]);
+    rtcm_setbitu(buff, bit, 8, msg_1033->antenna_descriptor[i]);
     bit += 8;
   }
 
-  setbits(buff, bit, 8, msg_1033->antenna_setup_ID);
+  rtcm_setbits(buff, bit, 8, msg_1033->antenna_setup_ID);
   bit += 8;
 
-  setbitu(buff, bit, 8, msg_1033->antenna_serial_num_counter);
+  rtcm_setbitu(buff, bit, 8, msg_1033->antenna_serial_num_counter);
   bit += 8;
   for (uint8_t i = 0; i < msg_1033->antenna_serial_num_counter; ++i) {
-    setbitu(buff, bit, 8, msg_1033->antenna_serial_num[i]);
+    rtcm_setbitu(buff, bit, 8, msg_1033->antenna_serial_num[i]);
     bit += 8;
   }
 
-  setbitu(buff, bit, 8, msg_1033->rcv_descriptor_counter);
+  rtcm_setbitu(buff, bit, 8, msg_1033->rcv_descriptor_counter);
   bit += 8;
   for (uint8_t i = 0; i < msg_1033->rcv_descriptor_counter; ++i) {
-    setbitu(buff, bit, 8, msg_1033->rcv_descriptor[i]);
+    rtcm_setbitu(buff, bit, 8, msg_1033->rcv_descriptor[i]);
     bit += 8;
   }
 
-  setbitu(buff, bit, 8, msg_1033->rcv_fw_counter);
+  rtcm_setbitu(buff, bit, 8, msg_1033->rcv_fw_counter);
   bit += 8;
   for (uint8_t i = 0; i < msg_1033->rcv_fw_counter; ++i) {
-    setbitu(buff, bit, 8, msg_1033->rcv_fw_version[i]);
+    rtcm_setbitu(buff, bit, 8, msg_1033->rcv_fw_version[i]);
     bit += 8;
   }
 
-  setbitu(buff, bit, 8, msg_1033->rcv_serial_num_counter);
+  rtcm_setbitu(buff, bit, 8, msg_1033->rcv_serial_num_counter);
   bit += 8;
   for (uint8_t i = 0; i < msg_1033->rcv_serial_num_counter; ++i) {
-    setbitu(buff, bit, 8, msg_1033->rcv_serial_num[i]);
+    rtcm_setbitu(buff, bit, 8, msg_1033->rcv_serial_num[i]);
     bit += 8;
   }
   /* Round number of bits up to nearest whole byte. */
@@ -679,35 +679,35 @@ uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t buff[]) {
 
 uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t buff[]) {
   uint16_t bit = 0;
-  setbitu(buff, bit, 12, 1230);
+  rtcm_setbitu(buff, bit, 12, 1230);
   bit += 12;
-  setbitu(buff, bit, 12, msg_1230->stn_id);
+  rtcm_setbitu(buff, bit, 12, msg_1230->stn_id);
   bit += 12;
-  setbitu(buff, bit, 8, msg_1230->bias_indicator);
+  rtcm_setbitu(buff, bit, 8, msg_1230->bias_indicator);
   bit += 1;
   /* 3 reserved bits */
-  setbitu(buff, bit, 3, 0);
+  rtcm_setbitu(buff, bit, 3, 0);
   bit += 3;
-  setbitu(buff, bit, 4, msg_1230->fdma_signal_mask);
+  rtcm_setbitu(buff, bit, 4, msg_1230->fdma_signal_mask);
   bit += 4;
   if (msg_1230->fdma_signal_mask & 0x08) {
     int16_t bias = round(msg_1230->L1_CA_cpb_meter * 50);
-    setbits(buff, bit, 16, bias);
+    rtcm_setbits(buff, bit, 16, bias);
     bit += 16;
   }
   if (msg_1230->fdma_signal_mask & 0x04) {
     int16_t bias = round(msg_1230->L1_P_cpb_meter * 50);
-    setbits(buff, bit, 16, bias);
+    rtcm_setbits(buff, bit, 16, bias);
     bit += 16;
   }
   if (msg_1230->fdma_signal_mask & 0x02) {
     int16_t bias = round(msg_1230->L2_CA_cpb_meter * 50);
-    setbits(buff, bit, 16, bias);
+    rtcm_setbits(buff, bit, 16, bias);
     bit += 16;
   }
   if (msg_1230->fdma_signal_mask & 0x01) {
     int16_t bias = round(msg_1230->L2_P_cpb_meter * 50);
-    setbits(buff, bit, 16, bias);
+    rtcm_setbits(buff, bit, 16, bias);
     bit += 16;
   }
 
@@ -718,33 +718,33 @@ uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t buff[]) {
 static uint16_t rtcm3_encode_msm_header(const rtcm_msm_header *header,
                                         uint8_t buff[]) {
   uint16_t bit = 0;
-  setbitu(buff, bit, 12, header->msg_num);
+  rtcm_setbitu(buff, bit, 12, header->msg_num);
   bit += 12;
-  setbitu(buff, bit, 12, header->stn_id);
+  rtcm_setbitu(buff, bit, 12, header->stn_id);
   bit += 12;
-  setbitu(buff, bit, 30, header->tow_ms);
+  rtcm_setbitu(buff, bit, 30, header->tow_ms);
   bit += 30;
-  setbitu(buff, bit, 1, header->multiple);
+  rtcm_setbitu(buff, bit, 1, header->multiple);
   bit += 1;
-  setbitu(buff, bit, 3, header->iods);
+  rtcm_setbitu(buff, bit, 3, header->iods);
   bit += 3;
-  setbitu(buff, bit, 7, header->reserved);
+  rtcm_setbitu(buff, bit, 7, header->reserved);
   bit += 7;
-  setbitu(buff, bit, 2, header->steering);
+  rtcm_setbitu(buff, bit, 2, header->steering);
   bit += 2;
-  setbitu(buff, bit, 2, header->ext_clock);
+  rtcm_setbitu(buff, bit, 2, header->ext_clock);
   bit += 2;
-  setbitu(buff, bit, 1, header->div_free);
+  rtcm_setbitu(buff, bit, 1, header->div_free);
   bit += 1;
-  setbitu(buff, bit, 3, header->smooth);
+  rtcm_setbitu(buff, bit, 3, header->smooth);
   bit += 3;
 
   for (uint8_t i = 0; i < MSM_SATELLITE_MASK_SIZE; i++) {
-    setbitu(buff, bit, 1, header->satellite_mask[i]);
+    rtcm_setbitu(buff, bit, 1, header->satellite_mask[i]);
     bit++;
   }
   for (uint8_t i = 0; i < MSM_SIGNAL_MASK_SIZE; i++) {
-    setbitu(buff, bit, 1, header->signal_mask[i]);
+    rtcm_setbitu(buff, bit, 1, header->signal_mask[i]);
     bit++;
   }
   uint8_t num_sats =
@@ -754,7 +754,7 @@ static uint16_t rtcm3_encode_msm_header(const rtcm_msm_header *header,
   uint8_t cell_mask_size = num_sats * num_sigs;
 
   for (uint8_t i = 0; i < cell_mask_size; i++) {
-    setbitu(buff, bit, 1, header->cell_mask[i]);
+    rtcm_setbitu(buff, bit, 1, header->cell_mask[i]);
     bit++;
   }
 
@@ -770,9 +770,9 @@ static void encode_msm_fine_pseudoranges(const uint8_t num_cells,
   for (uint16_t i = 0; i < num_cells; i++) {
     if (flags[i].valid_pr) {
       double fine_pr_ms = fine_pr[i] / PRUNIT_GPS;
-      setbits(buff, *bit, 15, (int16_t)(fine_pr_ms / C_1_2P24));
+      rtcm_setbits(buff, *bit, 15, (int16_t)(fine_pr_ms / C_1_2P24));
     } else {
-      setbits(buff, *bit, 15, MSM_PR_INVALID);
+      rtcm_setbits(buff, *bit, 15, MSM_PR_INVALID);
     }
     *bit += 15;
   }
@@ -787,9 +787,9 @@ static void encode_msm_fine_phaseranges(const uint8_t num_cells,
   for (uint16_t i = 0; i < num_cells; i++) {
     if (flags[i].valid_cp) {
       double fine_carrier_ms = fine_cp[i] / PRUNIT_GPS;
-      setbits(buff, *bit, 22, (int32_t)(fine_carrier_ms / C_1_2P29));
+      rtcm_setbits(buff, *bit, 22, (int32_t)(fine_carrier_ms / C_1_2P29));
     } else {
-      setbits(buff, *bit, 22, (int32_t)MSM_CP_INVALID);
+      rtcm_setbits(buff, *bit, 22, (int32_t)MSM_CP_INVALID);
     }
     *bit += 22;
   }
@@ -803,9 +803,9 @@ static void encode_msm_lock_times(const uint8_t num_cells,
   /* DF402 */
   for (uint16_t i = 0; i < num_cells; i++) {
     if (flags[i].valid_lock) {
-      setbitu(buff, *bit, 4, to_msm_lock_ind(lock_time[i]));
+      rtcm_setbitu(buff, *bit, 4, to_msm_lock_ind(lock_time[i]));
     } else {
-      setbitu(buff, *bit, 4, 0);
+      rtcm_setbitu(buff, *bit, 4, 0);
     }
     *bit += 4;
   }
@@ -817,7 +817,7 @@ static void encode_msm_hca_indicators(const uint8_t num_cells,
                                       uint16_t *bit) {
   /* DF420 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    setbitu(buff, *bit, 1, hca_indicator[i]);
+    rtcm_setbitu(buff, *bit, 1, hca_indicator[i]);
     *bit += 1;
   }
 }
@@ -830,9 +830,9 @@ static void encode_msm_cnrs(const uint8_t num_cells,
   /* DF403 */
   for (uint16_t i = 0; i < num_cells; i++) {
     if (flags[i].valid_lock) {
-      setbitu(buff, *bit, 6, (uint8_t)cnr[i]);
+      rtcm_setbitu(buff, *bit, 6, (uint8_t)cnr[i]);
     } else {
-      setbitu(buff, *bit, 6, 0);
+      rtcm_setbitu(buff, *bit, 6, 0);
     }
     *bit += 6;
   }
@@ -847,9 +847,9 @@ static void encode_msm_fine_phaserangerates(const uint8_t num_cells,
   for (uint16_t i = 0; i < num_cells; i++) {
     if (flags[i].valid_dop) {
       double fine_range_rate = fine_dop[i] / 0.0001;
-      setbits(buff, *bit, 15, (int16_t)(fine_range_rate));
+      rtcm_setbits(buff, *bit, 15, (int16_t)(fine_range_rate));
     } else {
-      setbits(buff, *bit, 15, (int32_t)MSM_DOP_INVALID);
+      rtcm_setbits(buff, *bit, 15, (int32_t)MSM_DOP_INVALID);
     }
     *bit += 15;
   }
@@ -896,13 +896,13 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
   /* number of integer milliseconds, DF397 */
   for (uint8_t i = 0; i < num_sats; i++) {
     integer_ms[i] = (uint8_t)(msg->sats[i].rough_range_m / PRUNIT_GPS);
-    setbitu(buff, bit, 8, integer_ms[i]);
+    rtcm_setbitu(buff, bit, 8, integer_ms[i]);
     bit += 8;
   }
 
   if (MSM5 == msm_type || MSM7 == msm_type) {
     for (uint8_t i = 0; i < num_sats; i++) {
-      setbitu(buff, bit, 4, msg->sats[i].sat_info);
+      rtcm_setbitu(buff, bit, 4, msg->sats[i].sat_info);
       bit += 4;
     }
   }
@@ -913,7 +913,7 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
     /* remove integer ms part */
     double range_modulo_ms = pr - integer_ms[i];
     uint16_t range_modulo_encoded = (uint16_t)round(1024 * range_modulo_ms);
-    setbitu(buff, bit, 10, range_modulo_encoded);
+    rtcm_setbitu(buff, bit, 10, range_modulo_encoded);
     bit += 10;
 
     rough_range_m[i] =
@@ -924,7 +924,7 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
     for (uint8_t i = 0; i < num_sats; i++) {
       /* range rate, m/s, DF399*/
       double range_rate = round(msg->sats[i].rough_range_rate_m_s);
-      setbits(buff, bit, 14, (int16_t)range_rate);
+      rtcm_setbits(buff, bit, 14, (int16_t)range_rate);
       bit += 14;
 
       rough_rate_m_s[i] = range_rate;

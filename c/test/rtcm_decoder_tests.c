@@ -1563,12 +1563,12 @@ void test_rtcm_random_bits(void) {
 
     /* fill the message number in the range from 1070 to 1200 */
     uint16_t msg_num = 1070 + (rand() % 130);
-    setbitu(buff, 0, 12, msg_num);
+    rtcm_setbitu(buff, 0, 12, msg_num);
 
     /* add more zeros to satellite and signal masks to make them plausible */
     for (uint16_t bit = 73; bit < 170; bit++) {
       if ((double)rand() / RAND_MAX < 0.5) {
-        setbitu(buff, bit, 1, 0);
+        rtcm_setbitu(buff, bit, 1, 0);
       }
     }
 

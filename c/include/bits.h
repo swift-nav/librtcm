@@ -19,14 +19,14 @@ extern "C" {
 
 #include <stdint.h>
 
-uint32_t getbitu(const uint8_t *buff, uint32_t pos, uint8_t len);
-uint64_t getbitul(const uint8_t *buff, uint32_t pos, uint8_t len);
-int32_t getbits(const uint8_t *buff, uint32_t pos, uint8_t len);
-int64_t getbitsl(const uint8_t *buff, uint32_t pos, uint8_t len);
-void setbitu(uint8_t *buff, uint32_t pos, uint32_t len, uint32_t data);
-void setbitul(uint8_t *buff, uint32_t pos, uint32_t len, uint64_t data);
-void setbits(uint8_t *buff, uint32_t pos, uint32_t len, int32_t data);
-void setbitsl(uint8_t *buff, uint32_t pos, uint32_t len, int64_t data);
+uint32_t rtcm_getbitu(const uint8_t *buff, uint32_t pos, uint8_t len);
+uint64_t rtcm_getbitul(const uint8_t *buff, uint32_t pos, uint8_t len);
+int32_t rtcm_getbits(const uint8_t *buff, uint32_t pos, uint8_t len);
+int64_t rtcm_getbitsl(const uint8_t *buff, uint32_t pos, uint8_t len);
+void rtcm_setbitu(uint8_t *buff, uint32_t pos, uint32_t len, uint32_t data);
+void rtcm_setbitul(uint8_t *buff, uint32_t pos, uint32_t len, uint64_t data);
+void rtcm_setbits(uint8_t *buff, uint32_t pos, uint32_t len, int32_t data);
+void rtcm_setbitsl(uint8_t *buff, uint32_t pos, uint32_t len, int64_t data);
 
 #ifdef __cplusplus
 }

@@ -74,14 +74,14 @@ void decode_basic_gps_l1_freq_data(const uint8_t buff[],
                                    rtcm_freq_data *freq_data,
                                    uint32_t *pr,
                                    int32_t *phr_pr_diff) {
-  freq_data->code = getbitu(buff, *bit, 1);
+  freq_data->code = rtcm_getbitu(buff, *bit, 1);
   *bit += 1;
-  *pr = getbitu(buff, *bit, 24);
+  *pr = rtcm_getbitu(buff, *bit, 24);
   *bit += 24;
-  *phr_pr_diff = getbits(buff, *bit, 20);
+  *phr_pr_diff = rtcm_getbits(buff, *bit, 20);
   *bit += 20;
 
-  freq_data->lock = from_lock_ind(getbitu(buff, *bit, 7));
+  freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
   *bit += 7;
   freq_data->flags.valid_lock = 1;
 
@@ -94,15 +94,15 @@ void decode_basic_glo_l1_freq_data(const uint8_t buff[],
                                    uint32_t *pr,
                                    int32_t *phr_pr_diff,
                                    uint8_t *fcn) {
-  freq_data->code = getbitu(buff, *bit, 1);
+  freq_data->code = rtcm_getbitu(buff, *bit, 1);
   *bit += 1;
-  *fcn = getbitu(buff, *bit, 5);
+  *fcn = rtcm_getbitu(buff, *bit, 5);
   *bit += 5;
-  *pr = getbitu(buff, *bit, 25);
+  *pr = rtcm_getbitu(buff, *bit, 25);
   *bit += 25;
-  *phr_pr_diff = getbits(buff, *bit, 20);
+  *phr_pr_diff = rtcm_getbits(buff, *bit, 20);
   *bit += 20;
-  freq_data->lock = from_lock_ind(getbitu(buff, *bit, 7));
+  freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
   *bit += 7;
   freq_data->flags.valid_lock = 1;
   return;
@@ -113,14 +113,14 @@ void decode_basic_l2_freq_data(const uint8_t buff[],
                                rtcm_freq_data *freq_data,
                                int32_t *pr,
                                int32_t *phr_pr_diff) {
-  freq_data->code = getbitu(buff, *bit, 2);
+  freq_data->code = rtcm_getbitu(buff, *bit, 2);
   *bit += 2;
-  *pr = getbits(buff, *bit, 14);
+  *pr = rtcm_getbits(buff, *bit, 14);
   *bit += 14;
-  *phr_pr_diff = getbits(buff, *bit, 20);
+  *phr_pr_diff = rtcm_getbits(buff, *bit, 20);
   *bit += 20;
 
-  freq_data->lock = from_lock_ind(getbitu(buff, *bit, 7));
+  freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
   *bit += 7;
   freq_data->flags.valid_lock = 1;
 
@@ -129,38 +129,38 @@ void decode_basic_l2_freq_data(const uint8_t buff[],
 
 uint16_t rtcm3_read_header(const uint8_t buff[], rtcm_obs_header *header) {
   uint16_t bit = 0;
-  header->msg_num = getbitu(buff, bit, 12);
+  header->msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
-  header->stn_id = getbitu(buff, bit, 12);
+  header->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
-  header->tow_ms = getbitu(buff, bit, 30);
+  header->tow_ms = rtcm_getbitu(buff, bit, 30);
   bit += 30;
-  header->sync = getbitu(buff, bit, 1);
+  header->sync = rtcm_getbitu(buff, bit, 1);
   bit += 1;
-  header->n_sat = getbitu(buff, bit, 5);
+  header->n_sat = rtcm_getbitu(buff, bit, 5);
   bit += 5;
-  header->div_free = getbitu(buff, bit, 1);
+  header->div_free = rtcm_getbitu(buff, bit, 1);
   bit += 1;
-  header->smooth = getbitu(buff, bit, 3);
+  header->smooth = rtcm_getbitu(buff, bit, 3);
   bit += 3;
   return bit;
 }
 
 uint16_t rtcm3_read_glo_header(const uint8_t buff[], rtcm_obs_header *header) {
   uint16_t bit = 0;
-  header->msg_num = getbitu(buff, bit, 12);
+  header->msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
-  header->stn_id = getbitu(buff, bit, 12);
+  header->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
-  header->tow_ms = getbitu(buff, bit, 27);
+  header->tow_ms = rtcm_getbitu(buff, bit, 27);
   bit += 27;
-  header->sync = getbitu(buff, bit, 1);
+  header->sync = rtcm_getbitu(buff, bit, 1);
   bit += 1;
-  header->n_sat = getbitu(buff, bit, 5);
+  header->n_sat = rtcm_getbitu(buff, bit, 5);
   bit += 5;
-  header->div_free = getbitu(buff, bit, 1);
+  header->div_free = rtcm_getbitu(buff, bit, 1);
   bit += 1;
-  header->smooth = getbitu(buff, bit, 3);
+  header->smooth = rtcm_getbitu(buff, bit, 3);
   bit += 3;
   return bit;
 }
@@ -178,47 +178,47 @@ static uint16_t rtcm3_read_msm_header(const uint8_t buff[],
                                       const constellation_t cons,
                                       rtcm_msm_header *header) {
   uint16_t bit = 0;
-  header->msg_num = getbitu(buff, bit, 12);
+  header->msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
-  header->stn_id = getbitu(buff, bit, 12);
+  header->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
   if (CONSTELLATION_GLO == cons) {
     /* skip the day of week, it is handled in gnss_converters */
     bit += 3;
     /* for GLONASS, the epoch time is the time of day in ms */
-    header->tow_ms = getbitu(buff, bit, 27);
+    header->tow_ms = rtcm_getbitu(buff, bit, 27);
     bit += 27;
   } else if (CONSTELLATION_BDS2) {
     /* Beidou time can be negative (at least for some Septentrio base stations),
      * so normalize it first */
-    header->tow_ms = normalize_bds2_tow(getbitu(buff, bit, 30));
+    header->tow_ms = normalize_bds2_tow(rtcm_getbitu(buff, bit, 30));
     bit += 30;
   } else {
     /* for other systems, epoch time is the time of week in ms */
-    header->tow_ms = getbitu(buff, bit, 30);
+    header->tow_ms = rtcm_getbitu(buff, bit, 30);
     bit += 30;
   }
-  header->multiple = getbitu(buff, bit, 1);
+  header->multiple = rtcm_getbitu(buff, bit, 1);
   bit += 1;
-  header->iods = getbitu(buff, bit, 3);
+  header->iods = rtcm_getbitu(buff, bit, 3);
   bit += 3;
-  header->reserved = getbitu(buff, bit, 7);
+  header->reserved = rtcm_getbitu(buff, bit, 7);
   bit += 7;
-  header->steering = getbitu(buff, bit, 2);
+  header->steering = rtcm_getbitu(buff, bit, 2);
   bit += 2;
-  header->ext_clock = getbitu(buff, bit, 2);
+  header->ext_clock = rtcm_getbitu(buff, bit, 2);
   bit += 2;
-  header->div_free = getbitu(buff, bit, 1);
+  header->div_free = rtcm_getbitu(buff, bit, 1);
   bit += 1;
-  header->smooth = getbitu(buff, bit, 3);
+  header->smooth = rtcm_getbitu(buff, bit, 3);
   bit += 3;
 
   for (uint8_t i = 0; i < MSM_SATELLITE_MASK_SIZE; i++) {
-    header->satellite_mask[i] = getbitu(buff, bit, 1);
+    header->satellite_mask[i] = rtcm_getbitu(buff, bit, 1);
     bit++;
   }
   for (uint8_t i = 0; i < MSM_SIGNAL_MASK_SIZE; i++) {
-    header->signal_mask[i] = getbitu(buff, bit, 1);
+    header->signal_mask[i] = rtcm_getbitu(buff, bit, 1);
     bit++;
   }
   uint8_t num_sats =
@@ -228,7 +228,7 @@ static uint16_t rtcm3_read_msm_header(const uint8_t buff[],
   uint8_t cell_mask_size = num_sats * num_sigs;
 
   for (uint8_t i = 0; i < cell_mask_size; i++) {
-    header->cell_mask[i] = getbitu(buff, bit, 1);
+    header->cell_mask[i] = rtcm_getbitu(buff, bit, 1);
     bit++;
   }
   return bit;
@@ -280,7 +280,7 @@ uint8_t construct_L2_phase(rtcm_freq_data *l2_freq_data,
 uint8_t get_cnr(rtcm_freq_data *freq_data,
                 const uint8_t buff[],
                 uint16_t *bit) {
-  uint8_t cnr = getbitu(buff, *bit, 8);
+  uint8_t cnr = rtcm_getbitu(buff, *bit, 8);
   *bit += 8;
   if (cnr == 0) {
     return 0;
@@ -311,7 +311,7 @@ rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001) {
   for (uint8_t i = 0; i < msg_1001->header.n_sat; i++) {
     init_sat_data(&msg_1001->sats[i]);
 
-    msg_1001->sats[i].svId = getbitu(buff, bit, 6);
+    msg_1001->sats[i].svId = rtcm_getbitu(buff, bit, 6);
     bit += 6;
 
     rtcm_freq_data *l1_freq_data = &msg_1001->sats[i].obs[L1_FREQ];
@@ -351,7 +351,7 @@ rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
   for (uint8_t i = 0; i < msg_1002->header.n_sat; i++) {
     init_sat_data(&msg_1002->sats[i]);
 
-    msg_1002->sats[i].svId = getbitu(buff, bit, 6);
+    msg_1002->sats[i].svId = rtcm_getbitu(buff, bit, 6);
     bit += 6;
 
     rtcm_freq_data *l1_freq_data = &msg_1002->sats[i].obs[L1_FREQ];
@@ -361,7 +361,7 @@ rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
     decode_basic_gps_l1_freq_data(
         buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff);
 
-    uint8_t amb = getbitu(buff, bit, 8);
+    uint8_t amb = rtcm_getbitu(buff, bit, 8);
     bit += 8;
     l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
     l1_freq_data->flags.valid_pr =
@@ -395,7 +395,7 @@ rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
   for (uint8_t i = 0; i < msg_1003->header.n_sat; i++) {
     init_sat_data(&msg_1003->sats[i]);
 
-    msg_1003->sats[i].svId = getbitu(buff, bit, 6);
+    msg_1003->sats[i].svId = rtcm_getbitu(buff, bit, 6);
     bit += 6;
 
     rtcm_freq_data *l1_freq_data = &msg_1003->sats[i].obs[L1_FREQ];
@@ -445,7 +445,7 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
   for (uint8_t i = 0; i < msg_1004->header.n_sat; i++) {
     init_sat_data(&msg_1004->sats[i]);
 
-    msg_1004->sats[i].svId = getbitu(buff, bit, 6);
+    msg_1004->sats[i].svId = rtcm_getbitu(buff, bit, 6);
     bit += 6;
 
     rtcm_freq_data *l1_freq_data = &msg_1004->sats[i].obs[L1_FREQ];
@@ -456,7 +456,7 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
     decode_basic_gps_l1_freq_data(
         buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff);
 
-    uint8_t amb = getbitu(buff, bit, 8);
+    uint8_t amb = rtcm_getbitu(buff, bit, 8);
     bit += 8;
 
     l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
@@ -482,29 +482,29 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
 rtcm3_rc rtcm3_decode_1005_base(const uint8_t buff[],
                                 rtcm_msg_1005 *msg_1005,
                                 uint16_t *bit) {
-  msg_1005->stn_id = getbitu(buff, *bit, 12);
+  msg_1005->stn_id = rtcm_getbitu(buff, *bit, 12);
   *bit += 12;
-  msg_1005->ITRF = getbitu(buff, *bit, 6);
+  msg_1005->ITRF = rtcm_getbitu(buff, *bit, 6);
   *bit += 6;
-  msg_1005->GPS_ind = getbitu(buff, *bit, 1);
+  msg_1005->GPS_ind = rtcm_getbitu(buff, *bit, 1);
   *bit += 1;
-  msg_1005->GLO_ind = getbitu(buff, *bit, 1);
+  msg_1005->GLO_ind = rtcm_getbitu(buff, *bit, 1);
   *bit += 1;
-  msg_1005->GAL_ind = getbitu(buff, *bit, 1);
+  msg_1005->GAL_ind = rtcm_getbitu(buff, *bit, 1);
   *bit += 1;
-  msg_1005->ref_stn_ind = getbitu(buff, *bit, 1);
+  msg_1005->ref_stn_ind = rtcm_getbitu(buff, *bit, 1);
   *bit += 1;
-  msg_1005->arp_x = (double)(getbitsl(buff, *bit, 38)) / 10000.0;
+  msg_1005->arp_x = (double)(rtcm_getbitsl(buff, *bit, 38)) / 10000.0;
   *bit += 38;
-  msg_1005->osc_ind = getbitu(buff, *bit, 1);
+  msg_1005->osc_ind = rtcm_getbitu(buff, *bit, 1);
   *bit += 1;
-  getbitu(buff, *bit, 1);
+  rtcm_getbitu(buff, *bit, 1);
   *bit += 1;
-  msg_1005->arp_y = (double)(getbitsl(buff, *bit, 38)) / 10000.0;
+  msg_1005->arp_y = (double)(rtcm_getbitsl(buff, *bit, 38)) / 10000.0;
   *bit += 38;
-  msg_1005->quart_cycle_ind = getbitu(buff, *bit, 2);
+  msg_1005->quart_cycle_ind = rtcm_getbitu(buff, *bit, 2);
   *bit += 2;
-  msg_1005->arp_z = (double)(getbitsl(buff, *bit, 38)) / 10000.0;
+  msg_1005->arp_z = (double)(rtcm_getbitsl(buff, *bit, 38)) / 10000.0;
   *bit += 38;
 
   return RC_OK;
@@ -519,7 +519,7 @@ rtcm3_rc rtcm3_decode_1005_base(const uint8_t buff[],
  */
 rtcm3_rc rtcm3_decode_1005(const uint8_t buff[], rtcm_msg_1005 *msg_1005) {
   uint16_t bit = 0;
-  uint16_t msg_num = getbitu(buff, bit, 12);
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
   if (msg_num != 1005) /* Unexpected message type. */
@@ -538,14 +538,14 @@ rtcm3_rc rtcm3_decode_1005(const uint8_t buff[], rtcm_msg_1005 *msg_1005) {
  */
 rtcm3_rc rtcm3_decode_1006(const uint8_t buff[], rtcm_msg_1006 *msg_1006) {
   uint16_t bit = 0;
-  uint16_t msg_num = getbitu(buff, bit, 12);
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
   if (msg_num != 1006) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
 
   rtcm3_decode_1005_base(buff, &msg_1006->msg_1005, &bit);
-  msg_1006->ant_height = (double)(getbitu(buff, bit, 16)) / 10000.0;
+  msg_1006->ant_height = (double)(rtcm_getbitu(buff, bit, 16)) / 10000.0;
   bit += 16;
   return RC_OK;
 }
@@ -553,15 +553,15 @@ rtcm3_rc rtcm3_decode_1006(const uint8_t buff[], rtcm_msg_1006 *msg_1006) {
 rtcm3_rc rtcm3_decode_1007_base(const uint8_t buff[],
                                 rtcm_msg_1007 *msg_1007,
                                 uint16_t *bit) {
-  msg_1007->stn_id = getbitu(buff, *bit, 12);
+  msg_1007->stn_id = rtcm_getbitu(buff, *bit, 12);
   *bit += 12;
-  msg_1007->desc_count = getbitu(buff, *bit, 8);
+  msg_1007->desc_count = rtcm_getbitu(buff, *bit, 8);
   *bit += 8;
   for (uint8_t i = 0; i < msg_1007->desc_count; ++i) {
-    msg_1007->desc[i] = getbitu(buff, *bit, 8);
+    msg_1007->desc[i] = rtcm_getbitu(buff, *bit, 8);
     *bit += 8;
   }
-  msg_1007->ant_id = getbitu(buff, *bit, 8);
+  msg_1007->ant_id = rtcm_getbitu(buff, *bit, 8);
   *bit += 8;
 
   return RC_OK;
@@ -576,7 +576,7 @@ rtcm3_rc rtcm3_decode_1007_base(const uint8_t buff[],
  */
 rtcm3_rc rtcm3_decode_1007(const uint8_t buff[], rtcm_msg_1007 *msg_1007) {
   uint16_t bit = 0;
-  uint16_t msg_num = getbitu(buff, bit, 12);
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
   if (msg_num != 1007) /* Unexpected message type. */
@@ -596,17 +596,17 @@ rtcm3_rc rtcm3_decode_1007(const uint8_t buff[], rtcm_msg_1007 *msg_1007) {
  */
 rtcm3_rc rtcm3_decode_1008(const uint8_t buff[], rtcm_msg_1008 *msg_1008) {
   uint16_t bit = 0;
-  uint16_t msg_num = getbitu(buff, bit, 12);
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
   if (msg_num != 1008) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
 
   rtcm3_decode_1007_base(buff, &msg_1008->msg_1007, &bit);
-  msg_1008->serial_count = getbitu(buff, bit, 8);
+  msg_1008->serial_count = rtcm_getbitu(buff, bit, 8);
   bit += 8;
   for (uint8_t i = 0; i < msg_1008->serial_count; ++i) {
-    msg_1008->serial_num[i] = getbitu(buff, bit, 8);
+    msg_1008->serial_num[i] = rtcm_getbitu(buff, bit, 8);
     bit += 8;
   }
   return RC_OK;
@@ -634,7 +634,7 @@ rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
   for (uint8_t i = 0; i < msg_1010->header.n_sat; i++) {
     init_sat_data(&msg_1010->sats[i]);
 
-    msg_1010->sats[i].svId = getbitu(buff, bit, 6);
+    msg_1010->sats[i].svId = rtcm_getbitu(buff, bit, 6);
     bit += 6;
 
     rtcm_freq_data *l1_freq_data = &msg_1010->sats[i].obs[L1_FREQ];
@@ -644,7 +644,7 @@ rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
     decode_basic_glo_l1_freq_data(
         buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff, &msg_1010->sats[i].fcn);
 
-    uint8_t amb = getbitu(buff, bit, 7);
+    uint8_t amb = rtcm_getbitu(buff, bit, 7);
     bit += 7;
 
     l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
@@ -683,7 +683,7 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
   for (uint8_t i = 0; i < msg_1012->header.n_sat; i++) {
     init_sat_data(&msg_1012->sats[i]);
 
-    msg_1012->sats[i].svId = getbitu(buff, bit, 6);
+    msg_1012->sats[i].svId = rtcm_getbitu(buff, bit, 6);
     bit += 6;
 
     rtcm_freq_data *l1_freq_data = &msg_1012->sats[i].obs[L1_FREQ];
@@ -694,7 +694,7 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
     decode_basic_glo_l1_freq_data(
         buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff, &msg_1012->sats[i].fcn);
 
-    uint8_t amb = getbitu(buff, bit, 7);
+    uint8_t amb = rtcm_getbitu(buff, bit, 7);
     bit += 7;
 
     int8_t glo_fcn = msg_1012->sats[i].fcn - MT1012_GLO_FCN_OFFSET;
@@ -732,28 +732,28 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
  */
 rtcm3_rc rtcm3_decode_1029(const uint8_t buff[], rtcm_msg_1029 *msg_1029) {
   uint16_t bit = 0;
-  uint16_t msg_num = getbitu(buff, bit, 12);
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
   if (msg_num != 1029) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
 
-  msg_1029->stn_id = getbitu(buff, bit, 12);
+  msg_1029->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
-  msg_1029->mjd_num = getbitu(buff, bit, 16);
+  msg_1029->mjd_num = rtcm_getbitu(buff, bit, 16);
   bit += 16;
 
-  msg_1029->utc_sec_of_day = getbitu(buff, bit, 17);
+  msg_1029->utc_sec_of_day = rtcm_getbitu(buff, bit, 17);
   bit += 17;
 
-  msg_1029->unicode_chars = getbitu(buff, bit, 7);
+  msg_1029->unicode_chars = rtcm_getbitu(buff, bit, 7);
   bit += 7;
 
-  msg_1029->utf8_code_units_n = getbitu(buff, bit, 8);
+  msg_1029->utf8_code_units_n = rtcm_getbitu(buff, bit, 8);
   bit += 8;
   for (uint8_t i = 0; i < msg_1029->utf8_code_units_n; ++i) {
-    msg_1029->utf8_code_units[i] = getbitu(buff, bit, 8);
+    msg_1029->utf8_code_units[i] = rtcm_getbitu(buff, bit, 8);
     bit += 8;
   }
 
@@ -769,50 +769,50 @@ rtcm3_rc rtcm3_decode_1029(const uint8_t buff[], rtcm_msg_1029 *msg_1029) {
  */
 rtcm3_rc rtcm3_decode_1033(const uint8_t buff[], rtcm_msg_1033 *msg_1033) {
   uint16_t bit = 0;
-  uint16_t msg_num = getbitu(buff, bit, 12);
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
   if (msg_num != 1033) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
 
-  msg_1033->stn_id = getbitu(buff, bit, 12);
+  msg_1033->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
-  msg_1033->antenna_desc_counter = getbitu(buff, bit, 8);
+  msg_1033->antenna_desc_counter = rtcm_getbitu(buff, bit, 8);
   bit += 8;
   for (uint8_t i = 0; i < msg_1033->antenna_desc_counter; ++i) {
-    msg_1033->antenna_descriptor[i] = getbitu(buff, bit, 8);
+    msg_1033->antenna_descriptor[i] = rtcm_getbitu(buff, bit, 8);
     bit += 8;
   }
 
-  msg_1033->antenna_setup_ID = getbitu(buff, bit, 8);
+  msg_1033->antenna_setup_ID = rtcm_getbitu(buff, bit, 8);
   bit += 8;
 
-  msg_1033->antenna_serial_num_counter = getbitu(buff, bit, 8);
+  msg_1033->antenna_serial_num_counter = rtcm_getbitu(buff, bit, 8);
   bit += 8;
   for (uint8_t i = 0; i < msg_1033->antenna_serial_num_counter; ++i) {
-    msg_1033->antenna_serial_num[i] = getbitu(buff, bit, 8);
+    msg_1033->antenna_serial_num[i] = rtcm_getbitu(buff, bit, 8);
     bit += 8;
   }
 
-  msg_1033->rcv_descriptor_counter = getbitu(buff, bit, 8);
+  msg_1033->rcv_descriptor_counter = rtcm_getbitu(buff, bit, 8);
   bit += 8;
   for (uint8_t i = 0; i < msg_1033->rcv_descriptor_counter; ++i) {
-    msg_1033->rcv_descriptor[i] = getbitu(buff, bit, 8);
+    msg_1033->rcv_descriptor[i] = rtcm_getbitu(buff, bit, 8);
     bit += 8;
   }
 
-  msg_1033->rcv_fw_counter = getbitu(buff, bit, 8);
+  msg_1033->rcv_fw_counter = rtcm_getbitu(buff, bit, 8);
   bit += 8;
   for (uint8_t i = 0; i < msg_1033->rcv_fw_counter; ++i) {
-    msg_1033->rcv_fw_version[i] = getbitu(buff, bit, 8);
+    msg_1033->rcv_fw_version[i] = rtcm_getbitu(buff, bit, 8);
     bit += 8;
   }
 
-  msg_1033->rcv_serial_num_counter = getbitu(buff, bit, 8);
+  msg_1033->rcv_serial_num_counter = rtcm_getbitu(buff, bit, 8);
   bit += 8;
   for (uint8_t i = 0; i < msg_1033->rcv_serial_num_counter; ++i) {
-    msg_1033->rcv_serial_num[i] = getbitu(buff, bit, 8);
+    msg_1033->rcv_serial_num[i] = rtcm_getbitu(buff, bit, 8);
     bit += 8;
   }
 
@@ -828,34 +828,34 @@ rtcm3_rc rtcm3_decode_1033(const uint8_t buff[], rtcm_msg_1033 *msg_1033) {
  */
 rtcm3_rc rtcm3_decode_1230(const uint8_t buff[], rtcm_msg_1230 *msg_1230) {
   uint16_t bit = 0;
-  uint16_t msg_num = getbitu(buff, bit, 12);
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
   if (msg_num != 1230) /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
 
-  msg_1230->stn_id = getbitu(buff, bit, 12);
+  msg_1230->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
-  msg_1230->bias_indicator = getbitu(buff, bit, 1);
+  msg_1230->bias_indicator = rtcm_getbitu(buff, bit, 1);
   bit += 1;
   /* 3 Reserved bits */
   bit += 3;
-  msg_1230->fdma_signal_mask = getbitu(buff, bit, 4);
+  msg_1230->fdma_signal_mask = rtcm_getbitu(buff, bit, 4);
   bit += 4;
   if (msg_1230->fdma_signal_mask & 0x08) {
-    msg_1230->L1_CA_cpb_meter = getbits(buff, bit, 16) * 0.02;
+    msg_1230->L1_CA_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
   if (msg_1230->fdma_signal_mask & 0x04) {
-    msg_1230->L1_P_cpb_meter = getbits(buff, bit, 16) * 0.02;
+    msg_1230->L1_P_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
   if (msg_1230->fdma_signal_mask & 0x02) {
-    msg_1230->L2_CA_cpb_meter = getbits(buff, bit, 16) * 0.02;
+    msg_1230->L2_CA_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
   if (msg_1230->fdma_signal_mask & 0x01) {
-    msg_1230->L2_P_cpb_meter = getbits(buff, bit, 16) * 0.02;
+    msg_1230->L2_P_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
     bit += 16;
   }
 
@@ -874,7 +874,7 @@ static void decode_msm_sat_data(const uint8_t buff[],
                                 uint16_t *bit) {
   /* number of integer milliseconds, DF397 */
   for (uint8_t i = 0; i < num_sats; i++) {
-    uint32_t range_ms = getbitu(buff, *bit, 8);
+    uint32_t range_ms = rtcm_getbitu(buff, *bit, 8);
     *bit += 8;
     rough_range[i] = (double)range_ms * PRUNIT_GPS;
     rough_range_valid[i] = (MSM_ROUGH_RANGE_INVALID != range_ms);
@@ -883,7 +883,7 @@ static void decode_msm_sat_data(const uint8_t buff[],
   /* satellite info (constellation-dependent)*/
   for (uint8_t i = 0; i < num_sats; i++) {
     if (MSM5 == msm_type || MSM7 == msm_type) {
-      sat_info[i] = getbitu(buff, *bit, 4);
+      sat_info[i] = rtcm_getbitu(buff, *bit, 4);
       *bit += 4;
       sat_info_valid[i] = true;
     } else {
@@ -894,7 +894,7 @@ static void decode_msm_sat_data(const uint8_t buff[],
 
   /* rough range modulo 1 ms, DF398 */
   for (uint8_t i = 0; i < num_sats; i++) {
-    uint32_t rough_pr = getbitu(buff, *bit, 10);
+    uint32_t rough_pr = rtcm_getbitu(buff, *bit, 10);
     *bit += 10;
     if (rough_range_valid[i]) {
       rough_range[i] += (double)rough_pr / 1024 * PRUNIT_GPS;
@@ -904,7 +904,7 @@ static void decode_msm_sat_data(const uint8_t buff[],
   /* range rate, m/s, DF399*/
   for (uint8_t i = 0; i < num_sats; i++) {
     if (MSM5 == msm_type || MSM7 == msm_type) {
-      int16_t rate = getbits(buff, *bit, 14);
+      int16_t rate = rtcm_getbits(buff, *bit, 14);
       *bit += 14;
       rough_rate[i] = (double)rate;
       rough_rate_valid[i] = (MSM_ROUGH_RANGE_INVALID != rate);
@@ -922,7 +922,7 @@ static void decode_msm_fine_pseudoranges(const uint8_t buff[],
                                          uint16_t *bit) {
   /* DF400 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    int16_t decoded = (int16_t)getbits(buff, *bit, 15);
+    int16_t decoded = (int16_t)rtcm_getbits(buff, *bit, 15);
     *bit += 15;
     flags[i].valid_pr = (decoded != MSM_PR_INVALID);
     fine_pr[i] = (double)decoded * C_1_2P24 * PRUNIT_GPS;
@@ -936,7 +936,7 @@ static void decode_msm_fine_pseudoranges_extended(const uint8_t buff[],
                                                   uint16_t *bit) {
   /* DF405 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    int32_t decoded = (int32_t)getbitsl(buff, *bit, 20);
+    int32_t decoded = (int32_t)rtcm_getbitsl(buff, *bit, 20);
     *bit += 20;
     flags[i].valid_pr = (decoded != MSM_PR_EXT_INVALID);
     fine_pr[i] = (double)decoded * C_1_2P29 * PRUNIT_GPS;
@@ -950,7 +950,7 @@ static void decode_msm_fine_phaseranges(const uint8_t buff[],
                                         uint16_t *bit) {
   /* DF401 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    int32_t decoded = getbits(buff, *bit, 22);
+    int32_t decoded = rtcm_getbits(buff, *bit, 22);
     *bit += 22;
     flags[i].valid_cp = (decoded != MSM_CP_INVALID);
     fine_cp[i] = (double)decoded * C_1_2P29 * PRUNIT_GPS;
@@ -964,7 +964,7 @@ static void decode_msm_fine_phaseranges_extended(const uint8_t buff[],
                                                  uint16_t *bit) {
   /* DF406 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    int32_t decoded = getbits(buff, *bit, 24);
+    int32_t decoded = rtcm_getbits(buff, *bit, 24);
     *bit += 24;
     flags[i].valid_cp = (decoded != MSM_CP_EXT_INVALID);
     fine_cp[i] = (double)decoded * C_1_2P31 * PRUNIT_GPS;
@@ -978,7 +978,7 @@ static void decode_msm_lock_times(const uint8_t buff[],
                                   uint16_t *bit) {
   /* DF402 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    uint32_t lock_ind = getbitu(buff, *bit, 4);
+    uint32_t lock_ind = rtcm_getbitu(buff, *bit, 4);
     *bit += 4;
     lock_time[i] = (double)from_msm_lock_ind(lock_ind) / 1000;
     flags[i].valid_lock = 1;
@@ -992,7 +992,7 @@ static void decode_msm_lock_times_extended(const uint8_t buff[],
                                            uint16_t *bit) {
   /* DF407 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    uint16_t lock_ind = getbitu(buff, *bit, 10);
+    uint16_t lock_ind = rtcm_getbitu(buff, *bit, 10);
     *bit += 10;
     lock_time[i] = (double)from_msm_lock_ind_ext(lock_ind) / 1000;
     flags[i].valid_lock = 1;
@@ -1005,7 +1005,7 @@ static void decode_msm_hca_indicators(const uint8_t buff[],
                                       uint16_t *bit) {
   /* DF420 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    hca_indicator[i] = (bool)getbitu(buff, *bit, 1);
+    hca_indicator[i] = (bool)rtcm_getbitu(buff, *bit, 1);
     *bit += 1;
   }
 }
@@ -1017,7 +1017,7 @@ static void decode_msm_cnrs(const uint8_t buff[],
                             uint16_t *bit) {
   /* DF403 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    uint32_t decoded = getbitu(buff, *bit, 6);
+    uint32_t decoded = rtcm_getbitu(buff, *bit, 6);
     *bit += 6;
     flags[i].valid_cnr = (decoded != 0);
     cnr[i] = (double)decoded;
@@ -1031,7 +1031,7 @@ static void decode_msm_cnrs_extended(const uint8_t buff[],
                                      uint16_t *bit) {
   /* DF408 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    uint32_t decoded = getbitu(buff, *bit, 10);
+    uint32_t decoded = rtcm_getbitu(buff, *bit, 10);
     *bit += 10;
     flags[i].valid_cnr = (decoded != 0);
     cnr[i] = (double)decoded * C_1_2P4;
@@ -1045,7 +1045,7 @@ static void decode_msm_fine_phaserangerates(const uint8_t buff[],
                                             uint16_t *bit) {
   /* DF404 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    int32_t decoded = getbits(buff, *bit, 15);
+    int32_t decoded = rtcm_getbits(buff, *bit, 15);
     *bit += 15;
     fine_dop[i] = (double)decoded * 0.0001;
     flags[i].valid_dop = (decoded != MSM_DOP_INVALID);
@@ -1072,7 +1072,7 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  msg->header.msg_num = getbitu(buff, 0, 12);
+  msg->header.msg_num = rtcm_getbitu(buff, 0, 12);
 
   if (msm_type != to_msm_type(msg->header.msg_num)) {
     /* Message number does not match the requested message type */

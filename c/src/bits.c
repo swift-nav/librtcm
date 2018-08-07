@@ -21,7 +21,7 @@
  * \param len Length of bit field in bits.
  * \return Bit field as an unsigned value.
  */
-uint32_t getbitu(const uint8_t *buff, uint32_t pos, uint8_t len) {
+uint32_t rtcm_getbitu(const uint8_t *buff, uint32_t pos, uint8_t len) {
   uint32_t bits = 0;
 
   for (uint32_t i = pos; i < pos + len; i++) {
@@ -40,7 +40,7 @@ uint32_t getbitu(const uint8_t *buff, uint32_t pos, uint8_t len) {
  * \param len Length of bit field in bits.
  * \return Bit field as an unsigned value.
  */
-uint64_t getbitul(const uint8_t *buff, uint32_t pos, uint8_t len) {
+uint64_t rtcm_getbitul(const uint8_t *buff, uint32_t pos, uint8_t len) {
   uint64_t bits = 0;
 
   for (uint32_t i = pos; i < pos + len; i++) {
@@ -61,8 +61,8 @@ uint64_t getbitul(const uint8_t *buff, uint32_t pos, uint8_t len) {
  * \param len Length of bit field in bits.
  * \return Bit field as a signed value.
  */
-int32_t getbits(const uint8_t *buff, uint32_t pos, uint8_t len) {
-  int32_t bits = (int32_t)getbitu(buff, pos, len);
+int32_t rtcm_getbits(const uint8_t *buff, uint32_t pos, uint8_t len) {
+  int32_t bits = (int32_t)rtcm_getbitu(buff, pos, len);
 
   /* Sign extend, taken from:
    * http://graphics.stanford.edu/~seander/bithacks.html#VariableSignExtend
@@ -82,8 +82,8 @@ int32_t getbits(const uint8_t *buff, uint32_t pos, uint8_t len) {
  * \param len Length of bit field in bits.
  * \return Bit field as a signed value.
  */
-int64_t getbitsl(const uint8_t *buff, uint32_t pos, uint8_t len) {
-  int64_t bits = (int64_t)getbitul(buff, pos, len);
+int64_t rtcm_getbitsl(const uint8_t *buff, uint32_t pos, uint8_t len) {
+  int64_t bits = (int64_t)rtcm_getbitul(buff, pos, len);
 
   /* Sign extend, taken from:
    * http://graphics.stanford.edu/~seander/bithacks.html#VariableSignExtend
@@ -101,7 +101,7 @@ int64_t getbitsl(const uint8_t *buff, uint32_t pos, uint8_t len) {
  * \param len Length of bit field in bits.
  * \param data Unsigned integer to be packed into bit field.
  */
-void setbitu(uint8_t *buff, uint32_t pos, uint32_t len, uint32_t data) {
+void rtcm_setbitu(uint8_t *buff, uint32_t pos, uint32_t len, uint32_t data) {
   uint32_t mask = 1u << (len - 1);
 
   if (len <= 0 || 32 < len) return;
@@ -123,7 +123,7 @@ void setbitu(uint8_t *buff, uint32_t pos, uint32_t len, uint32_t data) {
  * \param len Length of bit field in bits.
  * \param data Unsigned integer to be packed into bit field.
  */
-void setbitul(uint8_t *buff, uint32_t pos, uint32_t len, uint64_t data) {
+void rtcm_setbitul(uint8_t *buff, uint32_t pos, uint32_t len, uint64_t data) {
   uint64_t mask = ((uint64_t)1) << (len - 1);
 
   if (len <= 0 || 64 < len) return;
@@ -145,8 +145,8 @@ void setbitul(uint8_t *buff, uint32_t pos, uint32_t len, uint64_t data) {
  * \param len Length of bit field in bits.
  * \param data Signed integer to be packed into bit field.
  */
-void setbits(uint8_t *buff, uint32_t pos, uint32_t len, int32_t data) {
-  setbitu(buff, pos, len, (uint32_t)data);
+void rtcm_setbits(uint8_t *buff, uint32_t pos, uint32_t len, int32_t data) {
+  rtcm_setbitu(buff, pos, len, (uint32_t)data);
 }
 
 /** Set bit field in buffer from a signed integer.
@@ -158,6 +158,6 @@ void setbits(uint8_t *buff, uint32_t pos, uint32_t len, int32_t data) {
  * \param len Length of bit field in bits.
  * \param data Signed integer to be packed into bit field.
  */
-void setbitsl(uint8_t *buff, uint32_t pos, uint32_t len, int64_t data) {
-  setbitul(buff, pos, len, (uint64_t)data);
+void rtcm_setbitsl(uint8_t *buff, uint32_t pos, uint32_t len, int64_t data) {
+  rtcm_setbitul(buff, pos, len, (uint64_t)data);
 }
