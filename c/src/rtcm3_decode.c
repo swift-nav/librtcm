@@ -11,6 +11,7 @@
  */
 
 #include "rtcm3_decode.h"
+#include "rtcm3_eph_decode.h"
 #include <math.h>
 #include <stdio.h>
 #include "bits.h"
