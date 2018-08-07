@@ -13,6 +13,10 @@
 #ifndef SWIFTNAV_RTCM3_MSM_UTILS_H
 #define SWIFTNAV_RTCM3_MSM_UTILS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "rtcm3_messages.h"
 
 bool msm_signal_frequency(const rtcm_msm_header *header,
@@ -35,5 +39,9 @@ bool get_glo_fcn(const rtcm_msm_header *header,
                  const bool sat_info_valid[],
                  const uint8_t glo_sv_id_fcn_map[],
                  uint8_t *glo_fcn);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SWIFTNAV_RTCM3_MSM_UTILS_H */

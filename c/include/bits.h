@@ -13,6 +13,10 @@
 #ifndef LIBRTCM_BITS_H
 #define LIBRTCM_BITS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdint.h>
 
 uint32_t getbitu(const uint8_t *buff, uint32_t pos, uint8_t len);
@@ -23,5 +27,9 @@ void setbitu(uint8_t *buff, uint32_t pos, uint32_t len, uint32_t data);
 void setbitul(uint8_t *buff, uint32_t pos, uint32_t len, uint64_t data);
 void setbits(uint8_t *buff, uint32_t pos, uint32_t len, int32_t data);
 void setbitsl(uint8_t *buff, uint32_t pos, uint32_t len, int64_t data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* LIBRTCM_BITS_H */
