@@ -21,9 +21,11 @@ void decode_ssr_header(const uint8_t buff[], uint16_t *bit, rtcm_msg_ssr_header 
   if(to_constellation(msg_header->message_num) == CONSTELLATION_GPS) {
     msg_header->epoch_time = rtcm_getbitu(buff, *bit, 20);
     *bit += 20;
+    msg_header->constellation = CONSTELLATION_GPS;
   } else if((to_constellation(msg_header->message_num) == CONSTELLATION_GLO)) {
     msg_header->epoch_time = rtcm_getbitu(buff, *bit, 17);
     *bit += 17;
+    msg_header->constellation = CONSTELLATION_GLO;
   }
   msg_header->update_interval = rtcm_getbitu(buff, *bit, 4);
   *bit += 4;
@@ -107,7 +109,7 @@ rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[], rtcm_msg_orbit_clock *ms
 rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[], rtcm_msg_code_bias *msg_code_bias) {
   uint16_t bit = 0;
   decode_ssr_header(buff,&bit,&msg_code_bias->header);
-  if(msg_code_bias->header.message_num != 1065) {
+  if(msg_code_bias->header.message_num != 1059) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 

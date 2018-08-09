@@ -354,6 +354,7 @@ typedef struct {
 typedef struct {
     uint16_t message_num;
     uint32_t epoch_time;
+    uint8_t constellation;
     uint8_t update_interval;
     bool multi_message;
     bool sat_ref_datum;
