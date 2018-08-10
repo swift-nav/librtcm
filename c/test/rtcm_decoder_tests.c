@@ -1720,7 +1720,7 @@ void test_msm_sid_conversion(void) {
   assert(msm_sat_to_prn(&header, 0) == 1);
   assert(msm_sat_to_prn(&header, 1) == 2);
   assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
-  assert(msm_signal_to_code(&header, 0) == CODE_BDS2_B11);
+  assert(msm_signal_to_code(&header, 0) == CODE_BDS2_B1);
   assert(msm_signal_to_code(&header, 1) == CODE_BDS2_B2);
   assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
          freq == BDS2_B11_HZ);
