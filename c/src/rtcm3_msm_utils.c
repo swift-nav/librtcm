@@ -163,15 +163,17 @@ msm_enum to_msm_type(uint16_t msg_num) {
 }
 
 /** Convert message number into constellation enum
- *
+ * This also supports SSR messages
  * \param msg_num RTCM message number
  * \return constellation enum
  */
 constellation_t to_constellation(uint16_t msg_num) {
-  if (msg_num >= 1071 && msg_num <= 1077) {
+  if ((msg_num >= 1071 && msg_num <= 1077) ||
+     (msg_num >= 1057 && msg_num <= 1062) || msg_num == 1265){
     return CONSTELLATION_GPS;
   }
-  if (msg_num >= 1081 && msg_num <= 1087) {
+  if ((msg_num >= 1081 && msg_num <= 1087) ||
+     (msg_num >= 1063 && msg_num <= 1068) || msg_num == 1266) {
     return CONSTELLATION_GLO;
   }
   if (msg_num >= 1091 && msg_num <= 1097) {
