@@ -13,6 +13,7 @@
 #include <rtcm3_eph_decode.h>
 #include <rtcm3_msm_utils.h>
 #include "bits.h"
+#include <stdio.h>
 
 
 void decode_ssr_header(const uint8_t buff[], uint16_t *bit, rtcm_msg_ssr_header *msg_header){
@@ -31,7 +32,7 @@ void decode_ssr_header(const uint8_t buff[], uint16_t *bit, rtcm_msg_ssr_header 
   *bit += 4;
   msg_header->multi_message = rtcm_getbitu(buff, *bit, 1);
   *bit += 1;
-  if(msg_header->message_num == 1060){
+  if(msg_header->message_num == 1060 || msg_header->message_num == 1066){
     msg_header->sat_ref_datum = rtcm_getbitu(buff, *bit, 1);
     *bit += 1;
   }
@@ -62,17 +63,25 @@ void decode_ssr_header(const uint8_t buff[], uint16_t *bit, rtcm_msg_ssr_header 
 rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[], rtcm_msg_orbit_clock *msg_orbit_clock) {
   uint16_t bit = 0;
   decode_ssr_header(buff,&bit,&msg_orbit_clock->header);
-  if(msg_orbit_clock->header.message_num != 1060) {
+  if(msg_orbit_clock->header.message_num != 1060 && msg_orbit_clock->header.message_num != 1066) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  for (int i = 0; i < msg_orbit_clock->header.num_sats; i++) {
-    rtcm_msg_ssr_orbit_corr *orbit = &msg_orbit_clock->orbit[i];
-    rtcm_msg_ssr_clock_corr *clock = &msg_orbit_clock->clock[i];
+  for (int sat_count = 0; sat_count < msg_orbit_clock->header.num_sats; sat_count++) {
+    rtcm_msg_ssr_orbit_corr *orbit = &msg_orbit_clock->orbit[sat_count];
+    rtcm_msg_ssr_clock_corr *clock = &msg_orbit_clock->clock[sat_count];
 
-    orbit->sat_id = rtcm_getbitu(buff, bit, 6);
+    if(msg_orbit_clock->header.constellation == CONSTELLATION_GPS) {
+      orbit->sat_id = rtcm_getbitu(buff, bit, 6);
+      bit += 6;
+    } else if(msg_orbit_clock->header.constellation == CONSTELLATION_GLO) {
+      orbit->sat_id = rtcm_getbitu(buff, bit, 5);
+      bit += 5;
+    } else {
+      return RC_INVALID_MESSAGE;
+    }
     clock->sat_id = orbit->sat_id;
-    bit += 6;
+
     orbit->iode = rtcm_getbitu(buff, bit, 8);
     bit += 8;
     orbit->radial = rtcm_getbits(buff, bit, 22);
@@ -109,14 +118,21 @@ rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[], rtcm_msg_orbit_clock *ms
 rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[], rtcm_msg_code_bias *msg_code_bias) {
   uint16_t bit = 0;
   decode_ssr_header(buff,&bit,&msg_code_bias->header);
-  if(msg_code_bias->header.message_num != 1059) {
+  if(msg_code_bias->header.message_num != 1059 && msg_code_bias->header.message_num != 1065) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
   for (int i = 0; i < msg_code_bias->header.num_sats; i++) {
     rtcm_msg_ssr_code_bias_sat *sat = &msg_code_bias->sats[i];
-    sat->sat_id = rtcm_getbitu(buff, bit, 6);
-    bit += 6;
+    if(msg_code_bias->header.constellation == CONSTELLATION_GPS) {
+      sat->sat_id = rtcm_getbitu(buff, bit, 6);
+      bit += 6;
+    } else if(msg_code_bias->header.constellation == CONSTELLATION_GLO) {
+      sat->sat_id = rtcm_getbitu(buff, bit, 5);
+      bit += 5;
+    } else {
+      return RC_INVALID_MESSAGE;
+    }
     sat->num_code_biases = rtcm_getbitu(buff, bit, 5);
     bit += 5;
 
@@ -141,14 +157,21 @@ rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[], rtcm_msg_code_bias *msg_co
 rtcm3_rc rtcm3_decode_phase_bias(const uint8_t buff[], rtcm_msg_phase_bias *msg_phase_bias) {
   uint16_t bit = 0;
   decode_ssr_header(buff,&bit,&msg_phase_bias->header);
-  if(msg_phase_bias->header.message_num != 1264) {
+  if(msg_phase_bias->header.message_num != 1265) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
   for (int i = 0; i < msg_phase_bias->header.num_sats; i++) {
     rtcm_msg_ssr_phase_bias_sat *sat = &msg_phase_bias->sats[i];
-    sat->sat_id = rtcm_getbitu(buff, bit, 6);
-    bit += 6;
+    if(msg_phase_bias->header.constellation == CONSTELLATION_GPS) {
+      sat->sat_id = rtcm_getbitu(buff, bit, 6);
+      bit += 6;
+    } else if(msg_phase_bias->header.constellation == CONSTELLATION_GLO) {
+      sat->sat_id = rtcm_getbitu(buff, bit, 5);
+      bit += 5;
+    } else {
+      return RC_INVALID_MESSAGE;
+    }
     sat->num_phase_biases = rtcm_getbitu(buff, bit, 5);
     bit += 5;
     sat->yaw_angle = rtcm_getbitu(buff, bit, 9);
