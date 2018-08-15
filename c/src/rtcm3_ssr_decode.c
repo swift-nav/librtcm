@@ -74,17 +74,17 @@ uint8_t get_number_of_bits_for_sat_id(
 *              HRCLK : 1062      1068      1245*     1251*     1263*       -
 */
 
-bool is_ssr_orbit_clock_message(const u_int16_t message_num) {
+bool is_ssr_orbit_clock_message(const uint16_t message_num) {
   return message_num == 1060 || message_num == 1066 || message_num == 1243 ||
          message_num == 1249 || message_num == 1261;
 }
 
-bool is_ssr_code_biases_message(const u_int16_t message_num) {
+bool is_ssr_code_biases_message(const uint16_t message_num) {
   return message_num == 1059 || message_num == 1065 || message_num == 1242 ||
          message_num == 1248 || message_num == 1260;
 }
 
-bool is_ssr_phase_biases_message(const u_int16_t message_num) {
+bool is_ssr_phase_biases_message(const uint16_t message_num) {
   return message_num >= 1265 && message_num <= 1270;
 }
 
@@ -145,7 +145,7 @@ rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[],
     rtcm_msg_ssr_orbit_corr *orbit = &msg_orbit_clock->orbit[sat_count];
     rtcm_msg_ssr_clock_corr *clock = &msg_orbit_clock->clock[sat_count];
 
-    u_int8_t number_of_bits_for_sat_id =
+    uint8_t number_of_bits_for_sat_id =
         get_number_of_bits_for_sat_id(msg_orbit_clock->header.constellation);
     orbit->sat_id = rtcm_getbitu(buff, bit, number_of_bits_for_sat_id);
     bit += number_of_bits_for_sat_id;
@@ -196,7 +196,7 @@ rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[],
   for (int i = 0; i < msg_code_bias->header.num_sats; i++) {
     rtcm_msg_ssr_code_bias_sat *sat = &msg_code_bias->sats[i];
 
-    u_int8_t number_of_bits_for_sat_id =
+    uint8_t number_of_bits_for_sat_id =
         get_number_of_bits_for_sat_id(msg_code_bias->header.constellation);
     sat->sat_id = rtcm_getbitu(buff, bit, number_of_bits_for_sat_id);
     bit += number_of_bits_for_sat_id;
@@ -233,7 +233,7 @@ rtcm3_rc rtcm3_decode_phase_bias(const uint8_t buff[],
   for (int i = 0; i < msg_phase_bias->header.num_sats; i++) {
     rtcm_msg_ssr_phase_bias_sat *sat = &msg_phase_bias->sats[i];
 
-    u_int8_t number_of_bits_for_sat_id =
+    uint8_t number_of_bits_for_sat_id =
         get_number_of_bits_for_sat_id(msg_phase_bias->header.constellation);
     sat->sat_id = rtcm_getbitu(buff, bit, number_of_bits_for_sat_id);
     bit += number_of_bits_for_sat_id;
