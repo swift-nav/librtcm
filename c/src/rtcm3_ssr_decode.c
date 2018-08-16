@@ -10,7 +10,6 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include <assert.h>
 #include <rtcm3_eph_decode.h>
 #include <rtcm3_msm_utils.h>
 #include <stdio.h>
@@ -20,22 +19,25 @@
  * \param constellation Message constellation
  * \return Number of bits
  */
-uint8_t get_number_of_bits_for_epoch_time(
-    const enum constellation_e constellation) {
+enum rtcm3_rc_e get_number_of_bits_for_epoch_time(
+    const enum constellation_e constellation, uint8_t *num_bit) {
   switch (constellation) {
     case CONSTELLATION_GPS:
     case CONSTELLATION_GAL:
     case CONSTELLATION_BDS2:
     case CONSTELLATION_QZS:
-    case CONSTELLATION_SBAS:
-      return 20;
-    case CONSTELLATION_GLO:
-      return 17;
+    case CONSTELLATION_SBAS: {
+      *num_bit = 20;
+      return RC_OK;
+    }
+    case CONSTELLATION_GLO: {
+      *num_bit = 17;
+      return RC_OK;
+    }
     case CONSTELLATION_INVALID:
     case CONSTELLATION_COUNT:
     default:
-      assert(false);
-      return 0;
+      return RC_INVALID_MESSAGE;
   }
 }
 
@@ -43,22 +45,25 @@ uint8_t get_number_of_bits_for_epoch_time(
  * \param constellation Message constellation
  * \return Number of bits
  */
-uint8_t get_number_of_bits_for_sat_id(
-    const enum constellation_e constellation) {
+enum rtcm3_rc_e get_number_of_bits_for_sat_id(
+    const enum constellation_e constellation, uint8_t *num_bit) {
   switch (constellation) {
     case CONSTELLATION_GPS:
     case CONSTELLATION_GAL:
     case CONSTELLATION_BDS2:
     case CONSTELLATION_QZS:
-    case CONSTELLATION_SBAS:
-      return 6;
-    case CONSTELLATION_GLO:
-      return 5;
+    case CONSTELLATION_SBAS: {
+      *num_bit = 6;
+      return RC_OK;
+    }
+    case CONSTELLATION_GLO: {
+      *num_bit = 5;
+      return RC_OK;
+    }
     case CONSTELLATION_INVALID:
     case CONSTELLATION_COUNT:
     default:
-      assert(false);
-      return 0;
+      return RC_INVALID_MESSAGE;
   }
 }
 
@@ -72,6 +77,8 @@ uint8_t get_number_of_bits_for_sat_id(
 *              OBTCLK: 1060      1066      1243*     1249*     1261*       -
 *              URA   : 1061      1067      1244*     1250*     1262*       -
 *              HRCLK : 1062      1068      1245*     1251*     1263*       -
+*              PHBIAS: 1265*     1266*     1267*     1268*     1270*      1269*
+*                    (* means that these RTCM messages are still draft )
 */
 
 bool is_ssr_orbit_clock_message(const uint16_t message_num) {
@@ -88,13 +95,17 @@ bool is_ssr_phase_biases_message(const uint16_t message_num) {
   return message_num >= 1265 && message_num <= 1270;
 }
 
-void decode_ssr_header(const uint8_t buff[],
-                       uint16_t *bit,
-                       rtcm_msg_ssr_header *msg_header) {
+enum rtcm3_rc_e decode_ssr_header(const uint8_t buff[],
+                                  uint16_t *bit,
+                                  rtcm_msg_ssr_header *msg_header) {
   msg_header->message_num = rtcm_getbitu(buff, *bit, 12);
   *bit += 12;
-  uint8_t number_of_bits_for_epoch_time = get_number_of_bits_for_epoch_time(
-      to_constellation(msg_header->message_num));
+  uint8_t number_of_bits_for_epoch_time;
+  if (!(RC_OK == get_number_of_bits_for_epoch_time(
+                     to_constellation(msg_header->message_num),
+                     &number_of_bits_for_epoch_time))) {
+    return RC_INVALID_MESSAGE;
+  }
   msg_header->epoch_time =
       rtcm_getbitu(buff, *bit, number_of_bits_for_epoch_time);
   *bit += number_of_bits_for_epoch_time;
@@ -122,6 +133,7 @@ void decode_ssr_header(const uint8_t buff[],
   }
   msg_header->num_sats = rtcm_getbitu(buff, *bit, 6);
   *bit += 6;
+  return RC_OK;
 }
 
 /** Decode an RTCMv3 Combined SSR Orbit and Clock message
@@ -135,7 +147,10 @@ void decode_ssr_header(const uint8_t buff[],
 rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[],
                                   rtcm_msg_orbit_clock *msg_orbit_clock) {
   uint16_t bit = 0;
-  decode_ssr_header(buff, &bit, &msg_orbit_clock->header);
+  if (!(RC_OK == decode_ssr_header(buff, &bit, &msg_orbit_clock->header))) {
+    return RC_INVALID_MESSAGE;
+  }
+
   if (!is_ssr_orbit_clock_message(msg_orbit_clock->header.message_num)) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
@@ -145,8 +160,13 @@ rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[],
     rtcm_msg_ssr_orbit_corr *orbit = &msg_orbit_clock->orbit[sat_count];
     rtcm_msg_ssr_clock_corr *clock = &msg_orbit_clock->clock[sat_count];
 
-    uint8_t number_of_bits_for_sat_id =
-        get_number_of_bits_for_sat_id(msg_orbit_clock->header.constellation);
+    uint8_t number_of_bits_for_sat_id;
+    if (!(RC_OK ==
+          get_number_of_bits_for_sat_id(msg_orbit_clock->header.constellation,
+                                        &number_of_bits_for_sat_id))) {
+      return RC_INVALID_MESSAGE;
+    }
+
     orbit->sat_id = rtcm_getbitu(buff, bit, number_of_bits_for_sat_id);
     bit += number_of_bits_for_sat_id;
 
@@ -188,7 +208,10 @@ rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[],
 rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[],
                                 rtcm_msg_code_bias *msg_code_bias) {
   uint16_t bit = 0;
-  decode_ssr_header(buff, &bit, &msg_code_bias->header);
+  if (!(RC_OK == decode_ssr_header(buff, &bit, &msg_code_bias->header))) {
+    return RC_INVALID_MESSAGE;
+  }
+
   if (!is_ssr_code_biases_message(msg_code_bias->header.message_num)) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
@@ -196,8 +219,13 @@ rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[],
   for (int i = 0; i < msg_code_bias->header.num_sats; i++) {
     rtcm_msg_ssr_code_bias_sat *sat = &msg_code_bias->sats[i];
 
-    uint8_t number_of_bits_for_sat_id =
-        get_number_of_bits_for_sat_id(msg_code_bias->header.constellation);
+    uint8_t number_of_bits_for_sat_id;
+    if (!(RC_OK ==
+          get_number_of_bits_for_sat_id(msg_code_bias->header.constellation,
+                                        &number_of_bits_for_sat_id))) {
+      return RC_INVALID_MESSAGE;
+    }
+
     sat->sat_id = rtcm_getbitu(buff, bit, number_of_bits_for_sat_id);
     bit += number_of_bits_for_sat_id;
 
@@ -225,7 +253,10 @@ rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[],
 rtcm3_rc rtcm3_decode_phase_bias(const uint8_t buff[],
                                  rtcm_msg_phase_bias *msg_phase_bias) {
   uint16_t bit = 0;
-  decode_ssr_header(buff, &bit, &msg_phase_bias->header);
+  if (!(RC_OK == decode_ssr_header(buff, &bit, &msg_phase_bias->header))) {
+    return RC_INVALID_MESSAGE;
+  }
+
   if (!is_ssr_phase_biases_message(msg_phase_bias->header.message_num)) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
@@ -233,8 +264,13 @@ rtcm3_rc rtcm3_decode_phase_bias(const uint8_t buff[],
   for (int i = 0; i < msg_phase_bias->header.num_sats; i++) {
     rtcm_msg_ssr_phase_bias_sat *sat = &msg_phase_bias->sats[i];
 
-    uint8_t number_of_bits_for_sat_id =
-        get_number_of_bits_for_sat_id(msg_phase_bias->header.constellation);
+    uint8_t number_of_bits_for_sat_id;
+    if (!(RC_OK ==
+          get_number_of_bits_for_sat_id(msg_phase_bias->header.constellation,
+                                        &number_of_bits_for_sat_id))) {
+      return RC_INVALID_MESSAGE;
+    }
+
     sat->sat_id = rtcm_getbitu(buff, bit, number_of_bits_for_sat_id);
     bit += number_of_bits_for_sat_id;
 
