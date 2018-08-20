@@ -35,7 +35,7 @@ bool msm_signal_frequency(const rtcm_msm_header *header,
 
   /* TODO: use sid_to_carr_freq from LNSP */
 
-  switch ((int8_t) code) {
+  switch ((int8_t)code) {
     case CODE_GPS_L1CA:
     case CODE_GPS_L1P:
     case CODE_GPS_L1CI:
@@ -169,23 +169,26 @@ msm_enum to_msm_type(uint16_t msg_num) {
  */
 constellation_t to_constellation(uint16_t msg_num) {
   if ((msg_num >= 1071 && msg_num <= 1077) ||
-     (msg_num >= 1057 && msg_num <= 1062) || msg_num == 1265){
+      (msg_num >= 1057 && msg_num <= 1062) || msg_num == 1265) {
     return CONSTELLATION_GPS;
   }
   if ((msg_num >= 1081 && msg_num <= 1087) ||
-     (msg_num >= 1063 && msg_num <= 1068) || msg_num == 1266) {
+      (msg_num >= 1063 && msg_num <= 1068) || msg_num == 1266) {
     return CONSTELLATION_GLO;
   }
-  if (msg_num >= 1091 && msg_num <= 1097) {
+  if ((msg_num >= 1091 && msg_num <= 1097) ||
+      (msg_num >= 1240 && msg_num <= 1245) || (msg_num == 1267)) {
     return CONSTELLATION_GAL;
   }
-  if (msg_num >= 1101 && msg_num <= 1107) {
+  if ((msg_num >= 1101 && msg_num <= 1107) || msg_num == 1269) {
     return CONSTELLATION_SBAS;
   }
-  if (msg_num >= 1111 && msg_num <= 1117) {
+  if ((msg_num >= 1111 && msg_num <= 1117) ||
+      (msg_num >= 1246 && msg_num <= 1251) || msg_num == 1268) {
     return CONSTELLATION_QZS;
   }
-  if (msg_num >= 1121 && msg_num <= 1127) {
+  if ((msg_num >= 1121 && msg_num <= 1127) ||
+      (msg_num >= 1258 && msg_num <= 1263) || msg_num == 1270) {
     return CONSTELLATION_BDS2;
   }
   return CONSTELLATION_INVALID;
