@@ -176,19 +176,19 @@ constellation_t to_constellation(uint16_t msg_num) {
       (msg_num >= 1063 && msg_num <= 1068) || msg_num == 1266) {
     return CONSTELLATION_GLO;
   }
-  if ((msg_num >= 1091 && msg_num <= 1097) || (msg_num == 1267) ||
-      (msg_num >= 1240 && msg_num <= 1245)) {
+  if ((msg_num >= 1091 && msg_num <= 1097) ||
+      (msg_num >= 1240 && msg_num <= 1245) || (msg_num == 1267)) {
     return CONSTELLATION_GAL;
   }
   if ((msg_num >= 1101 && msg_num <= 1107) || msg_num == 1269) {
     return CONSTELLATION_SBAS;
   }
-  if ((msg_num >= 1111 && msg_num <= 1117) || msg_num == 1268 ||
-      (msg_num >= 1246 && msg_num <= 1251)) {
+  if ((msg_num >= 1111 && msg_num <= 1117) ||
+      (msg_num >= 1246 && msg_num <= 1251) || msg_num == 1268) {
     return CONSTELLATION_QZS;
   }
-  if ((msg_num >= 1121 && msg_num <= 1127) || msg_num == 1270 ||
-      (msg_num >= 1258 && msg_num <= 1263)) {
+  if ((msg_num >= 1121 && msg_num <= 1127) ||
+      (msg_num >= 1258 && msg_num <= 1263) || msg_num == 1270) {
     return CONSTELLATION_BDS2;
   }
   return CONSTELLATION_INVALID;
