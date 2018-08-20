@@ -183,7 +183,7 @@ rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   return RC_OK;
 }
 
-/** Decode an RTCMv3 GAL Ephemeris Message
+/** Decode an RTCMv3 BDS Ephemeris Message
  *
  * \param buff The input data buffer
  * \param RTCM message struct
@@ -191,10 +191,10 @@ rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
-rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   uint16_t bit = 0;
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  if(msg_num != 1045) {
+  if(msg_num != 1042) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
   bit += 12;
@@ -257,16 +257,24 @@ rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   return RC_OK;
 }
 
-rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+/** Decode an RTCMv3 GAL (I/NAV message) Ephemeris Message
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return  - RC_OK : Success
+ *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
+ */
+rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   uint16_t bit = 0;
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  if(msg_num != 1042) {
+  if(msg_num != 1046) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
   bit += 12;
   msg_eph->sat_id = rtcm_getbitu(buff, bit, 6);
   bit += 6;
-  msg_eph->wn = rtcm_getbitu(buff, bit, 13);
+  msg_eph->wn = rtcm_getbitu(buff, bit, 12);
   bit += 13;
   msg_eph->kepler.iode = rtcm_getbitu(buff, bit, 10);
   bit += 10;
