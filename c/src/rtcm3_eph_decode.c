@@ -275,10 +275,10 @@ rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   msg_eph->sat_id = rtcm_getbitu(buff, bit, 6);
   bit += 6;
   msg_eph->wn = rtcm_getbitu(buff, bit, 12);
-  bit += 13;
+  bit += 12;
   msg_eph->kepler.iode = rtcm_getbitu(buff, bit, 10);
   bit += 10;
-  /* SISA */ rtcm_getbitu(buff, bit, 8);
+  msg_eph->ura =  rtcm_getbitu(buff, bit, 8);
   bit += 8;
   msg_eph->kepler.inc_dot = rtcm_getbits(buff, bit, 14);
   bit += 14;
@@ -312,7 +312,7 @@ rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 32;
   msg_eph->kepler.cis = rtcm_getbits(buff, bit, 16);
   bit += 16;
-  /* i0 */ rtcm_getbits(buff, bit, 32);
+  msg_eph->kepler.inc = rtcm_getbits(buff, bit, 32);
   bit += 32;
   msg_eph->kepler.crc = rtcm_getbits(buff, bit, 16);
   bit += 16;
