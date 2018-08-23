@@ -13,3 +13,5 @@ else (CMAKE_CROSSCOMPILING)
         COMMAND rtcm_test
     )
 endif(CMAKE_CROSSCOMPILING)
+
+target_compile_options(rtcm_test PRIVATE "-std=gnu99")
