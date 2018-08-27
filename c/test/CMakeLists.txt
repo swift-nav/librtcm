@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.7)
 
 if (CMAKE_CROSSCOMPILING)
     message(STATUS "Skipping unit tests, cross compiling")
+
 else (CMAKE_CROSSCOMPILING)
     add_executable (rtcm_test rtcm_decoder_tests.c rtcm_encoder.c)
 
@@ -12,6 +13,7 @@ else (CMAKE_CROSSCOMPILING)
         COMMENT "Running unit tests"
         COMMAND rtcm_test
     )
+    target_compile_options(rtcm_test PRIVATE "-std=gnu99")
+
 endif(CMAKE_CROSSCOMPILING)
 
-target_compile_options(rtcm_test PRIVATE "-std=gnu99")
