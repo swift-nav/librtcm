@@ -51,13 +51,45 @@ rtcm3_rc get_number_of_bits_for_sat_id(rtcm_constellation_t constellation,
     case RTCM_CONSTELLATION_GPS:
     case RTCM_CONSTELLATION_GAL:
     case RTCM_CONSTELLATION_BDS:
-    case RTCM_CONSTELLATION_QZS:
     case RTCM_CONSTELLATION_SBAS: {
       *num_bit = 6;
       return RC_OK;
     }
     case RTCM_CONSTELLATION_GLO: {
       *num_bit = 5;
+      return RC_OK;
+    }
+    case RTCM_CONSTELLATION_QZS: {
+      *num_bit = 4;
+      return RC_OK;
+    }
+    case RTCM_CONSTELLATION_INVALID:
+    case RTCM_CONSTELLATION_COUNT:
+    default:
+      return RC_INVALID_MESSAGE;
+  }
+}
+
+/** Get the numbers of bits for the IODE field
+ * \param constellation Message constellation
+ * \return Number of bits
+ */
+enum rtcm3_rc_e get_number_of_bits_for_iode(
+    const rtcm_constellation_t constellation, uint8_t *num_bit) {
+  switch (constellation) {
+    case RTCM_CONSTELLATION_GPS:
+    case RTCM_CONSTELLATION_GLO:
+    case RTCM_CONSTELLATION_QZS: {
+      *num_bit = 8;
+      return RC_OK;
+    }
+    case RTCM_CONSTELLATION_GAL:
+    case RTCM_CONSTELLATION_BDS: {
+      *num_bit = 10;
+      return RC_OK;
+    }
+    case RTCM_CONSTELLATION_SBAS: {
+      *num_bit = 9;
       return RC_OK;
     }
     case RTCM_CONSTELLATION_INVALID:
@@ -172,8 +204,20 @@ rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[],
 
     clock->sat_id = orbit->sat_id;
 
-    orbit->iode = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
+    uint8_t number_of_bits_for_iode;
+    if (!(RC_OK ==
+          get_number_of_bits_for_iode(msg_orbit_clock->header.constellation,
+                                      &number_of_bits_for_iode))) {
+      return RC_INVALID_MESSAGE;
+    }
+    orbit->iode = rtcm_getbitu(buff, bit, number_of_bits_for_iode);
+    bit += number_of_bits_for_iode;
+    if (msg_orbit_clock->header.constellation == RTCM_CONSTELLATION_BDS ||
+        msg_orbit_clock->header.constellation == RTCM_CONSTELLATION_SBAS) {
+      // iodcrc = rtcm_getbitu(buff, bit, 24);
+      bit += 24;
+    }
+
     orbit->radial = rtcm_getbits(buff, bit, 22);
     bit += 22;
     orbit->along_track = rtcm_getbits(buff, bit, 20);
