@@ -11,7 +11,7 @@
  */
 
 #include "rtcm3_eph_decode.h"
-#include "bits.h"
+#include "rtcm3_bits.h"
 
 /** Decode an RTCMv3 GPS Ephemeris Message
  *

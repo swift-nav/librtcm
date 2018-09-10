@@ -11,10 +11,11 @@
  */
 
 #include "rtcm3_decode.h"
-#include "rtcm3_eph_decode.h"
 #include <math.h>
 #include <stdio.h>
-#include "bits.h"
+#include "rtcm3_bits.h"
+#include "rtcm3_eph_decode.h"
+#include "rtcm3_msm_utils.h"
 
 void init_sat_data(rtcm_sat_data *sat_data) {
   for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {
@@ -175,20 +176,20 @@ static uint32_t normalize_bds2_tow(const uint32_t tow_ms) {
 }
 
 static uint16_t rtcm3_read_msm_header(const uint8_t buff[],
-                                      const constellation_t cons,
+                                      const rtcm_constellation_t cons,
                                       rtcm_msm_header *header) {
   uint16_t bit = 0;
   header->msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
   header->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
-  if (CONSTELLATION_GLO == cons) {
+  if (RTCM_CONSTELLATION_GLO == cons) {
     /* skip the day of week, it is handled in gnss_converters */
     bit += 3;
     /* for GLONASS, the epoch time is the time of day in ms */
     header->tow_ms = rtcm_getbitu(buff, bit, 27);
     bit += 27;
-  } else if (CONSTELLATION_BDS2) {
+  } else if (RTCM_CONSTELLATION_BDS == cons) {
     /* Beidou time can be negative (at least for some Septentrio base stations),
      * so normalize it first */
     header->tow_ms = normalize_bds2_tow(rtcm_getbitu(buff, bit, 30));
@@ -865,22 +866,23 @@ rtcm3_rc rtcm3_decode_1230(const uint8_t buff[], rtcm_msg_1230 *msg_1230) {
 static void decode_msm_sat_data(const uint8_t buff[],
                                 const uint8_t num_sats,
                                 const msm_enum msm_type,
-                                double rough_range[],
+                                double rough_range_ms[],
                                 bool rough_range_valid[],
                                 uint8_t sat_info[],
                                 bool sat_info_valid[],
-                                double rough_rate[],
+                                double rough_rate_m_s[],
                                 bool rough_rate_valid[],
                                 uint16_t *bit) {
   /* number of integer milliseconds, DF397 */
   for (uint8_t i = 0; i < num_sats; i++) {
     uint32_t range_ms = rtcm_getbitu(buff, *bit, 8);
     *bit += 8;
-    rough_range[i] = (double)range_ms * PRUNIT_GPS;
+    rough_range_ms[i] = range_ms;
     rough_range_valid[i] = (MSM_ROUGH_RANGE_INVALID != range_ms);
   }
 
-  /* satellite info (constellation-dependent)*/
+  /* satellite info (constellation-dependent, currently only GLO uses this to
+   * deliver FCN) */
   for (uint8_t i = 0; i < num_sats; i++) {
     if (MSM5 == msm_type || MSM7 == msm_type) {
       sat_info[i] = rtcm_getbitu(buff, *bit, 4);
@@ -897,7 +899,7 @@ static void decode_msm_sat_data(const uint8_t buff[],
     uint32_t rough_pr = rtcm_getbitu(buff, *bit, 10);
     *bit += 10;
     if (rough_range_valid[i]) {
-      rough_range[i] += (double)rough_pr / 1024 * PRUNIT_GPS;
+      rough_range_ms[i] += (double)rough_pr / 1024;
     }
   }
 
@@ -906,10 +908,10 @@ static void decode_msm_sat_data(const uint8_t buff[],
     if (MSM5 == msm_type || MSM7 == msm_type) {
       int16_t rate = rtcm_getbits(buff, *bit, 14);
       *bit += 14;
-      rough_rate[i] = (double)rate;
+      rough_rate_m_s[i] = (double)rate;
       rough_rate_valid[i] = (MSM_ROUGH_RANGE_INVALID != rate);
     } else {
-      rough_rate[i] = 0;
+      rough_rate_m_s[i] = 0;
       rough_rate_valid[i] = false;
     }
   }
@@ -917,7 +919,7 @@ static void decode_msm_sat_data(const uint8_t buff[],
 
 static void decode_msm_fine_pseudoranges(const uint8_t buff[],
                                          const uint8_t num_cells,
-                                         double fine_pr[],
+                                         double fine_pr_ms[],
                                          flag_bf flags[],
                                          uint16_t *bit) {
   /* DF400 */
@@ -925,13 +927,13 @@ static void decode_msm_fine_pseudoranges(const uint8_t buff[],
     int16_t decoded = (int16_t)rtcm_getbits(buff, *bit, 15);
     *bit += 15;
     flags[i].valid_pr = (decoded != MSM_PR_INVALID);
-    fine_pr[i] = (double)decoded * C_1_2P24 * PRUNIT_GPS;
+    fine_pr_ms[i] = (double)decoded * C_1_2P24;
   }
 }
 
 static void decode_msm_fine_pseudoranges_extended(const uint8_t buff[],
                                                   const uint8_t num_cells,
-                                                  double fine_pr[],
+                                                  double fine_pr_ms[],
                                                   flag_bf flags[],
                                                   uint16_t *bit) {
   /* DF405 */
@@ -939,13 +941,13 @@ static void decode_msm_fine_pseudoranges_extended(const uint8_t buff[],
     int32_t decoded = (int32_t)rtcm_getbitsl(buff, *bit, 20);
     *bit += 20;
     flags[i].valid_pr = (decoded != MSM_PR_EXT_INVALID);
-    fine_pr[i] = (double)decoded * C_1_2P29 * PRUNIT_GPS;
+    fine_pr_ms[i] = (double)decoded * C_1_2P29;
   }
 }
 
 static void decode_msm_fine_phaseranges(const uint8_t buff[],
                                         const uint8_t num_cells,
-                                        double fine_cp[],
+                                        double fine_cp_ms[],
                                         flag_bf flags[],
                                         uint16_t *bit) {
   /* DF401 */
@@ -953,13 +955,13 @@ static void decode_msm_fine_phaseranges(const uint8_t buff[],
     int32_t decoded = rtcm_getbits(buff, *bit, 22);
     *bit += 22;
     flags[i].valid_cp = (decoded != MSM_CP_INVALID);
-    fine_cp[i] = (double)decoded * C_1_2P29 * PRUNIT_GPS;
+    fine_cp_ms[i] = (double)decoded * C_1_2P29;
   }
 }
 
 static void decode_msm_fine_phaseranges_extended(const uint8_t buff[],
                                                  const uint8_t num_cells,
-                                                 double fine_cp[],
+                                                 double fine_cp_ms[],
                                                  flag_bf flags[],
                                                  uint16_t *bit) {
   /* DF406 */
@@ -967,7 +969,7 @@ static void decode_msm_fine_phaseranges_extended(const uint8_t buff[],
     int32_t decoded = rtcm_getbits(buff, *bit, 24);
     *bit += 24;
     flags[i].valid_cp = (decoded != MSM_CP_EXT_INVALID);
-    fine_cp[i] = (double)decoded * C_1_2P31 * PRUNIT_GPS;
+    fine_cp_ms[i] = (double)decoded * C_1_2P31;
   }
 }
 
@@ -1040,14 +1042,14 @@ static void decode_msm_cnrs_extended(const uint8_t buff[],
 
 static void decode_msm_fine_phaserangerates(const uint8_t buff[],
                                             const uint8_t num_cells,
-                                            double *fine_dop,
+                                            double *fine_range_rate_m_s,
                                             flag_bf *flags,
                                             uint16_t *bit) {
   /* DF404 */
   for (uint16_t i = 0; i < num_cells; i++) {
     int32_t decoded = rtcm_getbits(buff, *bit, 15);
     *bit += 15;
-    fine_dop[i] = (double)decoded * 0.0001;
+    fine_range_rate_m_s[i] = (double)decoded * 0.0001;
     flags[i].valid_dop = (decoded != MSM_DOP_INVALID);
   }
 }
@@ -1056,7 +1058,6 @@ static void decode_msm_fine_phaserangerates(const uint8_t buff[],
  *
  * \param buff The input data buffer
  * \param msm_type MSM4, MSM5, MSM6 or MSM7
- * \param glo_sv_id_fcn_map Optional GLO FCN table (size MAX_GLO_PRN + 1)
  * \param msg The parsed RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
@@ -1064,7 +1065,6 @@ static void decode_msm_fine_phaserangerates(const uint8_t buff[],
  */
 static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
                                           const uint16_t msm_type,
-                                          const uint8_t glo_sv_id_fcn_map[],
                                           rtcm_msm_message *msg) {
   if (MSM4 != msm_type && MSM5 != msm_type && MSM6 != msm_type &&
       MSM7 != msm_type) {
@@ -1079,8 +1079,8 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  constellation_t cons = to_constellation(msg->header.msg_num);
-  if (CONSTELLATION_INVALID == cons) {
+  rtcm_constellation_t cons = to_constellation(msg->header.msg_num);
+  if (RTCM_CONSTELLATION_INVALID == cons) {
     /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
   }
@@ -1088,7 +1088,7 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
   uint16_t bit = 0;
   bit += rtcm3_read_msm_header(buff, cons, &msg->header);
 
-  if (CONSTELLATION_GLO != cons) {
+  if (RTCM_CONSTELLATION_GLO != cons) {
     if (msg->header.tow_ms > RTCM_MAX_TOW_MS) {
       return RC_INVALID_MESSAGE;
     }
@@ -1111,8 +1111,8 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
 
   /* Satellite Data */
 
-  double rough_range[num_sats];
-  double rough_rate[num_sats];
+  double rough_range_ms[num_sats];
+  double rough_rate_m_s[num_sats];
   uint8_t sat_info[num_sats];
   bool rough_range_valid[num_sats];
   bool rough_rate_valid[num_sats];
@@ -1121,22 +1121,22 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
   decode_msm_sat_data(buff,
                       num_sats,
                       msm_type,
-                      rough_range,
+                      rough_range_ms,
                       rough_range_valid,
                       sat_info,
                       sat_info_valid,
-                      rough_rate,
+                      rough_rate_m_s,
                       rough_rate_valid,
                       &bit);
 
   /* Signal Data */
 
-  double fine_pr[num_cells];
-  double fine_cp[num_cells];
+  double fine_pr_ms[num_cells];
+  double fine_cp_ms[num_cells];
   double lock_time[num_cells];
   bool hca_indicator[num_cells];
   double cnr[num_cells];
-  double fine_dop[num_cells];
+  double fine_range_rate_m_s[num_cells];
   flag_bf flags[num_cells];
 
   for (uint8_t i = 0; i < num_cells; i++) {
@@ -1144,13 +1144,14 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
   }
 
   if (MSM4 == msm_type || MSM5 == msm_type) {
-    decode_msm_fine_pseudoranges(buff, num_cells, fine_pr, flags, &bit);
-    decode_msm_fine_phaseranges(buff, num_cells, fine_cp, flags, &bit);
+    decode_msm_fine_pseudoranges(buff, num_cells, fine_pr_ms, flags, &bit);
+    decode_msm_fine_phaseranges(buff, num_cells, fine_cp_ms, flags, &bit);
     decode_msm_lock_times(buff, num_cells, lock_time, flags, &bit);
   } else if (MSM6 == msm_type || MSM7 == msm_type) {
     decode_msm_fine_pseudoranges_extended(
-        buff, num_cells, fine_pr, flags, &bit);
-    decode_msm_fine_phaseranges_extended(buff, num_cells, fine_cp, flags, &bit);
+        buff, num_cells, fine_pr_ms, flags, &bit);
+    decode_msm_fine_phaseranges_extended(
+        buff, num_cells, fine_cp_ms, flags, &bit);
     decode_msm_lock_times_extended(buff, num_cells, lock_time, flags, &bit);
   } else {
     return RC_MESSAGE_TYPE_MISMATCH;
@@ -1167,42 +1168,33 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
   }
 
   if (MSM5 == msm_type || MSM7 == msm_type) {
-    decode_msm_fine_phaserangerates(buff, num_cells, fine_dop, flags, &bit);
+    decode_msm_fine_phaserangerates(
+        buff, num_cells, fine_range_rate_m_s, flags, &bit);
   }
 
   uint8_t i = 0;
   for (uint8_t sat = 0; sat < num_sats; sat++) {
-    msg->sats[sat].rough_range_m = rough_range[sat];
-    msg->sats[sat].sat_info = sat_info[sat];
-    msg->sats[sat].rough_range_rate_m_s = rough_rate[sat];
+    msg->sats[sat].rough_range_ms = rough_range_ms[sat];
+    msg->sats[sat].rough_range_rate_m_s = rough_rate_m_s[sat];
+    if (RTCM_CONSTELLATION_GLO == cons && !sat_info_valid[sat]) {
+      msg->sats[sat].glo_fcn = MSM_GLO_FCN_UNKNOWN;
+    } else {
+      msg->sats[sat].glo_fcn = sat_info[sat];
+    }
 
     for (uint8_t sig = 0; sig < num_sigs; sig++) {
       if (msg->header.cell_mask[sat * num_sigs + sig]) {
-        /* get GLO FCN */
-        uint8_t glo_fcn = MSM_GLO_FCN_UNKNOWN;
-        bool glo_fcn_valid = get_glo_fcn(&msg->header,
-                                         sat,
-                                         sat_info,
-                                         sat_info_valid,
-                                         glo_sv_id_fcn_map,
-                                         &glo_fcn);
-
-        double freq;
-        bool freq_valid = msm_signal_frequency(
-            &msg->header, sig, glo_fcn, glo_fcn_valid, &freq);
-
         if (rough_range_valid[sat] && flags[i].valid_pr) {
-          msg->signals[i].pseudorange_m = rough_range[sat] + fine_pr[i];
+          msg->signals[i].pseudorange_ms = rough_range_ms[sat] + fine_pr_ms[i];
         } else {
-          msg->signals[i].pseudorange_m = 0;
+          msg->signals[i].pseudorange_ms = 0;
           flags[i].valid_pr = false;
         }
-        if (rough_range_valid[sat] && flags[i].valid_cp && freq_valid) {
-          /* convert carrier phase into cycles */
-          msg->signals[i].carrier_phase_cyc =
-              (rough_range[sat] + fine_cp[i]) * (freq / GPS_C);
+        if (rough_range_valid[sat] && flags[i].valid_cp) {
+          msg->signals[i].carrier_phase_ms =
+              rough_range_ms[sat] + fine_cp_ms[i];
         } else {
-          msg->signals[i].carrier_phase_cyc = 0;
+          msg->signals[i].carrier_phase_ms = 0;
           flags[i].valid_cp = false;
         }
         msg->signals[i].lock_time_s = lock_time[i];
@@ -1212,12 +1204,12 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
         } else {
           msg->signals[i].cnr = 0;
         }
-        if (rough_rate_valid[sat] && flags[i].valid_dop && freq_valid) {
+        if (rough_rate_valid[sat] && flags[i].valid_dop) {
           /* convert Doppler into Hz */
-          msg->signals[i].range_rate_Hz =
-              (rough_rate[sat] + fine_dop[i]) * (freq / GPS_C);
+          msg->signals[i].range_rate_m_s =
+              rough_rate_m_s[sat] + fine_range_rate_m_s[i];
         } else {
-          msg->signals[i].range_rate_Hz = 0;
+          msg->signals[i].range_rate_m_s = 0;
           flags[i].valid_dop = 0;
         }
         msg->signals[i].flags = flags[i];
@@ -1232,16 +1224,13 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
 /** Decode an RTCMv3 Multi System Message 4
  *
  * \param buff The input data buffer
- * \param glo_sv_id_fcn_map Optional GLO FCN table (size MAX_GLO_PRN + 1)
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
-rtcm3_rc rtcm3_decode_msm4(const uint8_t buff[],
-                           const uint8_t glo_sv_id_fcn_map[],
-                           rtcm_msm_message *msg) {
-  return rtcm3_decode_msm_internal(buff, MSM4, glo_sv_id_fcn_map, msg);
+rtcm3_rc rtcm3_decode_msm4(const uint8_t buff[], rtcm_msm_message *msg) {
+  return rtcm3_decode_msm_internal(buff, MSM4, msg);
 }
 
 /** Decode an RTCMv3 Multi System Message 5
@@ -1253,22 +1242,19 @@ rtcm3_rc rtcm3_decode_msm4(const uint8_t buff[],
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 rtcm3_rc rtcm3_decode_msm5(const uint8_t buff[], rtcm_msm_message *msg) {
-  return rtcm3_decode_msm_internal(buff, MSM5, NULL, msg);
+  return rtcm3_decode_msm_internal(buff, MSM5, msg);
 }
 
 /** Decode an RTCMv3 Multi System Message 6
  *
  * \param buff The input data buffer
- * \param glo_sv_id_fcn_map Optional GLO FCN table (size MAX_GLO_PRN + 1)
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
-rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[],
-                           const uint8_t glo_sv_id_fcn_map[],
-                           rtcm_msm_message *msg) {
-  return rtcm3_decode_msm_internal(buff, MSM6, glo_sv_id_fcn_map, msg);
+rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[], rtcm_msm_message *msg) {
+  return rtcm3_decode_msm_internal(buff, MSM6, msg);
 }
 
 /** Decode an RTCMv3 Multi System Message 7
@@ -1280,5 +1266,5 @@ rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[],
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 rtcm3_rc rtcm3_decode_msm7(const uint8_t buff[], rtcm_msm_message *msg) {
-  return rtcm3_decode_msm_internal(buff, MSM7, NULL, msg);
+  return rtcm3_decode_msm_internal(buff, MSM7, msg);
 }

@@ -13,9 +13,9 @@
 #ifndef PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H
 #define PIKSI_BUILDROOT_RTCM3_MESSAGES_H_H
 
-#include <constants.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "rtcm3_constants.h"
 
 typedef enum { L1_FREQ, L2_FREQ, NUM_FREQS } freq_enum;
 
@@ -30,87 +30,17 @@ typedef enum {
   MSM7
 } msm_enum;
 
-/** Constellation identifier. */
-typedef enum constellation_e {
-  CONSTELLATION_INVALID = -1,
-  CONSTELLATION_GPS,
-  CONSTELLATION_SBAS,
-  CONSTELLATION_GLO,
-  CONSTELLATION_BDS2,
-  CONSTELLATION_QZS,
-  CONSTELLATION_GAL,
-  CONSTELLATION_COUNT,
-} constellation_t;
-
-/** Code identifier (from libswiftnav-private) */
-typedef enum code_e {
-  CODE_INVALID = -1,
-  CODE_GPS_L1CA = 0, /* GPS L1CA: BPSK(1) */
-  CODE_GPS_L2CM = 1, /* GPS L2C: 2 x BPSK(0.5) */
-  CODE_SBAS_L1CA = 2, /* SBAS L1: BPSK(1) */
-  CODE_GLO_L1OF = 3, /* GLONASS L1OF: FDMA BPSK(0.5) */
-  CODE_GLO_L2OF = 4, /* GLONASS L2OF: FDMA BPSK(0.5) */
-  CODE_GPS_L1P = 5,  /* GPS L1P(Y): encrypted BPSK(10) */
-  CODE_GPS_L2P = 6,  /* GPS L2P(Y): encrypted BPSK(10) */
-  CODE_GPS_L2CL = 7,
-  CODE_GPS_L2CX = 8,
-  CODE_GPS_L5I = 9, /* GPS L5: QPSK(10) at 1150*f0 */
-  CODE_GPS_L5Q = 10,
-  CODE_GPS_L5X = 11,
-  CODE_BDS2_B1 = 12, /* BDS2 B1I: BPSK(2) at 1526*f0 */
-  CODE_BDS2_B2 = 13, /* BDS2 B2I: BPSK(2) at 1180*f0 */
-  CODE_GAL_E1B = 14,  /* Galileo E1: CASM CBOC(1,1) at 1540*f0 */
-  CODE_GAL_E1C = 15,
-  CODE_GAL_E1X = 16,
-  CODE_GAL_E6B = 17, /* Galileo E6: CASM BPSK(5) at 1250*f0 */
-  CODE_GAL_E6C = 18,
-  CODE_GAL_E6X = 19,
-  CODE_GAL_E7I = 20, /* Galileo E5b: QPSK(10) at 1180*f0 */
-  CODE_GAL_E7Q = 21,
-  CODE_GAL_E7X = 22,
-  CODE_GAL_E8I = 23, /* Galileo E5AltBOC(15,10) at 1165*f0 */
-  CODE_GAL_E8Q = 24,
-  CODE_GAL_E8X = 25,
-  CODE_GAL_E5I = 26, /* Galileo E5a: QPSK(10) at 1150*f0 */
-  CODE_GAL_E5Q = 27,
-  CODE_GAL_E5X = 28,
-  CODE_GLO_L1P = 29, /* GLONASS L1P: encrypted */
-  CODE_GLO_L2P = 30, /* GLONASS L2P: encrypted */
-  CODE_QZS_L1CA = 31, /* QZSS L1CA: BPSK(1) at 1540*f0 */
-  CODE_QZS_L1CI = 32, /* QZSS L1C: TM-BOC at 1540*f0 */
-  CODE_QZS_L1CQ = 33,
-  CODE_QZS_L1CX = 34,
-  CODE_QZS_L2CM = 35, /* QZSS L2C: 2 x BPSK(0.5) at 1200*f0 */
-  CODE_QZS_L2CL = 36,
-  CODE_QZS_L2CX = 37,
-  CODE_QZS_L5I = 38, /* QZSS L5: QPSK(10) at 1150*f0 */
-  CODE_QZS_L5Q = 39,
-  CODE_QZS_L5X = 40,
-  CODE_SBAS_L5I = 41, /* SBAS L5: ? at 1150*f0 */
-  CODE_SBAS_L5Q = 42,
-  CODE_SBAS_L5X = 43,
-  CODE_BDS3_B1CI = 44, /* BDS3 B1C: TM-BOC at 1540*f0 */
-  CODE_BDS3_B1CQ = 45,
-  CODE_BDS3_B1CX = 46,
-  CODE_BDS3_B5I = 47, /* BDS3 B2a: QPSK(10) at 1150*f0 */
-  CODE_BDS3_B5Q = 48,
-  CODE_BDS3_B5X = 49,
-  CODE_BDS3_B7I = 50, /* BDS3 B2b: QPSK(10) at 1180*f0 */
-  CODE_BDS3_B7Q = 51,
-  CODE_BDS3_B7X = 52,
-  CODE_BDS3_B3I = 53, /* BDS3 B3I: QPSK(10) at 1240*f0 */
-  CODE_BDS3_B3Q = 54,
-  CODE_BDS3_B3X = 55,
-  CODE_GPS_L1CI = 56, /* GPS L1C: TM-BOC at 1540*f0 */
-  CODE_GPS_L1CQ = 57,
-  CODE_GPS_L1CX = 58,
-  CODE_AUX_GPS = 59, /* Auxiliary antenna signals */
-  CODE_AUX_SBAS = 60,
-  CODE_AUX_GAL = 61,
-  CODE_AUX_QZS = 62,
-  CODE_AUX_BDS = 63,
-  CODE_COUNT
-} code_t;
+/** Constellation identifier (aligns with constellation_t in libswiftnav) */
+typedef enum rtcm_constellation_e {
+  RTCM_CONSTELLATION_INVALID = -1,
+  RTCM_CONSTELLATION_GPS,
+  RTCM_CONSTELLATION_SBAS,
+  RTCM_CONSTELLATION_GLO,
+  RTCM_CONSTELLATION_BDS,
+  RTCM_CONSTELLATION_QZS,
+  RTCM_CONSTELLATION_GAL,
+  RTCM_CONSTELLATION_COUNT,
+} rtcm_constellation_t;
 
 /* return codes for the decoders */
 typedef enum rtcm3_rc_e {
@@ -178,19 +108,19 @@ typedef struct {
 } rtcm_sat_data;
 
 typedef struct {
-  uint8_t sat_info;
-  double rough_range_m;
+  uint8_t glo_fcn;
+  double rough_range_ms;
   double rough_range_rate_m_s;
 } rtcm_msm_sat_data;
 
 typedef struct {
-  double pseudorange_m;
-  double carrier_phase_cyc;
+  double pseudorange_ms;
+  double carrier_phase_ms;
   double lock_time_s;
   bool hca_indicator;
   double cnr;
   flag_bf flags;
-  double range_rate_Hz;
+  double range_rate_m_s;
 } rtcm_msm_signal_data;
 
 typedef struct {
@@ -333,7 +263,7 @@ typedef struct {
 /** Structure containing the ephemeris for one satellite. */
 typedef struct {
   uint8_t sat_id;
-  constellation_t constellation;
+  rtcm_constellation_t constellation;
   uint16_t wn;
   uint16_t toe;
   uint16_t ura;
@@ -346,7 +276,6 @@ typedef struct {
     ephemeris_glo_t glo;
   };
 } rtcm_msg_eph;
-
 
 #define MAX_SSR_SATELLITES 64
 #define MAX_SSR_SIGNALS 32

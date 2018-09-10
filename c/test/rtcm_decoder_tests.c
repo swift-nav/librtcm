@@ -13,13 +13,12 @@
 #include "rtcm_decoder_tests.h"
 #include <assert.h>
 #include <math.h>
-#include <string.h>
-#include <rtcm3_decode.h>
-#include <rtcm3_messages.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "bits.h"
+#include "rtcm3_bits.h"
+#include "rtcm3_decode.h"
+#include "rtcm3_messages.h"
 #include "rtcm_encoder.h"
 #define LIBRTCM_LOG_INTERNAL
 #include <rtcm_logging.h>
@@ -43,8 +42,6 @@ int main(void) {
   test_rtcm_msm5();
   test_rtcm_msm7();
   test_rtcm_random_bits();
-  test_msm_sid_conversion();
-  test_msm_glo_fcn();
   test_logging();
 }
 
@@ -1216,18 +1213,18 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
   }
 
   for (uint8_t i = 0; i < num_sats; i++) {
-    if (fabs(msg_in->sats[i].rough_range_m - msg_out->sats[i].rough_range_m) >
-        1) {
-      printf("msm sats[%d].rough_pseudorange not equal: %.1f %.1f\n",
+    if (fabs(msg_in->sats[i].rough_range_ms - msg_out->sats[i].rough_range_ms) >
+        1.0 / 1024) {
+      printf("msm sats[%d].rough_pseudorange not equal: %.4f %.4f\n",
              i,
-             msg_in->sats[i].rough_range_m,
-             msg_out->sats[i].rough_range_m);
+             msg_in->sats[i].rough_range_ms,
+             msg_out->sats[i].rough_range_ms);
     }
-    if (msg_in->sats[i].sat_info != msg_out->sats[i].sat_info) {
+    if (msg_in->sats[i].glo_fcn != msg_out->sats[i].glo_fcn) {
       printf("msm sats[%d].sat_info not equal: %u %u\n",
              i,
-             msg_in->sats[i].sat_info,
-             msg_out->sats[i].sat_info);
+             msg_in->sats[i].glo_fcn,
+             msg_out->sats[i].glo_fcn);
     }
     if (fabs(msg_in->sats[i].rough_range_rate_m_s -
              msg_out->sats[i].rough_range_rate_m_s) > 0) {
@@ -1278,21 +1275,20 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
     }
 
     if (in_data->flags.valid_pr) {
-      if (fabs(in_data->pseudorange_m - out_data->pseudorange_m) > 0.018) {
+      if (fabs(in_data->pseudorange_ms - out_data->pseudorange_ms) > 1e-7) {
         printf("msm pseudorange[%u] not equal: %.2f %.2f\n",
                i,
-               in_data->pseudorange_m,
-               out_data->pseudorange_m);
+               in_data->pseudorange_ms,
+               out_data->pseudorange_ms);
         return false;
       }
     }
     if (in_data->flags.valid_cp) {
-      if (fabs(in_data->carrier_phase_cyc - out_data->carrier_phase_cyc) >
-          0.01) {
+      if (fabs(in_data->carrier_phase_ms - out_data->carrier_phase_ms) > 1e-8) {
         printf("msm carrier_phase[%u] not equal: %.5f %.5f\n",
                i,
-               in_data->carrier_phase_cyc,
-               out_data->carrier_phase_cyc);
+               in_data->carrier_phase_ms,
+               out_data->carrier_phase_ms);
 
         return false;
       }
@@ -1331,11 +1327,11 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
     }
 
     if (in_data->flags.valid_dop) {
-      if (fabs(in_data->range_rate_Hz - out_data->range_rate_Hz) > 0.1) {
+      if (fabs(in_data->range_rate_m_s - out_data->range_rate_m_s) > 0.02) {
         printf("msm range_rate[%u] not equal: %f %f\n",
                i,
-               in_data->range_rate_Hz,
-               out_data->range_rate_Hz);
+               in_data->range_rate_m_s,
+               out_data->range_rate_m_s);
         return false;
       }
     }
@@ -1378,10 +1374,10 @@ void test_rtcm_msm4(void) {
   rtcm_msm_message msg_msm4;
   memset((void *)&msg_msm4, 0, sizeof(msg_msm4));
   msg_msm4.header = header;
-  msg_msm4.sats[0].rough_range_m =
-      round(20000004.4 / PRUNIT_GPS * 1024) * PRUNIT_GPS / 1024;
-  msg_msm4.signals[0].pseudorange_m = 20000004.4;
-  msg_msm4.signals[0].carrier_phase_cyc = 105100794.4;
+  msg_msm4.sats[0].rough_range_ms =
+      round(20000004.4 / PRUNIT_GPS * 1024) / 1024;
+  msg_msm4.signals[0].pseudorange_ms = 20000004.4 / PRUNIT_GPS;
+  msg_msm4.signals[0].carrier_phase_ms = msg_msm4.signals[0].pseudorange_ms;
   msg_msm4.signals[0].lock_time_s = 900;
   msg_msm4.signals[0].flags.valid_pr = 1;
   msg_msm4.signals[0].flags.valid_cp = 1;
@@ -1389,14 +1385,14 @@ void test_rtcm_msm4(void) {
   msg_msm4.signals[0].cnr = 34;
   msg_msm4.signals[0].flags.valid_cnr = 1;
   msg_msm4.signals[1] = msg_msm4.signals[0];
-  msg_msm4.signals[1].pseudorange_m = 20000124.4;
-  msg_msm4.signals[1].carrier_phase_cyc = 81897184.4;
+  msg_msm4.signals[1].pseudorange_ms = 20000124.4 / PRUNIT_GPS;
+  msg_msm4.signals[1].carrier_phase_ms = msg_msm4.signals[1].pseudorange_ms;
   msg_msm4.signals[1].cnr = 35;
 
-  msg_msm4.sats[1].rough_range_m =
-      round(22000004.4 / PRUNIT_GPS * 1024) * PRUNIT_GPS / 1024;
-  msg_msm4.signals[2].pseudorange_m = 22000004.4;
-  msg_msm4.signals[2].carrier_phase_cyc = 115610703.4;
+  msg_msm4.sats[1].rough_range_ms =
+      round(22000004.4 / PRUNIT_GPS * 1024) / 1024;
+  msg_msm4.signals[2].pseudorange_ms = 22000004.4 / PRUNIT_GPS;
+  msg_msm4.signals[2].carrier_phase_ms = msg_msm4.signals[2].pseudorange_ms;
   msg_msm4.signals[2].lock_time_s = 254;
   msg_msm4.signals[2].flags.valid_pr = 1;
   msg_msm4.signals[2].flags.valid_cp = 1;
@@ -1404,13 +1400,13 @@ void test_rtcm_msm4(void) {
   msg_msm4.signals[2].cnr = 50.2;
   msg_msm4.signals[2].flags.valid_cnr = 1;
   msg_msm4.signals[3] = msg_msm4.signals[2];
-  msg_msm4.signals[3].pseudorange_m = 22000024.4;
-  msg_msm4.signals[3].carrier_phase_cyc = 90086422.236;
+  msg_msm4.signals[3].pseudorange_ms = 22000024.4 / PRUNIT_GPS;
+  msg_msm4.signals[3].carrier_phase_ms = msg_msm4.signals[3].pseudorange_ms;
 
-  msg_msm4.sats[2].rough_range_m =
-      round(22000004.55 / PRUNIT_GPS * 1024) * PRUNIT_GPS / 1024;
-  msg_msm4.signals[4].pseudorange_m = 22000004.55;
-  msg_msm4.signals[4].carrier_phase_cyc = 115610553.4;
+  msg_msm4.sats[2].rough_range_ms =
+      round(22000004.55 / PRUNIT_GPS * 1024) / 1024;
+  msg_msm4.signals[4].pseudorange_ms = 22000004.55 / PRUNIT_GPS;
+  msg_msm4.signals[4].carrier_phase_ms = msg_msm4.signals[4].pseudorange_ms;
   msg_msm4.signals[4].lock_time_s = 254;
   msg_msm4.signals[4].flags.valid_pr = 1;
   msg_msm4.signals[4].flags.valid_cp = 0;
@@ -1427,7 +1423,7 @@ void test_rtcm_msm4(void) {
   assert(num_bytes > 0 && num_bytes < 1024);
 
   rtcm_msm_message msg_msm4_out;
-  int8_t ret = rtcm3_decode_msm4(buff, NULL, &msg_msm4_out);
+  int8_t ret = rtcm3_decode_msm4(buff, &msg_msm4_out);
 
   assert(RC_OK == ret && msg_msm_equals(&msg_msm4, &msg_msm4_out));
 }
@@ -1466,12 +1462,12 @@ void test_rtcm_msm5(void) {
   rtcm_msm_message msg_msm5;
   memset((void *)&msg_msm5, 0, sizeof(msg_msm5));
   msg_msm5.header = header;
-  msg_msm5.sats[0].rough_range_m =
-      round(20000004.4 / PRUNIT_GPS * 1024) * PRUNIT_GPS / 1024;
-  msg_msm5.sats[0].rough_range_rate_m_s = round(1001 * (GPS_C / GPS_L1_HZ));
-  msg_msm5.signals[0].pseudorange_m = 20000004.4;
-  msg_msm5.signals[0].carrier_phase_cyc = 105100794.4;
-  msg_msm5.signals[0].range_rate_Hz = 1001; /* Hz */
+  msg_msm5.sats[0].rough_range_ms =
+      round(20000004.4 / PRUNIT_GPS * 1024) / 1024;
+  msg_msm5.sats[0].rough_range_rate_m_s = round(1001.3);
+  msg_msm5.signals[0].pseudorange_ms = 20000004.4 / PRUNIT_GPS;
+  msg_msm5.signals[0].carrier_phase_ms = msg_msm5.signals[0].pseudorange_ms;
+  msg_msm5.signals[0].range_rate_m_s = 1001.3;
   msg_msm5.signals[0].lock_time_s = 900;
   msg_msm5.signals[0].flags.valid_pr = 1;
   msg_msm5.signals[0].flags.valid_cp = 1;
@@ -1481,17 +1477,17 @@ void test_rtcm_msm5(void) {
   msg_msm5.signals[0].hca_indicator = 1;
   msg_msm5.signals[0].flags.valid_cnr = 1;
   msg_msm5.signals[1] = msg_msm5.signals[0];
-  msg_msm5.signals[1].pseudorange_m = 20000124.4;
-  msg_msm5.signals[1].carrier_phase_cyc = 81897184.4;
-  msg_msm5.signals[1].range_rate_Hz = 1001 * GPS_L2_HZ / GPS_L1_HZ;
+  msg_msm5.signals[1].pseudorange_ms = 20000124.4 / PRUNIT_GPS;
+  msg_msm5.signals[1].carrier_phase_ms = msg_msm5.signals[1].pseudorange_ms;
+  msg_msm5.signals[1].range_rate_m_s = 1001.3;
   msg_msm5.signals[1].cnr = 35;
 
-  msg_msm5.sats[1].rough_range_m =
-      round(22000004.4 / PRUNIT_GPS * 1024) * PRUNIT_GPS / 1024;
-  msg_msm5.sats[1].rough_range_rate_m_s = round(-1001 * (GPS_C / GPS_L1_HZ));
-  msg_msm5.signals[2].pseudorange_m = 22000004.4;
-  msg_msm5.signals[2].carrier_phase_cyc = 115610703.4;
-  msg_msm5.signals[2].range_rate_Hz = -1001.5;
+  msg_msm5.sats[1].rough_range_ms =
+      round(22000004.4 / PRUNIT_GPS * 1024) / 1024;
+  msg_msm5.sats[1].rough_range_rate_m_s = round(-1001.5);
+  msg_msm5.signals[2].pseudorange_ms = 22000004.4 / PRUNIT_GPS;
+  msg_msm5.signals[2].carrier_phase_ms = msg_msm5.signals[2].pseudorange_ms;
+  msg_msm5.signals[2].range_rate_m_s = -1001.5;
   msg_msm5.signals[2].lock_time_s = 254;
   msg_msm5.signals[2].flags.valid_pr = 1;
   msg_msm5.signals[2].flags.valid_cp = 1;
@@ -1500,16 +1496,16 @@ void test_rtcm_msm5(void) {
   msg_msm5.signals[2].cnr = 50.2;
   msg_msm5.signals[2].flags.valid_cnr = 1;
   msg_msm5.signals[3] = msg_msm5.signals[2];
-  msg_msm5.signals[3].pseudorange_m = 22000024.4;
-  msg_msm5.signals[3].carrier_phase_cyc = 90086422.236;
-  msg_msm5.signals[3].range_rate_Hz = -1001.5 * GPS_L2_HZ / GPS_L1_HZ;
+  msg_msm5.signals[3].pseudorange_ms = 22000024.4 / PRUNIT_GPS;
+  msg_msm5.signals[3].carrier_phase_ms = msg_msm5.signals[3].pseudorange_ms;
+  msg_msm5.signals[3].range_rate_m_s = -1001.5;
 
-  msg_msm5.sats[2].rough_range_m =
-      round(22000004.55 / PRUNIT_GPS * 1024) * PRUNIT_GPS / 1024;
-  msg_msm5.sats[2].rough_range_rate_m_s = round(550 * (GPS_C / GPS_L1_HZ));
-  msg_msm5.signals[4].pseudorange_m = 22000004.55;
-  msg_msm5.signals[4].carrier_phase_cyc = 115610553.4;
-  msg_msm5.signals[4].range_rate_Hz = 555;
+  msg_msm5.sats[2].rough_range_ms =
+      round(22000004.55 / PRUNIT_GPS * 1024) / 1024;
+  msg_msm5.sats[2].rough_range_rate_m_s = round(555.2);
+  msg_msm5.signals[4].pseudorange_ms = 22000004.55 / PRUNIT_GPS;
+  msg_msm5.signals[4].carrier_phase_ms = msg_msm5.signals[4].pseudorange_ms;
+  msg_msm5.signals[4].range_rate_m_s = 555.2;
   msg_msm5.signals[4].lock_time_s = 254;
   msg_msm5.signals[4].flags.valid_pr = 1;
   msg_msm5.signals[4].flags.valid_cp = 0;
@@ -1572,9 +1568,9 @@ void test_rtcm_random_bits(void) {
       }
     }
 
-    rtcm3_decode_msm4(buff, NULL, &msg_msm);
+    rtcm3_decode_msm4(buff, &msg_msm);
     rtcm3_decode_msm5(buff, &msg_msm);
-    rtcm3_decode_msm6(buff, NULL, &msg_msm);
+    rtcm3_decode_msm6(buff, &msg_msm);
     rtcm3_decode_msm7(buff, &msg_msm);
   }
 }
@@ -1633,152 +1629,6 @@ void test_msm_bit_utils(void) {
     assert(3 == find_nth_mask_value(sizeof(mask), mask, 4));
     assert(4 == find_nth_mask_value(sizeof(mask), mask, 5));
   }
-}
-
-void test_msm_sid_conversion(void) {
-  rtcm_msm_header header;
-  /* GPS message */
-
-  header.msg_num = 1074;
-  /* PRNs 1, 2 and 20 */
-  memset((void *)&header.satellite_mask, 0, sizeof(header.satellite_mask));
-  header.satellite_mask[0] = true;  /* PRN 1 */
-  header.satellite_mask[1] = true;  /* PRN 2 */
-  header.satellite_mask[63] = true; /* invalid PRN 64 */
-  /* signal ids 2 (L1CA) and 15 (L2CM) */
-  memset((void *)&header.signal_mask, 0, sizeof(header.signal_mask));
-  header.signal_mask[1] = true;
-  header.signal_mask[14] = true;
-
-  assert(to_constellation(header.msg_num) == CONSTELLATION_GPS);
-  assert(msm_sat_to_prn(&header, 0) == 1);
-  assert(msm_sat_to_prn(&header, 1) == 2);
-  assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
-  assert(msm_signal_to_code(&header, 0) == CODE_GPS_L1CA);
-  assert(msm_signal_to_code(&header, 1) == CODE_GPS_L2CM);
-  double freq;
-  assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
-         freq == GPS_L1_HZ);
-  assert(msm_signal_frequency(&header, 1, 0, false, &freq) &&
-         freq == GPS_L2_HZ);
-
-  /* GLO */
-  header.msg_num = 1084;
-  assert(to_constellation(header.msg_num) == CONSTELLATION_GLO);
-  assert(msm_sat_to_prn(&header, 0) == 1);
-  assert(msm_sat_to_prn(&header, 1) == 2);
-  assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
-  assert(msm_signal_to_code(&header, 0) == CODE_GLO_L1OF);
-  assert(msm_signal_to_code(&header, 1) == CODE_INVALID);
-  uint8_t fcn = 3;
-  assert(
-      msm_signal_frequency(&header, 0, fcn + MSM_GLO_FCN_OFFSET, true, &freq) &&
-      freq == GLO_L1_HZ + fcn * GLO_L1_DELTA_HZ);
-  assert(
-      !msm_signal_frequency(&header, 1, fcn + MSM_GLO_FCN_OFFSET, true, &freq));
-
-  /* GAL */
-  header.msg_num = 1094;
-  assert(to_constellation(header.msg_num) == CONSTELLATION_GAL);
-  assert(msm_sat_to_prn(&header, 0) == 1);
-  assert(msm_sat_to_prn(&header, 1) == 2);
-  assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
-  assert(msm_signal_to_code(&header, 0) == CODE_GAL_E1C);
-  assert(msm_signal_to_code(&header, 1) == CODE_GAL_E7Q);
-  assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
-         freq == GAL_E1_HZ);
-  assert(msm_signal_frequency(&header, 1, 0, false, &freq) &&
-         freq == GAL_E7_HZ);
-
-  /* SBAS */
-  header.msg_num = 1104;
-  assert(to_constellation(header.msg_num) == CONSTELLATION_SBAS);
-  assert(msm_sat_to_prn(&header, 0) == 120);
-  assert(msm_sat_to_prn(&header, 1) == 121);
-  assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
-  assert(msm_signal_to_code(&header, 0) == CODE_SBAS_L1CA);
-  assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
-         freq == SBAS_L1_HZ);
-
-  /* QZS PRNs start from 193 */
-  header.msg_num = 1114;
-  assert(to_constellation(header.msg_num) == CONSTELLATION_QZS);
-  assert(msm_sat_to_prn(&header, 0) == 193);
-  assert(msm_sat_to_prn(&header, 1) == 194);
-  assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
-  assert(msm_signal_to_code(&header, 0) == CODE_QZS_L1CA);
-  assert(msm_signal_to_code(&header, 1) == CODE_QZS_L2CM);
-  assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
-         freq == QZS_L1_HZ);
-  assert(msm_signal_frequency(&header, 1, 0, false, &freq) &&
-         freq == QZS_L2_HZ);
-
-  /* BDS2 */
-  header.msg_num = 1124;
-  header.signal_mask[13] = true;
-  assert(to_constellation(header.msg_num) == CONSTELLATION_BDS2);
-  assert(msm_sat_to_prn(&header, 0) == 1);
-  assert(msm_sat_to_prn(&header, 1) == 2);
-  assert(msm_sat_to_prn(&header, 2) == PRN_INVALID);
-  assert(msm_signal_to_code(&header, 0) == CODE_BDS2_B1);
-  assert(msm_signal_to_code(&header, 1) == CODE_BDS2_B2);
-  assert(msm_signal_frequency(&header, 0, 0, false, &freq) &&
-         freq == BDS2_B11_HZ);
-  assert(msm_signal_frequency(&header, 1, 0, false, &freq) &&
-         freq == BDS2_B2_HZ);
-}
-
-void test_msm_glo_fcn(void) {
-  rtcm_msm_header header;
-
-  header.msg_num = 1084;
-  memset((void *)&header.satellite_mask, 0, sizeof(header.satellite_mask));
-  header.satellite_mask[0] = true;  /* PRN 1 */
-  header.satellite_mask[2] = true;  /* PRN 3 */
-  header.satellite_mask[63] = true; /* invalid PRN 64 */
-  /* signal id 2 (L1CA)) */
-  memset((void *)&header.signal_mask, 0, sizeof(header.signal_mask));
-  header.signal_mask[1] = true;
-
-  uint8_t sat_info[2] = {3 + MSM_GLO_FCN_OFFSET, -6 + MSM_GLO_FCN_OFFSET};
-  bool sat_info_valid[2] = {true, true};
-
-  uint8_t glo_fcn;
-
-  /* FCN for both satellites available in sat_info */
-  assert(get_glo_fcn(&header, 0, sat_info, sat_info_valid, NULL, &glo_fcn));
-  assert(glo_fcn == 3 + MSM_GLO_FCN_OFFSET);
-
-  assert(get_glo_fcn(&header, 1, sat_info, sat_info_valid, NULL, &glo_fcn));
-  assert(glo_fcn == -6 + MSM_GLO_FCN_OFFSET);
-
-  /* sat info invalid for first satellite, FCN not available */
-  sat_info_valid[0] = false;
-  assert(!get_glo_fcn(&header, 0, sat_info, sat_info_valid, NULL, &glo_fcn));
-
-  /* FCN map indexed by PRN */
-  uint8_t fcn_map[RTCM_MAX_SATS];
-  fcn_map[0] = MSM_GLO_FCN_UNKNOWN;
-  fcn_map[1] = 2 + MSM_GLO_FCN_OFFSET; /* PRN 1 */
-  fcn_map[2] = MSM_GLO_FCN_UNKNOWN;
-  fcn_map[3] = MSM_GLO_FCN_UNKNOWN; /* PRN 3 */
-
-  /* FCN for first satellite from FCN MAP */
-  assert(get_glo_fcn(&header, 0, sat_info, sat_info_valid, fcn_map, &glo_fcn));
-  assert(glo_fcn == 2 + MSM_GLO_FCN_OFFSET);
-
-  /* FCN MAP invalid for second satellite, value in sat_info used */
-  assert(get_glo_fcn(&header, 1, sat_info, sat_info_valid, fcn_map, &glo_fcn));
-  assert(glo_fcn == -6 + MSM_GLO_FCN_OFFSET);
-
-  /* both FCN map and sat_info invalid, invalid FCN returned */
-  sat_info_valid[1] = false;
-  assert(!get_glo_fcn(&header, 1, sat_info, sat_info_valid, fcn_map, &glo_fcn));
-
-  /* add valid value in the FCN map */
-  fcn_map[3] = -5 + MSM_GLO_FCN_OFFSET;
-  assert(get_glo_fcn(&header, 1, sat_info, sat_info_valid, fcn_map, &glo_fcn));
-  assert(glo_fcn == -5 + MSM_GLO_FCN_OFFSET);
 }
 
 #define TEST_LOG_LEVEL LOG_WARNING

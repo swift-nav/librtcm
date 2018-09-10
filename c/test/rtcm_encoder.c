@@ -12,7 +12,7 @@
 
 #include "rtcm_encoder.h"
 #include <math.h>
-#include "bits.h"
+#include "rtcm3_bits.h"
 
 /** Convert a lock time in seconds into a RTCMv3 Lock Time Indicator value.
  * See RTCM 10403.1, Table 3.4-2.
@@ -762,15 +762,14 @@ static uint16_t rtcm3_encode_msm_header(const rtcm_msm_header *header,
 }
 
 static void encode_msm_fine_pseudoranges(const uint8_t num_cells,
-                                         const double fine_pr[],
+                                         const double fine_pr_ms[],
                                          const flag_bf flags[],
                                          uint8_t buff[],
                                          uint16_t *bit) {
   /* DF400 */
   for (uint16_t i = 0; i < num_cells; i++) {
     if (flags[i].valid_pr) {
-      double fine_pr_ms = fine_pr[i] / PRUNIT_GPS;
-      rtcm_setbits(buff, *bit, 15, (int16_t)(fine_pr_ms / C_1_2P24));
+      rtcm_setbits(buff, *bit, 15, (int16_t)(fine_pr_ms[i] / C_1_2P24));
     } else {
       rtcm_setbits(buff, *bit, 15, MSM_PR_INVALID);
     }
@@ -779,15 +778,14 @@ static void encode_msm_fine_pseudoranges(const uint8_t num_cells,
 }
 
 static void encode_msm_fine_phaseranges(const uint8_t num_cells,
-                                        const double fine_cp[],
+                                        const double fine_cp_ms[],
                                         const flag_bf flags[],
                                         uint8_t buff[],
                                         uint16_t *bit) {
   /* DF401 */
   for (uint16_t i = 0; i < num_cells; i++) {
     if (flags[i].valid_cp) {
-      double fine_carrier_ms = fine_cp[i] / PRUNIT_GPS;
-      rtcm_setbits(buff, *bit, 22, (int32_t)(fine_carrier_ms / C_1_2P29));
+      rtcm_setbits(buff, *bit, 22, (int32_t)(fine_cp_ms[i] / C_1_2P29));
     } else {
       rtcm_setbits(buff, *bit, 22, (int32_t)MSM_CP_INVALID);
     }
@@ -839,15 +837,14 @@ static void encode_msm_cnrs(const uint8_t num_cells,
 }
 
 static void encode_msm_fine_phaserangerates(const uint8_t num_cells,
-                                            const double fine_dop[],
+                                            const double fine_range_rate_m_s[],
                                             const flag_bf flags[],
                                             uint8_t buff[],
                                             uint16_t *bit) {
   /* DF404 */
   for (uint16_t i = 0; i < num_cells; i++) {
     if (flags[i].valid_dop) {
-      double fine_range_rate = fine_dop[i] / 0.0001;
-      rtcm_setbits(buff, *bit, 15, (int16_t)(fine_range_rate));
+      rtcm_setbits(buff, *bit, 15, (int16_t)(fine_range_rate_m_s[i] / 0.0001));
     } else {
       rtcm_setbits(buff, *bit, 15, (int32_t)MSM_DOP_INVALID);
     }
@@ -871,8 +868,7 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
     return 0;
   }
 
-  constellation_t cons = to_constellation(msg->header.msg_num);
-  if (CONSTELLATION_GPS != cons) {
+  if (RTCM_CONSTELLATION_GPS != to_constellation(msg->header.msg_num)) {
     /* Unexpected message type. */
     return 0;
   }
@@ -890,34 +886,33 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
   /* Satellite Data */
 
   uint8_t integer_ms[num_sats];
-  double rough_range_m[num_sats];
+  double rough_range_ms[num_sats];
   double rough_rate_m_s[num_sats];
 
   /* number of integer milliseconds, DF397 */
   for (uint8_t i = 0; i < num_sats; i++) {
-    integer_ms[i] = (uint8_t)(msg->sats[i].rough_range_m / PRUNIT_GPS);
+    integer_ms[i] = (uint8_t)(msg->sats[i].rough_range_ms);
     rtcm_setbitu(buff, bit, 8, integer_ms[i]);
     bit += 8;
   }
 
   if (MSM5 == msm_type || MSM7 == msm_type) {
     for (uint8_t i = 0; i < num_sats; i++) {
-      rtcm_setbitu(buff, bit, 4, msg->sats[i].sat_info);
+      rtcm_setbitu(buff, bit, 4, msg->sats[i].glo_fcn);
       bit += 4;
     }
   }
 
   /* rough range modulo 1 ms, DF398 */
   for (uint8_t i = 0; i < num_sats; i++) {
-    double pr = msg->sats[i].rough_range_m / PRUNIT_GPS;
+    double pr = msg->sats[i].rough_range_ms;
     /* remove integer ms part */
     double range_modulo_ms = pr - integer_ms[i];
     uint16_t range_modulo_encoded = (uint16_t)round(1024 * range_modulo_ms);
     rtcm_setbitu(buff, bit, 10, range_modulo_encoded);
     bit += 10;
 
-    rough_range_m[i] =
-        PRUNIT_GPS * (integer_ms[i] + (double)range_modulo_encoded / 1024);
+    rough_range_ms[i] = integer_ms[i] + (double)range_modulo_encoded / 1024;
   }
 
   if (MSM5 == msm_type) {
@@ -933,29 +928,25 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
 
   /* Signal Data */
 
-  double fine_pr[num_cells];
-  double fine_cp[num_cells];
+  double fine_pr_ms[num_cells];
+  double fine_cp_ms[num_cells];
   double lock_time[num_cells];
   bool hca_indicator[num_cells];
   double cnr[num_cells];
-  double fine_dop[num_cells];
+  double fine_range_rate_m_s[num_cells];
   flag_bf flags[num_cells];
 
   uint8_t i = 0;
   for (uint8_t sat = 0; sat < num_sats; sat++) {
     for (uint8_t sig = 0; sig < num_sigs; sig++) {
       if (header->cell_mask[sat * num_sigs + sig]) {
-        double freq;
-        bool freq_valid = msm_signal_frequency(
-            &msg->header, sig, msg->sats[sat].sat_info, true, &freq);
-
         flags[i] = msg->signals[i].flags;
         if (flags[i].valid_pr) {
-          fine_pr[i] = msg->signals[i].pseudorange_m - rough_range_m[sat];
+          fine_pr_ms[i] = msg->signals[i].pseudorange_ms - rough_range_ms[sat];
         }
-        if (flags[i].valid_cp && freq_valid) {
-          fine_cp[i] = msg->signals[i].carrier_phase_cyc * (GPS_C / freq) -
-                       rough_range_m[sat];
+        if (flags[i].valid_cp) {
+          fine_cp_ms[i] =
+              msg->signals[i].carrier_phase_ms - rough_range_ms[sat];
         } else {
           flags[i].valid_cp = false;
         }
@@ -968,9 +959,9 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
         } else {
           cnr[i] = 0;
         }
-        if (MSM5 == msm_type && flags[i].valid_dop && freq_valid) {
-          fine_dop[i] = msg->signals[i].range_rate_Hz * (GPS_C / freq) -
-                        rough_rate_m_s[sat];
+        if (MSM5 == msm_type && flags[i].valid_dop) {
+          fine_range_rate_m_s[i] =
+              msg->signals[i].range_rate_m_s - rough_rate_m_s[sat];
         } else {
           flags[i].valid_dop = false;
         }
@@ -979,13 +970,14 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
     }
   }
 
-  encode_msm_fine_pseudoranges(num_cells, fine_pr, flags, buff, &bit);
-  encode_msm_fine_phaseranges(num_cells, fine_cp, flags, buff, &bit);
+  encode_msm_fine_pseudoranges(num_cells, fine_pr_ms, flags, buff, &bit);
+  encode_msm_fine_phaseranges(num_cells, fine_cp_ms, flags, buff, &bit);
   encode_msm_lock_times(num_cells, lock_time, flags, buff, &bit);
   encode_msm_hca_indicators(num_cells, hca_indicator, buff, &bit);
   encode_msm_cnrs(num_cells, cnr, flags, buff, &bit);
   if (MSM5 == msm_type) {
-    encode_msm_fine_phaserangerates(num_cells, fine_dop, flags, buff, &bit);
+    encode_msm_fine_phaserangerates(
+        num_cells, fine_range_rate_m_s, flags, buff, &bit);
   }
 
   /* Round number of bits up to nearest whole byte. */

@@ -10,7 +10,7 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include "bits.h"
+#include "rtcm3_bits.h"
 
 /** Get bit field from buffer as an unsigned integer.
  * Unpacks `len` bits at bit position `pos` from the start of the buffer.
@@ -168,8 +168,9 @@ void rtcm_setbitsl(uint8_t *buff, uint32_t pos, uint32_t len, int64_t data) {
  * \param len Length of bit field in bits.
  * \return Bit field as a signed value.
  */
-int32_t rtcm_get_sign_magnitude_bit(const uint8_t *buff, uint32_t pos, uint8_t len)
-{
-  int32_t value=rtcm_getbitu(buff,pos+1,len-1);
-  return rtcm_getbitu(buff,pos,1)?-value:value;
+int32_t rtcm_get_sign_magnitude_bit(const uint8_t *buff,
+                                    uint32_t pos,
+                                    uint8_t len) {
+  int32_t value = rtcm_getbitu(buff, pos + 1, len - 1);
+  return rtcm_getbitu(buff, pos, 1) ? -value : value;
 }

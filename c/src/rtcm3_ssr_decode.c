@@ -10,32 +10,32 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include <rtcm3_eph_decode.h>
-#include <rtcm3_msm_utils.h>
+#include "rtcm3_ssr_decode.h"
 #include <stdio.h>
-#include "bits.h"
+#include "rtcm3_bits.h"
+#include "rtcm3_msm_utils.h"
 
 /** Get the numbers of bits for the  Epoch Time 1s field
  * \param constellation Message constellation
  * \return Number of bits
  */
-enum rtcm3_rc_e get_number_of_bits_for_epoch_time(
-    const enum constellation_e constellation, uint8_t *num_bit) {
+rtcm3_rc get_number_of_bits_for_epoch_time(rtcm_constellation_t constellation,
+                                           uint8_t *num_bit) {
   switch (constellation) {
-    case CONSTELLATION_GPS:
-    case CONSTELLATION_GAL:
-    case CONSTELLATION_BDS2:
-    case CONSTELLATION_QZS:
-    case CONSTELLATION_SBAS: {
+    case RTCM_CONSTELLATION_GPS:
+    case RTCM_CONSTELLATION_GAL:
+    case RTCM_CONSTELLATION_BDS:
+    case RTCM_CONSTELLATION_QZS:
+    case RTCM_CONSTELLATION_SBAS: {
       *num_bit = 20;
       return RC_OK;
     }
-    case CONSTELLATION_GLO: {
+    case RTCM_CONSTELLATION_GLO: {
       *num_bit = 17;
       return RC_OK;
     }
-    case CONSTELLATION_INVALID:
-    case CONSTELLATION_COUNT:
+    case RTCM_CONSTELLATION_INVALID:
+    case RTCM_CONSTELLATION_COUNT:
     default:
       return RC_INVALID_MESSAGE;
   }
@@ -45,23 +45,23 @@ enum rtcm3_rc_e get_number_of_bits_for_epoch_time(
  * \param constellation Message constellation
  * \return Number of bits
  */
-enum rtcm3_rc_e get_number_of_bits_for_sat_id(
-    const enum constellation_e constellation, uint8_t *num_bit) {
+rtcm3_rc get_number_of_bits_for_sat_id(rtcm_constellation_t constellation,
+                                       uint8_t *num_bit) {
   switch (constellation) {
-    case CONSTELLATION_GPS:
-    case CONSTELLATION_GAL:
-    case CONSTELLATION_BDS2:
-    case CONSTELLATION_QZS:
-    case CONSTELLATION_SBAS: {
+    case RTCM_CONSTELLATION_GPS:
+    case RTCM_CONSTELLATION_GAL:
+    case RTCM_CONSTELLATION_BDS:
+    case RTCM_CONSTELLATION_QZS:
+    case RTCM_CONSTELLATION_SBAS: {
       *num_bit = 6;
       return RC_OK;
     }
-    case CONSTELLATION_GLO: {
+    case RTCM_CONSTELLATION_GLO: {
       *num_bit = 5;
       return RC_OK;
     }
-    case CONSTELLATION_INVALID:
-    case CONSTELLATION_COUNT:
+    case RTCM_CONSTELLATION_INVALID:
+    case RTCM_CONSTELLATION_COUNT:
     default:
       return RC_INVALID_MESSAGE;
   }

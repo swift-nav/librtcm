@@ -10,8 +10,8 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef LIBRTCM_BITS_H
-#define LIBRTCM_BITS_H
+#ifndef SWIFTNAV_RTCM3_BITS_H
+#define SWIFTNAV_RTCM3_BITS_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,9 +27,11 @@ void rtcm_setbitu(uint8_t *buff, uint32_t pos, uint32_t len, uint32_t data);
 void rtcm_setbitul(uint8_t *buff, uint32_t pos, uint32_t len, uint64_t data);
 void rtcm_setbits(uint8_t *buff, uint32_t pos, uint32_t len, int32_t data);
 void rtcm_setbitsl(uint8_t *buff, uint32_t pos, uint32_t len, int64_t data);
-int32_t rtcm_get_sign_magnitude_bit(const uint8_t *buff, uint32_t pos, uint8_t len);
+int32_t rtcm_get_sign_magnitude_bit(const uint8_t *buff,
+                                    uint32_t pos,
+                                    uint8_t len);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* LIBRTCM_BITS_H */
+#endif /* SWIFTNAV_RTCM3_BITS_H */

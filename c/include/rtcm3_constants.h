@@ -10,8 +10,8 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef LIBRTCM_CONSTANTS_H
-#define LIBRTCM_CONSTANTS_H
+#ifndef SWIFTNAV_RTCM3_CONSTANTS_H
+#define SWIFTNAV_RTCM3_CONSTANTS_H
 
 #define PRUNIT_GPS 299792.458 /**< RTCM v3 Unit of GPS Pseudorange (m) */
 #define PRUNIT_GLO 599584.916 /**< RTCM v3 Unit of GLO Pseudorange (m) */
@@ -65,9 +65,6 @@
 /** The GPS L2 center frequency in Hz. */
 #define GPS_L2_HZ 1.22760e9
 
-/** The GPS L5 center frequency in Hz. */
-#define GPS_L5_HZ (115 * 10.23e6)
-
 /** The GLO L1 center frequency in Hz. */
 #define GLO_L1_HZ 1.602e9
 
@@ -80,43 +77,8 @@
 /** Frequency range between two adjacent GLO channel in Hz for L2 band */
 #define GLO_L2_DELTA_HZ 4.375e5
 
-/** Centre frequency of SBAS L1 */
-#define SBAS_L1_HZ (1.023e6 * 1540)
-
-/** Centre frequency of SBAS L5 */
-#define SBAS_L5_HZ (1.023e6 * 1150)
-
-/** Centre frequency of Beidou2 B11 */
-#define BDS2_B11_HZ (1.023e6 * (1540 - 14))
-
-/** Centre frequency of Beidou2 B2 */
-#define BDS2_B2_HZ (1.023e6 * 1180)
-
-/** Centre frequency of Galileo E1 */
-#define GAL_E1_HZ (1.023e6 * 1540)
-
-/** Centre frequency of Galileo E6 */
-#define GAL_E6_HZ (1.023e6 * 1250)
-
-/** Centre frequency of Galileo E5b */
-#define GAL_E7_HZ (1.023e6 * 1180)
-
-/** Centre frequency of Galileo E5AltBOC */
-#define GAL_E8_HZ (1.023e6 * 1165)
-
-/** Centre frequency of Galileo E5a */
-#define GAL_E5_HZ (1.023e6 * 1150)
-
-/** Centre frequency of QZSS L1CA */
-#define QZS_L1_HZ (1.023e6 * 1540)
-
-/** Centre frequency of QZSS L2C */
-#define QZS_L2_HZ (1.023e6 * 1200)
-
-/** Centre frequency of QZSS L5 */
-#define QZS_L5_HZ (1.023e6 * 1150)
-
 /** Valid PRN ranges, Tables 3.5.90 to 3.5-107 */
+/* Note that libswiftnav/constants.h defines only the first PRNs */
 #define GPS_FIRST_PRN 1
 #define GPS_LAST_PRN 63
 #define SBAS_FIRST_PRN 120
@@ -132,4 +94,4 @@
 
 #define PRN_INVALID 0
 
-#endif /* LIBRTCM_CONSTANTS_H */
+#endif /* SWIFTNAV_RTCM3_CONSTANTS_H */
