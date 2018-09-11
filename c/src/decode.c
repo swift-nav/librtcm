@@ -10,12 +10,12 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include "rtcm3_decode.h"
 #include <math.h>
 #include <stdio.h>
-#include "rtcm3_bits.h"
-#include "rtcm3_eph_decode.h"
-#include "rtcm3_msm_utils.h"
+#include <rtcm3/decode.h>
+#include <rtcm3/bits.h>
+#include <rtcm3/eph_decode.h>
+#include <rtcm3/msm_utils.h>
 
 void init_sat_data(rtcm_sat_data *sat_data) {
   for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {

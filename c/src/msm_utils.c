@@ -10,12 +10,12 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include "rtcm3_msm_utils.h"
 #include <assert.h>
 #include <stdio.h>
+#include <rtcm3/msm_utils.h>
 
 #define LIBRTCM_LOG_INTERNAL
-#include "rtcm_logging.h"
+#include <rtcm3/logging.h>
 
 /** Convert message number into MSM message type
  *

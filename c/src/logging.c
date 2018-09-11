@@ -12,7 +12,7 @@
 
 #include <stdlib.h>
 
-#include "rtcm_logging.h"
+#include <rtcm3/logging.h>
 
 static rtcm_log_callback log_callback_ = NULL;
 static void *log_context_ = NULL;

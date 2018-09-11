@@ -18,8 +18,8 @@
 #ifndef LIBRTCM_RTCM_ENCODER_H
 #define LIBRTCM_RTCM_ENCODER_H
 
-#include "rtcm3_messages.h"
-#include "rtcm3_msm_utils.h"
+#include <rtcm3/messages.h>
+#include <rtcm3/msm_utils.h>
 
 uint16_t rtcm3_write_header(const rtcm_obs_header *header,
                             uint8_t num_sats,

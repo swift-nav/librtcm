@@ -13,7 +13,7 @@
 #ifndef PIKSI_BUILDROOT_RTCM_DECODER_TESTS_H
 #define PIKSI_BUILDROOT_RTCM_DECODER_TESTS_H
 
-#include <rtcm3_messages.h>
+#include <rtcm3/messages.h>
 
 static void test_rtcm_1001(void);
 static void test_rtcm_1002(void);

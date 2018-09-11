@@ -10,7 +10,7 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include "rtcm3_bits.h"
+#include <rtcm3/bits.h>
 
 /** Get bit field from buffer as an unsigned integer.
  * Unpacks `len` bits at bit position `pos` from the start of the buffer.
