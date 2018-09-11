@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-#include "rtcm3_messages.h"
+#include <rtcm3/messages.h>
 
 rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001);
 rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002);

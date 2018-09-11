@@ -13,7 +13,7 @@
 #ifndef SWIFTNAV_RTCM3_SSR_DECODE_H
 #define SWIFTNAV_RTCM3_SSR_DECODE_H
 
-#include "rtcm3_messages.h"
+#include <rtcm3/messages.h>
 
 rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[], rtcm_msg_orbit_clock *msg_orbit_clock);
 rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[], rtcm_msg_code_bias *msg_code_bias);

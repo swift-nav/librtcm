@@ -15,7 +15,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "rtcm3_constants.h"
+#include <rtcm3/constants.h>
 
 typedef enum { L1_FREQ, L2_FREQ, NUM_FREQS } freq_enum;
 

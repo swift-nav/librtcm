@@ -10,18 +10,18 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include "rtcm_decoder_tests.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "rtcm3_bits.h"
-#include "rtcm3_decode.h"
-#include "rtcm3_messages.h"
+#include <rtcm3/bits.h>
+#include <rtcm3/decode.h>
+#include <rtcm3/messages.h>
 #include "rtcm_encoder.h"
+#include "rtcm_decoder_tests.h"
 #define LIBRTCM_LOG_INTERNAL
-#include <rtcm_logging.h>
+#include <rtcm3/logging.h>
 
 int main(void) {
   test_msm_bit_utils();

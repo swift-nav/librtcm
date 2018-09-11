@@ -10,9 +10,9 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include "rtcm_encoder.h"
 #include <math.h>
-#include "rtcm3_bits.h"
+#include <rtcm3/bits.h>
+#include "rtcm_encoder.h"
 
 /** Convert a lock time in seconds into a RTCMv3 Lock Time Indicator value.
  * See RTCM 10403.1, Table 3.4-2.

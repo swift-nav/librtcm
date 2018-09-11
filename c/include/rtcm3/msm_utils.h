@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-#include "rtcm3_messages.h"
+#include <rtcm3/messages.h>
 
 msm_enum to_msm_type(uint16_t msg_num);
 rtcm_constellation_t to_constellation(uint16_t msg_num);
