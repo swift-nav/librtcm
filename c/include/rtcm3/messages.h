@@ -203,10 +203,8 @@ typedef struct {
 } rtcm_msg_1230;
 
 /** Structure containing the ephemeris for one satellite.
- * (TODO) Anthony - this was lifted with minor alteratons from LSNP ephemeris.c,
- * if we split this out to be a common repo, we should submodule it in here
+ *  NOTE: this size has to fit parameters for all constellations
  */
-
 typedef struct {
   union {
     int8_t tgd_gps_s;
@@ -215,11 +213,11 @@ typedef struct {
     double tgd_gal_s[2];
   };
   int32_t crc;
-  int16_t crs;
-  int16_t cuc;
-  int16_t cus;
-  int16_t cic;
-  int16_t cis;
+  int32_t crs;
+  int32_t cuc;
+  int32_t cus;
+  int32_t cic;
+  int32_t cis;
   int16_t dn;
   int32_t m0;
   uint32_t ecc;
@@ -230,9 +228,9 @@ typedef struct {
   int32_t inc;
   int16_t inc_dot;
   int32_t af0;
-  int16_t af1;
-  int8_t af2;
-  uint16_t toc;
+  int32_t af1;
+  int16_t af2;
+  uint32_t toc;
   uint16_t iodc;
   uint16_t iode;
 } ephemeris_kepler_t;
