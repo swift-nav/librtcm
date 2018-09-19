@@ -257,21 +257,14 @@ rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   return RC_OK;
 }
 
-/** Decode an RTCMv3 GAL (I/NAV message) Ephemeris Message
+/** Decode an RTCMv3 GAL (common part) Ephemeris Message
  *
  * \param buff The input data buffer
- * \param RTCM message struct
- * \return  - RC_OK : Success
- *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
+ * \param msg_eph RTCM message struct
+ * \return bit position in the RTCM frame
  */
-rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
-  uint16_t bit = 0;
-  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  if(msg_num != 1046) {
-    return RC_MESSAGE_TYPE_MISMATCH;
-  }
-  bit += 12;
+static uint16_t rtcm3_decode_gal_eph_common(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+  uint16_t bit = 12;
   msg_eph->sat_id = rtcm_getbitu(buff, bit, 6);
   bit += 6;
   msg_eph->wn = rtcm_getbitu(buff, bit, 12);
@@ -320,6 +313,27 @@ rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 32;
   msg_eph->kepler.omegadot = rtcm_getbits(buff, bit, 24);
   bit += 24;
+  return bit;
+}
+
+/** Decode an RTCMv3 GAL (I/NAV message) Ephemeris Message
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return  - RC_OK : Success
+ *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
+ */
+rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+  uint16_t bit = 0;
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
+  if(msg_num != 1046) {
+    return RC_MESSAGE_TYPE_MISMATCH;
+  }
+
+  /* parse common I/NAV and F/NAV part */
+  bit = rtcm3_decode_gal_eph_common(buff, msg_eph);
+
   msg_eph->kepler.tgd_gal_s[0] = rtcm_getbits(buff, bit, 10);
   bit += 10;
   msg_eph->kepler.tgd_gal_s[1] = rtcm_getbits(buff, bit, 10);
@@ -328,6 +342,34 @@ rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 6;
   /* reserved */ rtcm_getbits(buff, bit, 2);
   bit += 2;
+
+  return RC_OK;
+}
+
+/** Decode an RTCMv3 GAL (F/NAV message) Ephemeris Message
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return  - RC_OK : Success
+ *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
+ */
+rtcm3_rc rtcm3_decode_gal_eph_fnav(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+  uint16_t bit = 0;
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
+  if(msg_num != 1045) {
+    return RC_MESSAGE_TYPE_MISMATCH;
+  }
+
+  /* parse common F/NAV and I/NAV part */
+  bit = rtcm3_decode_gal_eph_common(buff, msg_eph);
+
+  msg_eph->kepler.tgd_gal_s[0] = rtcm_getbits(buff, bit, 10);
+  bit += 10;
+  msg_eph->health_bits = rtcm_getbits(buff, bit, 3);
+  bit += 3;
+  /* reserved */ rtcm_getbits(buff, bit, 7);
+  bit += 7;
 
   return RC_OK;
 }

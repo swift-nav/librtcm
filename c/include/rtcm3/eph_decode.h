@@ -18,6 +18,7 @@
 rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);
 rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);
 rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);
+rtcm3_rc rtcm3_decode_gal_eph_fnav(const uint8_t buff[], rtcm_msg_eph *msg_eph);
 rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);
 
 #endif /* SWIFTNAV_RTCM3_EPH_DECODE_H */
