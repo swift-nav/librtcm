@@ -22,11 +22,11 @@
 #define MSM_MAX_CELLS 64         /* Maximum number of cells in MSM message */
 #define MSM_ROUGH_RANGE_INVALID 0xFF  /* Unsigned bit pattern 0xFF */
 #define MSM_ROUGH_RATE_INVALID 0x2000 /* Unsigned bit pattern 0x2000 */
-#define MSM_PR_INVALID -16384         /* Signed bit pattern 0x4000 */
-#define MSM_PR_EXT_INVALID -8388608   /* Signed bit pattern 0x800000 */
-#define MSM_CP_INVALID -2097152       /* Signed bit pattern 0x200000 */
-#define MSM_CP_EXT_INVALID -8388608   /* Signed bit pattern 0x800000 */
-#define MSM_DOP_INVALID -16384        /* Signed bit pattern 0x4000 */
+#define MSM_PR_INVALID (-16384)       /* Signed bit pattern 0x4000 */
+#define MSM_PR_EXT_INVALID (-8388608) /* Signed bit pattern 0x800000 */
+#define MSM_CP_INVALID (-2097152)     /* Signed bit pattern 0x200000 */
+#define MSM_CP_EXT_INVALID (-8388608) /* Signed bit pattern 0x800000 */
+#define MSM_DOP_INVALID (-16384)      /* Signed bit pattern 0x4000 */
 
 #define MSM_GLO_FCN_OFFSET 7 /* Offset for FCN coding in sat_info */
 #define MSM_GLO_MAX_FCN 13

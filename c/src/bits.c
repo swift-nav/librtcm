@@ -104,13 +104,16 @@ int64_t rtcm_getbitsl(const uint8_t *buff, uint32_t pos, uint8_t len) {
 void rtcm_setbitu(uint8_t *buff, uint32_t pos, uint32_t len, uint32_t data) {
   uint32_t mask = 1u << (len - 1);
 
-  if (len <= 0 || 32 < len) return;
+  if (len <= 0 || 32 < len) {
+    return;
+  }
 
   for (uint32_t i = pos; i < pos + len; i++, mask >>= 1) {
-    if (data & mask)
+    if (data & mask) {
       buff[i / 8] |= 1u << (7 - i % 8);
-    else
+    } else {
       buff[i / 8] &= ~(1u << (7 - i % 8));
+    }
   }
 }
 
@@ -126,13 +129,16 @@ void rtcm_setbitu(uint8_t *buff, uint32_t pos, uint32_t len, uint32_t data) {
 void rtcm_setbitul(uint8_t *buff, uint32_t pos, uint32_t len, uint64_t data) {
   uint64_t mask = ((uint64_t)1) << (len - 1);
 
-  if (len <= 0 || 64 < len) return;
+  if (len <= 0 || 64 < len) {
+    return;
+  }
 
   for (uint32_t i = pos; i < pos + len; i++, mask >>= 1) {
-    if (data & mask)
+    if (data & mask) {
       buff[i / 8] |= ((uint64_t)1) << (7 - i % 8);
-    else
+    } else {
       buff[i / 8] &= ~(((uint64_t)1) << (7 - i % 8));
+    }
   }
 }
 

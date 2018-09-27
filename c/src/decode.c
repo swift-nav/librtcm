@@ -10,12 +10,13 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include "rtcm3/decode.h"
 #include <math.h>
 #include <stdio.h>
-#include <rtcm3/decode.h>
-#include <rtcm3/bits.h>
-#include <rtcm3/eph_decode.h>
-#include <rtcm3/msm_utils.h>
+#include <string.h>
+#include "rtcm3/bits.h"
+#include "rtcm3/eph_decode.h"
+#include "rtcm3/msm_utils.h"
 
 void init_sat_data(rtcm_sat_data *sat_data) {
   for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {
@@ -24,12 +25,24 @@ void init_sat_data(rtcm_sat_data *sat_data) {
 }
 
 static uint32_t from_lock_ind(uint8_t lock) {
-  if (lock < 24) return lock;
-  if (lock < 48) return 2 * lock - 24;
-  if (lock < 72) return 4 * lock - 120;
-  if (lock < 96) return 8 * lock - 408;
-  if (lock < 120) return 16 * lock - 1176;
-  if (lock < 127) return 32 * lock - 3096;
+  if (lock < 24) {
+    return lock;
+  }
+  if (lock < 48) {
+    return 2 * lock - 24;
+  }
+  if (lock < 72) {
+    return 4 * lock - 120;
+  }
+  if (lock < 96) {
+    return 8 * lock - 408;
+  }
+  if (lock < 120) {
+    return 16 * lock - 1176;
+  }
+  if (lock < 127) {
+    return 32 * lock - 3096;
+  }
   return 937;
 }
 
@@ -38,35 +51,76 @@ static uint32_t from_lock_ind(uint8_t lock) {
 static uint32_t from_msm_lock_ind(uint8_t lock) {
   if (lock == 0) {
     return 0;
-  } else {
-    return 32 << lock;
   }
+  return 32 << lock;
 }
 
 /* Returns the lock time in milliseconds */
 /* RTCM 10403.3 Table 3.5-75 */
 static uint32_t from_msm_lock_ind_ext(uint16_t lock) {
-  if (lock < 64) return lock;
-  if (lock < 96) return 2 * lock - 64;
-  if (lock < 128) return 4 * lock - 256;
-  if (lock < 160) return 8 * lock - 768;
-  if (lock < 192) return 16 * lock - 2048;
-  if (lock < 224) return 32 * lock - 5120;
-  if (lock < 256) return 64 * lock - 12288;
-  if (lock < 288) return 128 * lock - 28672;
-  if (lock < 320) return 256 * lock - 65536;
-  if (lock < 352) return 512 * lock - 147456;
-  if (lock < 384) return 1024 * lock - 327680;
-  if (lock < 416) return 2048 * lock - 720896;
-  if (lock < 448) return 4096 * lock - 1572864;
-  if (lock < 480) return 8192 * lock - 3407872;
-  if (lock < 512) return 16384 * lock - 7340032;
-  if (lock < 544) return 32768 * lock - 15728640;
-  if (lock < 576) return 65536 * lock - 33554432;
-  if (lock < 608) return 131072 * lock - 71303168;
-  if (lock < 640) return 262144 * lock - 150994944;
-  if (lock < 672) return 524288 * lock - 318767104;
-  if (lock < 704) return 1048576 * lock - 671088640;
+  if (lock < 64) {
+    return lock;
+  }
+  if (lock < 96) {
+    return 2 * lock - 64;
+  }
+  if (lock < 128) {
+    return 4 * lock - 256;
+  }
+  if (lock < 160) {
+    return 8 * lock - 768;
+  }
+  if (lock < 192) {
+    return 16 * lock - 2048;
+  }
+  if (lock < 224) {
+    return 32 * lock - 5120;
+  }
+  if (lock < 256) {
+    return 64 * lock - 12288;
+  }
+  if (lock < 288) {
+    return 128 * lock - 28672;
+  }
+  if (lock < 320) {
+    return 256 * lock - 65536;
+  }
+  if (lock < 352) {
+    return 512 * lock - 147456;
+  }
+  if (lock < 384) {
+    return 1024 * lock - 327680;
+  }
+  if (lock < 416) {
+    return 2048 * lock - 720896;
+  }
+  if (lock < 448) {
+    return 4096 * lock - 1572864;
+  }
+  if (lock < 480) {
+    return 8192 * lock - 3407872;
+  }
+  if (lock < 512) {
+    return 16384 * lock - 7340032;
+  }
+  if (lock < 544) {
+    return 32768 * lock - 15728640;
+  }
+  if (lock < 576) {
+    return 65536 * lock - 33554432;
+  }
+  if (lock < 608) {
+    return 131072 * lock - 71303168;
+  }
+  if (lock < 640) {
+    return 262144 * lock - 150994944;
+  }
+  if (lock < 672) {
+    return 524288 * lock - 318767104;
+  }
+  if (lock < 704) {
+    return 1048576 * lock - 671088640;
+  }
   return 67108864;
 }
 
@@ -85,8 +139,6 @@ void decode_basic_gps_l1_freq_data(const uint8_t buff[],
   freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
   *bit += 7;
   freq_data->flags.valid_lock = 1;
-
-  return;
 }
 
 void decode_basic_glo_l1_freq_data(const uint8_t buff[],
@@ -106,7 +158,6 @@ void decode_basic_glo_l1_freq_data(const uint8_t buff[],
   freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
   *bit += 7;
   freq_data->flags.valid_lock = 1;
-  return;
 }
 
 void decode_basic_l2_freq_data(const uint8_t buff[],
@@ -124,8 +175,6 @@ void decode_basic_l2_freq_data(const uint8_t buff[],
   freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
   *bit += 7;
   freq_data->flags.valid_lock = 1;
-
-  return;
 }
 
 uint16_t rtcm3_read_header(const uint8_t buff[], rtcm_obs_header *header) {
@@ -302,8 +351,9 @@ rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001) {
   uint16_t bit = 0;
   bit += rtcm3_read_header(buff, &msg_1001->header);
 
-  if (msg_1001->header.msg_num != 1001) /* Unexpected message type. */
+  if (msg_1001->header.msg_num != 1001) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   if (msg_1001->header.tow_ms > RTCM_MAX_TOW_MS) {
     return RC_INVALID_MESSAGE;
@@ -342,8 +392,9 @@ rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
   uint16_t bit = 0;
   bit += rtcm3_read_header(buff, &msg_1002->header);
 
-  if (msg_1002->header.msg_num != 1002) /* Unexpected message type. */
+  if (msg_1002->header.msg_num != 1002) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   if (msg_1002->header.tow_ms > RTCM_MAX_TOW_MS) {
     return RC_INVALID_MESSAGE;
@@ -386,8 +437,9 @@ rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
   uint16_t bit = 0;
   bit += rtcm3_read_header(buff, &msg_1003->header);
 
-  if (msg_1003->header.msg_num != 1003) /* Unexpected message type. */
+  if (msg_1003->header.msg_num != 1003) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   if (msg_1003->header.tow_ms > RTCM_MAX_TOW_MS) {
     return RC_INVALID_MESSAGE;
@@ -436,8 +488,9 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
   uint16_t bit = 0;
   bit += rtcm3_read_header(buff, &msg_1004->header);
 
-  if (msg_1004->header.msg_num != 1004) /* Unexpected message type. */
+  if (msg_1004->header.msg_num != 1004) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   if (msg_1004->header.tow_ms > RTCM_MAX_TOW_MS) {
     return RC_INVALID_MESSAGE;
@@ -523,8 +576,9 @@ rtcm3_rc rtcm3_decode_1005(const uint8_t buff[], rtcm_msg_1005 *msg_1005) {
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1005) /* Unexpected message type. */
+  if (msg_num != 1005) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   return rtcm3_decode_1005_base(buff, msg_1005, &bit);
 }
@@ -542,8 +596,9 @@ rtcm3_rc rtcm3_decode_1006(const uint8_t buff[], rtcm_msg_1006 *msg_1006) {
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1006) /* Unexpected message type. */
+  if (msg_num != 1006) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   rtcm3_decode_1005_base(buff, &msg_1006->msg_1005, &bit);
   msg_1006->ant_height = (double)(rtcm_getbitu(buff, bit, 16)) / 10000.0;
@@ -580,8 +635,9 @@ rtcm3_rc rtcm3_decode_1007(const uint8_t buff[], rtcm_msg_1007 *msg_1007) {
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1007) /* Unexpected message type. */
+  if (msg_num != 1007) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   rtcm3_decode_1007_base(buff, msg_1007, &bit);
 
@@ -600,8 +656,9 @@ rtcm3_rc rtcm3_decode_1008(const uint8_t buff[], rtcm_msg_1008 *msg_1008) {
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1008) /* Unexpected message type. */
+  if (msg_num != 1008) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   rtcm3_decode_1007_base(buff, &msg_1008->msg_1007, &bit);
   msg_1008->serial_count = rtcm_getbitu(buff, bit, 8);
@@ -625,8 +682,9 @@ rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
   uint16_t bit = 0;
   bit += rtcm3_read_glo_header(buff, &msg_1010->header);
 
-  if (msg_1010->header.msg_num != 1010) /* Unexpected message type. */
+  if (msg_1010->header.msg_num != 1010) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   if (msg_1010->header.tow_ms > RTCM_GLO_MAX_TOW_MS) {
     return RC_INVALID_MESSAGE;
@@ -674,8 +732,9 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
   uint16_t bit = 0;
   bit += rtcm3_read_glo_header(buff, &msg_1012->header);
 
-  if (msg_1012->header.msg_num != 1012) /* Unexpected message type. */
+  if (msg_1012->header.msg_num != 1012) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   if (msg_1012->header.tow_ms > RTCM_GLO_MAX_TOW_MS) {
     return RC_INVALID_MESSAGE;
@@ -736,8 +795,9 @@ rtcm3_rc rtcm3_decode_1029(const uint8_t buff[], rtcm_msg_1029 *msg_1029) {
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1029) /* Unexpected message type. */
+  if (msg_num != 1029) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   msg_1029->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
@@ -773,8 +833,9 @@ rtcm3_rc rtcm3_decode_1033(const uint8_t buff[], rtcm_msg_1033 *msg_1033) {
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1033) /* Unexpected message type. */
+  if (msg_num != 1033) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   msg_1033->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
@@ -832,8 +893,9 @@ rtcm3_rc rtcm3_decode_1230(const uint8_t buff[], rtcm_msg_1230 *msg_1230) {
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
-  if (msg_num != 1230) /* Unexpected message type. */
+  if (msg_num != 1230) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
+  }
 
   msg_1230->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;

@@ -10,8 +10,8 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifndef LIBRTCM_LOGGING_H
-#define LIBRTCM_LOGGING_H
+#ifndef SWIFTNAV_RTCM3_LOGGING_H
+#define SWIFTNAV_RTCM3_LOGGING_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,4 +43,4 @@ void rtcm_log(uint8_t level, uint8_t *msg, uint16_t len);
 }
 #endif
 
-#endif /* LIBRTCM_LOGGING_H */
+#endif /* SWIFTNAV_RTCM3_LOGGING_H */

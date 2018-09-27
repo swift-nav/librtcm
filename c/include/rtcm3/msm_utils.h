@@ -22,9 +22,7 @@ extern "C" {
 msm_enum to_msm_type(uint16_t msg_num);
 rtcm_constellation_t to_constellation(uint16_t msg_num);
 uint8_t count_mask_values(uint8_t mask_size, const bool mask[]);
-uint8_t find_nth_mask_value(const uint8_t mask_size,
-                            const bool mask[],
-                            const uint8_t n);
+uint8_t find_nth_mask_value(uint8_t mask_size, const bool mask[], uint8_t n);
 
 #ifdef __cplusplus
 }

@@ -11,8 +11,8 @@
  */
 
 #include <assert.h>
-#include <stdio.h>
 #include <rtcm3/msm_utils.h>
+#include <stdio.h>
 
 #define LIBRTCM_LOG_INTERNAL
 #include <rtcm3/logging.h>
