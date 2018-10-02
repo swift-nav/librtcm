@@ -10,149 +10,235 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include <math.h>
-#include <rtcm3/bits.h>
-#include "rtcm_encoder.h"
+#include "rtcm3/encode.h"
 
-/** Convert a lock time in seconds into a RTCMv3 Lock Time Indicator value.
+#include <math.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include "rtcm3/bits.h"
+#include "rtcm3/constants.h"
+#include "rtcm3/msm_utils.h"
+
+/** Convert a lock time in seconds into 7-bit RTCMv3 Lock Time Indicator value.
  * See RTCM 10403.1, Table 3.4-2.
+ *
  *
  * \param time Lock time in seconds.
  * \return Lock Time Indicator value.
  */
-static uint8_t to_lock_ind(uint32_t time) {
-  if (time < 24) return time;
-  if (time < 72) return (time + 24) / 2;
-  if (time < 168) return (time + 120) / 4;
-  if (time < 360) return (time + 408) / 8;
-  if (time < 744) return (time + 1176) / 16;
-  if (time < 937) return (time + 3096) / 32;
+static uint8_t to_lock_ind(double time) {
+  if (time < 24) {
+    return time;
+  }
+  if (time < 72) {
+    return (time + 24) / 2;
+  }
+  if (time < 168) {
+    return (time + 120) / 4;
+  }
+  if (time < 360) {
+    return (time + 408) / 8;
+  }
+  if (time < 744) {
+    return (time + 1176) / 16;
+  }
+  if (time < 937) {
+    return (time + 3096) / 32;
+  }
   return 127;
 }
 
-/** Convert a lock time in seconds into a 4-bit RTCMv3 Lock Time Indicator value
+/** Convert a lock time in seconds into a 4-bit RTCMv3 Lock Time Indicator DF402
  * See RTCM 10403.1, Table 3.5-74.
  *
  * \param time Lock time in seconds.
- * \return Lock Time Indicator value.
+ * \return Lock Time Indicator value 0-15.
  */
-static uint8_t to_msm_lock_ind(double time) {
-  if (time < 0.032) return 0;
-  if (time < 0.064) return 1;
-  if (time < 0.128) return 2;
-  if (time < 0.256) return 3;
-  if (time < 0.512) return 4;
-  if (time < 1.024) return 5;
-  if (time < 2.048) return 6;
-  if (time < 4.096) return 7;
-  if (time < 8.192) return 8;
-  if (time < 16.384) return 9;
-  if (time < 32.768) return 10;
-  if (time < 65.536) return 11;
-  if (time < 131.072) return 12;
-  if (time < 262.144) return 13;
-  if (time < 524.288) return 14;
+uint8_t rtcm3_encode_lock_time(double time) {
+  if (time < 0.032) {
+    return 0;
+  }
+  if (time < 0.064) {
+    return 1;
+  }
+  if (time < 0.128) {
+    return 2;
+  }
+  if (time < 0.256) {
+    return 3;
+  }
+  if (time < 0.512) {
+    return 4;
+  }
+  if (time < 1.024) {
+    return 5;
+  }
+  if (time < 2.048) {
+    return 6;
+  }
+  if (time < 4.096) {
+    return 7;
+  }
+  if (time < 8.192) {
+    return 8;
+  }
+  if (time < 16.384) {
+    return 9;
+  }
+  if (time < 32.768) {
+    return 10;
+  }
+  if (time < 65.536) {
+    return 11;
+  }
+  if (time < 131.072) {
+    return 12;
+  }
+  if (time < 262.144) {
+    return 13;
+  }
+  if (time < 524.288) {
+    return 14;
+  }
   return 15;
 }
 
-void encode_basic_freq_data(const rtcm_freq_data *freq_data,
-                            const double freq,
-                            const double *l1_pr,
-                            uint8_t buff[],
-                            uint16_t *bit) {
+/* Encode PhaseRange – L1 Pseudorange (DF012, DF018 ,DF042, DF048) */
+static int32_t encode_diff_phaserange(double cp_pr, double freq) {
+  double phase_unit = (GPS_C / freq) / 0.0005;
+  int32_t ppr = round(cp_pr * phase_unit);
+
+  /* From specification: "Certain ionospheric conditions might cause the GPS
+   * L1 Phaserange – L1 Pseudorange to diverge over time across the range
+   * limits defined. Under these circumstances the computed value needs to be
+   * adjusted (rolled over) by the equivalent of 1500 cycles in order to bring
+   * the value back within the range" */
+
+  if (ppr <= -C_2P19) {
+    /* add multiples of 1500 cycles */
+    cp_pr += 1500 * ceil((-C_2P19 / phase_unit - cp_pr) / 1500);
+    ppr = round(cp_pr * phase_unit);
+  } else if (ppr >= C_2P19) {
+    /* substract multiples of 1500 cycles */
+    cp_pr -= 1500 * ceil((cp_pr - C_2P19 / phase_unit) / 1500);
+    ppr = round(cp_pr * phase_unit);
+  }
+  return ppr;
+}
+
+static void encode_basic_freq_data(const rtcm_freq_data *freq_data,
+                                   const freq_t freq_enum,
+                                   const double *l1_pr,
+                                   uint8_t buff[],
+                                   uint16_t *bit) {
   /* Calculate GPS Integer L1 Pseudorange Modulus Ambiguity (DF014). */
   uint8_t amb = (uint8_t)(*l1_pr / PRUNIT_GPS);
 
   /* Construct L1 pseudorange value as it would be transmitted (DF011). */
-  uint32_t calc_l1_pr =
-      (uint32_t)roundl((double)(*l1_pr - amb * PRUNIT_GPS) / 0.02);
+  uint32_t calc_l1_pr = (uint32_t)round((*l1_pr - amb * PRUNIT_GPS) / 0.02);
 
   /* Calculate GPS Pseudorange (DF011/DF016). */
   uint32_t pr =
-      (uint32_t)roundl((freq_data->pseudorange - amb * PRUNIT_GPS) / 0.02);
+      (uint32_t)round((freq_data->pseudorange - amb * PRUNIT_GPS) / 0.02);
 
   double l1_prc = calc_l1_pr * 0.02 + amb * PRUNIT_GPS;
 
-  /* phaserange - L1 pseudorange */
-  double cp_pr = freq_data->carrier_phase - l1_prc / (GPS_C / freq);
-
-  /* TODO (anthony) If the pr and cp diverge, we should adjust the cp ambiguity
-   * and reset the lock time indicator */
-
-  /* Calculate PhaseRange – L1 Pseudorange (DF012/DF018). */
-  int32_t ppr = roundl(cp_pr * (GPS_C / freq) / 0.0005);
-
-  if (fabs(freq - GPS_L1_HZ) < 0.01) {
+  double freq = 0;
+  if (L1_FREQ == freq_enum) {
+    freq = GPS_L1_HZ;
     rtcm_setbitu(buff, *bit, 1, 0);
     *bit += 1;
-    rtcm_setbitu(buff, *bit, 24, pr);
+    rtcm_setbitu(
+        buff, *bit, 24, freq_data->flags.valid_pr ? pr : PR_L1_INVALID);
     *bit += 24;
   } else {
+    freq = GPS_L2_HZ;
     rtcm_setbitu(buff, *bit, 2, 0);
     *bit += 2;
-    rtcm_setbits(buff, *bit, 14, (int32_t)pr - (int32_t)calc_l1_pr);
+    rtcm_setbits(buff,
+                 *bit,
+                 14,
+                 freq_data->flags.valid_pr ? (int32_t)pr - (int32_t)calc_l1_pr
+                                           : (int32_t)PR_L2_INVALID);
     *bit += 14;
   }
-  rtcm_setbits(buff, *bit, 20, ppr);
+
+  if (freq_data->flags.valid_cp) {
+    /* phaserange - L1 pseudorange */
+    double cp_pr = freq_data->carrier_phase - l1_prc / (GPS_C / freq);
+    /* encode PhaseRange – L1 Pseudorange (DF012/DF018) and roll over if
+     * necessary */
+    int32_t ppr = encode_diff_phaserange(cp_pr, freq);
+    rtcm_setbits(buff, *bit, 20, ppr);
+  } else {
+    rtcm_setbits(buff, *bit, 20, CP_INVALID);
+  }
   *bit += 20;
   rtcm_setbitu(buff,
-          *bit,
-          7,
-          freq_data->flags.valid_lock ? to_lock_ind(freq_data->lock) : 0);
+               *bit,
+               7,
+               freq_data->flags.valid_lock ? to_lock_ind(freq_data->lock) : 0);
   *bit += 7;
 }
 
-void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data,
-                                const double freq,
-                                const double *l1_pr,
-                                const uint8_t fcn,
-                                uint8_t buff[],
-                                uint16_t *bit) {
-  bool L1 = fabs(freq - GLO_L1_HZ) < 0.01;
+static void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data,
+                                       const freq_t freq_enum,
+                                       const double *l1_pr,
+                                       const uint8_t fcn,
+                                       uint8_t buff[],
+                                       uint16_t *bit) {
   /* Calculate GPS Integer L1 Pseudorange Modulus Ambiguity (DF044). */
   uint8_t amb = (uint8_t)(*l1_pr / PRUNIT_GLO);
 
   /* Construct L1 pseudorange value as it would be transmitted (DF041). */
-  uint32_t calc_l1_pr =
-      (uint32_t)roundl((double)(*l1_pr - amb * PRUNIT_GLO) / 0.02);
+  uint32_t calc_l1_pr = (uint32_t)round((*l1_pr - amb * PRUNIT_GLO) / 0.02);
 
   /* Calculate GLO Pseudorange (DF041/DF046). */
   uint32_t pr =
-      (uint32_t)roundl((freq_data->pseudorange - amb * PRUNIT_GLO) / 0.02);
+      (uint32_t)round((freq_data->pseudorange - amb * PRUNIT_GLO) / 0.02);
 
   double l1_prc = calc_l1_pr * 0.02 + amb * PRUNIT_GLO;
 
   double glo_freq = 0.0;
-  if (L1) {
-    glo_freq = freq + (fcn - 7) * GLO_L1_DELTA_HZ;
-  } else {
-    glo_freq = freq + (fcn - 7) * GLO_L2_DELTA_HZ;
-  }
-  /* phaserange - L1 pseudorange */
-  double cp_pr = freq_data->carrier_phase - l1_prc / (GPS_C / glo_freq);
+  if (L1_FREQ == freq_enum) {
+    glo_freq = GLO_L1_HZ + (fcn - MT1012_GLO_FCN_OFFSET) * GLO_L1_DELTA_HZ;
 
-  /* Calculate PhaseRange – L1 Pseudorange (DF042/DF048). */
-  int32_t ppr = roundl(cp_pr * (GPS_C / glo_freq) / 0.0005);
-
-  if (L1) {
     rtcm_setbitu(buff, *bit, 1, 0);
     *bit += 1;
     rtcm_setbitu(buff, *bit, 5, fcn);
     *bit += 5;
-    rtcm_setbitu(buff, *bit, 25, pr);
+    rtcm_setbitu(
+        buff, *bit, 25, freq_data->flags.valid_pr ? pr : PR_L1_INVALID);
     *bit += 25;
   } else {
+    glo_freq = GLO_L2_HZ + (fcn - MT1012_GLO_FCN_OFFSET) * GLO_L2_DELTA_HZ;
+
     rtcm_setbitu(buff, *bit, 2, 0);
     *bit += 2;
-    rtcm_setbits(buff, *bit, 14, (int32_t)pr - (int32_t)calc_l1_pr);
+    rtcm_setbits(buff,
+                 *bit,
+                 14,
+                 freq_data->flags.valid_pr ? (int32_t)pr - (int32_t)calc_l1_pr
+                                           : (int32_t)PR_L2_INVALID);
     *bit += 14;
   }
-  rtcm_setbits(buff, *bit, 20, ppr);
+
+  if (freq_data->flags.valid_cp) {
+    /* phaserange - L1 pseudorange */
+    double cp_pr = freq_data->carrier_phase - l1_prc / (GPS_C / glo_freq);
+
+    /* Calculate PhaseRange – L1 Pseudorange (DF042/DF048) and roll over if
+     * necessary */
+    int32_t ppr = encode_diff_phaserange(cp_pr, glo_freq);
+    rtcm_setbits(buff, *bit, 20, ppr);
+  } else {
+    rtcm_setbits(buff, *bit, 20, CP_INVALID);
+  }
   *bit += 20;
   rtcm_setbitu(buff,
-          *bit,
-          7,
-          freq_data->flags.valid_lock ? to_lock_ind(freq_data->lock) : 0);
+               *bit,
+               7,
+               freq_data->flags.valid_lock ? to_lock_ind(freq_data->lock) : 0);
   *bit += 7;
 }
 
@@ -286,14 +372,19 @@ uint16_t rtcm3_encode_1001(const rtcm_obs_message *msg_1001, uint8_t buff[]) {
       rtcm_setbitu(buff, bit, 6, msg_1001->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1001->sats[i].obs[L1_FREQ],
-                             GPS_L1_HZ,
+                             L1_FREQ,
                              &msg_1001->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
       ++num_sats;
+      if (num_sats >= RTCM_MAX_SATS) {
+        /* sanity */
+        break;
+      }
     }
   }
 
+  /* Fill in the header */
   rtcm3_write_header(&msg_1001->header, num_sats, buff);
 
   /* Round number of bits up to nearest whole byte. */
@@ -322,7 +413,7 @@ uint16_t rtcm3_encode_1002(const rtcm_obs_message *msg_1002, uint8_t buff[]) {
       rtcm_setbitu(buff, bit, 6, msg_1002->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1002->sats[i].obs[L1_FREQ],
-                             GPS_L1_HZ,
+                             L1_FREQ,
                              &msg_1002->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
@@ -334,11 +425,15 @@ uint16_t rtcm3_encode_1002(const rtcm_obs_message *msg_1002, uint8_t buff[]) {
       rtcm_setbitu(buff, bit, 8, amb);
       bit += 8;
       rtcm_setbitu(buff,
-              bit,
-              8,
-              (uint8_t)roundl(msg_1002->sats[i].obs[L1_FREQ].cnr * 4.0));
+                   bit,
+                   8,
+                   (uint8_t)round(msg_1002->sats[i].obs[L1_FREQ].cnr * 4.0));
       bit += 8;
       ++num_sats;
+      if (num_sats >= RTCM_MAX_SATS) {
+        /* sanity */
+        break;
+      }
     }
   }
 
@@ -360,16 +455,20 @@ uint16_t rtcm3_encode_1003(const rtcm_obs_message *msg_1003, uint8_t buff[]) {
       rtcm_setbitu(buff, bit, 6, msg_1003->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1003->sats[i].obs[L1_FREQ],
-                             GPS_L1_HZ,
+                             L1_FREQ,
                              &msg_1003->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
       encode_basic_freq_data(&msg_1003->sats[i].obs[L2_FREQ],
-                             GPS_L2_HZ,
+                             L2_FREQ,
                              &msg_1003->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
       ++num_sats;
+      if (num_sats >= RTCM_MAX_SATS) {
+        /* sanity */
+        break;
+      }
     }
   }
 
@@ -385,13 +484,11 @@ uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_1004->header.n_sat; i++) {
     flag_bf l1_flags = msg_1004->sats[i].obs[L1_FREQ].flags;
-    flag_bf l2_flags = msg_1004->sats[i].obs[L2_FREQ].flags;
-    if (l1_flags.valid_pr && l1_flags.valid_cp && l2_flags.valid_pr &&
-        l2_flags.valid_cp) {
+    if (l1_flags.valid_pr && l1_flags.valid_cp) {
       rtcm_setbitu(buff, bit, 6, msg_1004->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1004->sats[i].obs[L1_FREQ],
-                             GPS_L1_HZ,
+                             L1_FREQ,
                              &msg_1004->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
@@ -403,22 +500,26 @@ uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
       rtcm_setbitu(buff, bit, 8, amb);
       bit += 8;
       rtcm_setbitu(buff,
-              bit,
-              8,
-              (uint8_t)roundl(msg_1004->sats[i].obs[L1_FREQ].cnr * 4.0));
+                   bit,
+                   8,
+                   (uint8_t)round(msg_1004->sats[i].obs[L1_FREQ].cnr * 4.0));
       bit += 8;
 
       encode_basic_freq_data(&msg_1004->sats[i].obs[L2_FREQ],
-                             GPS_L2_HZ,
+                             L2_FREQ,
                              &msg_1004->sats[i].obs[L1_FREQ].pseudorange,
                              buff,
                              &bit);
       rtcm_setbitu(buff,
-              bit,
-              8,
-              (uint8_t)roundl(msg_1004->sats[i].obs[L2_FREQ].cnr * 4.0));
+                   bit,
+                   8,
+                   (uint8_t)round(msg_1004->sats[i].obs[L2_FREQ].cnr * 4.0));
       bit += 8;
       ++num_sats;
+      if (num_sats >= RTCM_MAX_SATS) {
+        /* sanity */
+        break;
+      }
     }
   }
 
@@ -443,17 +544,17 @@ uint16_t rtcm3_encode_1005_base(const rtcm_msg_1005 *msg_1005,
   *bit += 1;
   rtcm_setbitu(buff, *bit, 1, msg_1005->ref_stn_ind);
   *bit += 1;
-  rtcm_setbitsl(buff, *bit, 38, (int64_t)roundl(msg_1005->arp_x * 10000.0));
+  rtcm_setbitsl(buff, *bit, 38, (int64_t)round(msg_1005->arp_x * 10000.0));
   *bit += 38;
   rtcm_setbitu(buff, *bit, 1, msg_1005->osc_ind);
   *bit += 1;
   rtcm_setbitu(buff, *bit, 1, 0);
   *bit += 1;
-  rtcm_setbitsl(buff, *bit, 38, (int64_t)roundl(msg_1005->arp_y * 10000.0));
+  rtcm_setbitsl(buff, *bit, 38, (int64_t)round(msg_1005->arp_y * 10000.0));
   *bit += 38;
   rtcm_setbitu(buff, *bit, 2, msg_1005->quart_cycle_ind);
   *bit += 2;
-  rtcm_setbitsl(buff, *bit, 38, (int64_t)roundl(msg_1005->arp_z * 10000.0));
+  rtcm_setbitsl(buff, *bit, 38, (int64_t)round(msg_1005->arp_z * 10000.0));
   *bit += 38;
 
   /* Round number of bits up to nearest whole byte. */
@@ -472,7 +573,7 @@ uint16_t rtcm3_encode_1006(const rtcm_msg_1006 *msg_1006, uint8_t buff[]) {
   rtcm_setbitu(buff, bit, 12, 1006);
   bit += 12;
   rtcm3_encode_1005_base(&msg_1006->msg_1005, buff, &bit);
-  rtcm_setbitu(buff, bit, 16, (uint16_t)roundl(msg_1006->ant_height * 10000.0));
+  rtcm_setbitu(buff, bit, 16, (uint16_t)round(msg_1006->ant_height * 10000.0));
   bit += 16;
 
   /* Round number of bits up to nearest whole byte. */
@@ -531,7 +632,7 @@ uint16_t rtcm3_encode_1010(const rtcm_obs_message *msg_1010, uint8_t buff[]) {
       rtcm_setbitu(buff, bit, 6, sat_obs->svId);
       bit += 6;
       encode_basic_glo_freq_data(&sat_obs->obs[L1_FREQ],
-                                 GLO_L1_HZ,
+                                 L1_FREQ,
                                  &sat_obs->obs[L1_FREQ].pseudorange,
                                  sat_obs->fcn,
                                  buff,
@@ -542,9 +643,14 @@ uint16_t rtcm3_encode_1010(const rtcm_obs_message *msg_1010, uint8_t buff[]) {
 
       rtcm_setbitu(buff, bit, 7, amb);
       bit += 7;
-      rtcm_setbitu(buff, bit, 8, (uint8_t)roundl(sat_obs->obs[L1_FREQ].cnr * 4.0));
+      rtcm_setbitu(
+          buff, bit, 8, (uint8_t)round(sat_obs->obs[L1_FREQ].cnr * 4.0));
       bit += 8;
       ++num_sats;
+      if (num_sats >= RTCM_MAX_SATS) {
+        /* sanity */
+        break;
+      }
     }
   }
 
@@ -560,14 +666,12 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_1012->header.n_sat; i++) {
     flag_bf l1_flags = msg_1012->sats[i].obs[L1_FREQ].flags;
-    flag_bf l2_flags = msg_1012->sats[i].obs[L2_FREQ].flags;
-    if (l1_flags.valid_pr && l1_flags.valid_cp && l2_flags.valid_pr &&
-        l2_flags.valid_cp) {
+    if (l1_flags.valid_pr && l1_flags.valid_cp) {
       const rtcm_sat_data *sat_obs = &msg_1012->sats[i];
       rtcm_setbitu(buff, bit, 6, sat_obs->svId);
       bit += 6;
       encode_basic_glo_freq_data(&sat_obs->obs[L1_FREQ],
-                                 GLO_L1_HZ,
+                                 L1_FREQ,
                                  &sat_obs->obs[L1_FREQ].pseudorange,
                                  sat_obs->fcn,
                                  buff,
@@ -578,18 +682,24 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
 
       rtcm_setbitu(buff, bit, 7, amb);
       bit += 7;
-      rtcm_setbitu(buff, bit, 8, (uint8_t)roundl(sat_obs->obs[L1_FREQ].cnr * 4.0));
+      rtcm_setbitu(
+          buff, bit, 8, (uint8_t)round(sat_obs->obs[L1_FREQ].cnr * 4.0));
       bit += 8;
 
       encode_basic_glo_freq_data(&sat_obs->obs[L2_FREQ],
-                                 GLO_L2_HZ,
+                                 L2_FREQ,
                                  &sat_obs->obs[L1_FREQ].pseudorange,
                                  sat_obs->fcn,
                                  buff,
                                  &bit);
-      rtcm_setbitu(buff, bit, 8, (uint8_t)roundl(sat_obs->obs[L2_FREQ].cnr * 4.0));
+      rtcm_setbitu(
+          buff, bit, 8, (uint8_t)round(sat_obs->obs[L2_FREQ].cnr * 4.0));
       bit += 8;
       ++num_sats;
+      if (num_sats >= RTCM_MAX_SATS) {
+        /* sanity */
+        break;
+      }
     }
   }
 
@@ -787,7 +897,7 @@ static void encode_msm_fine_phaseranges(const uint8_t num_cells,
     if (flags[i].valid_cp) {
       rtcm_setbits(buff, *bit, 22, (int32_t)(fine_cp_ms[i] / C_1_2P29));
     } else {
-      rtcm_setbits(buff, *bit, 22, (int32_t)MSM_CP_INVALID);
+      rtcm_setbits(buff, *bit, 22, MSM_CP_INVALID);
     }
     *bit += 22;
   }
@@ -801,7 +911,7 @@ static void encode_msm_lock_times(const uint8_t num_cells,
   /* DF402 */
   for (uint16_t i = 0; i < num_cells; i++) {
     if (flags[i].valid_lock) {
-      rtcm_setbitu(buff, *bit, 4, to_msm_lock_ind(lock_time[i]));
+      rtcm_setbitu(buff, *bit, 4, rtcm3_encode_lock_time(lock_time[i]));
     } else {
       rtcm_setbitu(buff, *bit, 4, 0);
     }
@@ -846,7 +956,7 @@ static void encode_msm_fine_phaserangerates(const uint8_t num_cells,
     if (flags[i].valid_dop) {
       rtcm_setbits(buff, *bit, 15, (int16_t)(fine_range_rate_m_s[i] / 0.0001));
     } else {
-      rtcm_setbits(buff, *bit, 15, (int32_t)MSM_DOP_INVALID);
+      rtcm_setbits(buff, *bit, 15, MSM_DOP_INVALID);
     }
     *bit += 15;
   }
@@ -860,7 +970,8 @@ static void encode_msm_fine_phaserangerates(const uint8_t num_cells,
  * \return Number of bytes written
  */
 
-uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
+static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
+                                          uint8_t buff[]) {
   const rtcm_msm_header *header = &msg->header;
 
   msm_enum msm_type = to_msm_type(header->msg_num);
@@ -982,4 +1093,36 @@ uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg, uint8_t buff[]) {
 
   /* Round number of bits up to nearest whole byte. */
   return (bit + 7) / 8;
+}
+
+/** MSM4 encoder
+ *
+ * \param msg The input RTCM message struct
+ * \param buff Data buffer large enough to hold the message (at worst 742 bytes)
+ *             (see RTCM 10403.3 Table 3.5-71)
+ * \return Number of bytes written
+ */
+
+uint16_t rtcm3_encode_msm4(const rtcm_msm_message *msg_msm4, uint8_t buff[]) {
+  if (MSM4 != to_msm_type(msg_msm4->header.msg_num)) {
+    return 0;
+  }
+
+  return rtcm3_encode_msm_internal(msg_msm4, buff);
+}
+
+/** MSM5 encoder
+ *
+ * \param msg The input RTCM message struct
+ * \param buff Data buffer large enough to hold the message (at worst 742 bytes)
+ *             (see RTCM 10403.3 Table 3.5-71)
+ * \return Number of bytes written
+ */
+
+uint16_t rtcm3_encode_msm5(const rtcm_msm_message *msg_msm5, uint8_t buff[]) {
+  if (MSM5 != to_msm_type(msg_msm5->header.msg_num)) {
+    return 0;
+  }
+
+  return rtcm3_encode_msm_internal(msg_msm5, buff);
 }

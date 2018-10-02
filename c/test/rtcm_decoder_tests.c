@@ -10,21 +10,24 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include "rtcm_decoder_tests.h"
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <rtcm3/bits.h>
-#include <rtcm3/decode.h>
-#include <rtcm3/messages.h>
-#include "rtcm_encoder.h"
-#include "rtcm_decoder_tests.h"
+#include "rtcm3/bits.h"
+#include "rtcm3/decode.h"
+#include "rtcm3/encode.h"
+#include "rtcm3/messages.h"
+#include "rtcm3/msm_utils.h"
+
 #define LIBRTCM_LOG_INTERNAL
-#include <rtcm3/logging.h>
+#include "rtcm3/logging.h"
 
 int main(void) {
   test_msm_bit_utils();
+  test_lock_time_decoding();
   test_rtcm_1001();
   test_rtcm_1002();
   test_rtcm_1003();
@@ -215,7 +218,7 @@ void test_rtcm_1004(void) {
   rtcm_obs_header header;
   header.msg_num = 1004;
   header.div_free = 0;
-  header.n_sat = 3;
+  header.n_sat = 5;
   header.smooth = 0;
   header.stn_id = 7;
   header.sync = 1;
@@ -256,7 +259,7 @@ void test_rtcm_1004(void) {
   msg1004.sats[1].obs[1].pseudorange = 22000024.4;
   msg1004.sats[1].obs[1].carrier_phase = 90086422.236;
 
-  msg1004.sats[2].svId = 6;
+  msg1004.sats[2].svId = 7;
   msg1004.sats[2].obs[0].code = 0;
   msg1004.sats[2].obs[0].pseudorange = 22000004.4;
   msg1004.sats[2].obs[0].carrier_phase = 115610553.4;
@@ -271,6 +274,37 @@ void test_rtcm_1004(void) {
   msg1004.sats[2].obs[1] = msg1004.sats[2].obs[0];
   msg1004.sats[2].obs[1].cnr = 54.2;
   msg1004.sats[2].obs[1].flags.valid_cnr = 1;
+
+  msg1004.sats[3].svId = 8;
+  msg1004.sats[3].obs[0].code = 0;
+  msg1004.sats[3].obs[0].pseudorange = 22000004.4;
+  msg1004.sats[3].obs[0].carrier_phase = 115610703.4;
+  msg1004.sats[3].obs[0].lock = 254;
+  msg1004.sats[3].obs[0].flags.valid_pr = 1;
+  msg1004.sats[3].obs[0].flags.valid_cp = 1;
+  msg1004.sats[3].obs[0].flags.valid_lock = 1;
+  msg1004.sats[3].obs[0].cnr = 50.2;
+  msg1004.sats[3].obs[0].flags.valid_cnr = 1;
+  msg1004.sats[3].obs[0].cnr = 50.2;
+  msg1004.sats[3].obs[0].flags.valid_cnr = 1;
+  /* L2 invalid */
+  msg1004.sats[3].obs[1].flags.data = 0;
+
+  msg1004.sats[4].svId = 9;
+  msg1004.sats[4].obs[0].code = 0;
+  msg1004.sats[4].obs[0].pseudorange = 22000004.4;
+  msg1004.sats[4].obs[0].carrier_phase = 125610703.4; /* divergent phase */
+  msg1004.sats[4].obs[0].lock = 254;
+  msg1004.sats[4].obs[0].flags.valid_pr = 1;
+  msg1004.sats[4].obs[0].flags.valid_cp = 1;
+  msg1004.sats[4].obs[0].flags.valid_lock = 1;
+  msg1004.sats[4].obs[0].cnr = 50.2;
+  msg1004.sats[4].obs[0].flags.valid_cnr = 1;
+  msg1004.sats[4].obs[0].cnr = 50.2;
+  msg1004.sats[4].obs[0].flags.valid_cnr = 1;
+  msg1004.sats[4].obs[1] = msg1004.sats[4].obs[0];
+  msg1004.sats[4].obs[1].pseudorange = 22000024.4;
+  msg1004.sats[4].obs[1].carrier_phase = 80086422.236; /* divergent phase */
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -434,7 +468,7 @@ void test_rtcm_1012(void) {
   rtcm_obs_header header;
   header.msg_num = 1012;
   header.div_free = 0;
-  header.n_sat = 3;
+  header.n_sat = 4;
   header.smooth = 0;
   header.stn_id = 7;
   header.sync = 1;
@@ -477,7 +511,7 @@ void test_rtcm_1012(void) {
   msg1012.sats[1].obs[1].pseudorange = 22000024.4;
   msg1012.sats[1].obs[1].carrier_phase = 91629341.2;
 
-  msg1012.sats[2].svId = 6;
+  msg1012.sats[2].svId = 7;
   msg1012.sats[2].fcn = 1;
   msg1012.sats[2].obs[0].code = 0;
   msg1012.sats[2].obs[0].pseudorange = 22000004.4;
@@ -492,6 +526,20 @@ void test_rtcm_1012(void) {
   msg1012.sats[2].obs[0].flags.valid_cnr = 0;
   msg1012.sats[2].obs[1].cnr = 54.2;
   msg1012.sats[2].obs[1].flags.valid_cnr = 1;
+
+  msg1012.sats[3].svId = 8;
+  msg1012.sats[3].fcn = 7;
+  msg1012.sats[3].obs[0].code = 0;
+  msg1012.sats[3].obs[0].pseudorange = 20000004.4;
+  msg1012.sats[3].obs[0].carrier_phase = 106874009.6;
+  msg1012.sats[3].obs[0].lock = 900;
+  msg1012.sats[3].obs[0].flags.valid_pr = 1;
+  msg1012.sats[3].obs[0].flags.valid_cp = 1;
+  msg1012.sats[3].obs[0].flags.valid_lock = 1;
+  msg1012.sats[3].obs[0].cnr = 3.4;
+  msg1012.sats[3].obs[0].flags.valid_cnr = 1;
+  /* no L2 observation */
+  msg1012.sats[3].obs[1].flags.data = 0;
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -636,10 +684,6 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
     printf("msgobs msg_num not equal\n");
     return false;
   }
-  bool L1_only = false;
-  if (msg_in->header.msg_num == 1001 || msg_in->header.msg_num == 1002) {
-    L1_only = true;
-  }
   if (msg_in->header.stn_id != msg_out->header.stn_id) {
     printf("msgobs stn_id not equal\n");
     return false;
@@ -656,9 +700,7 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_in->header.n_sat; i++) {
     flag_bf l1_flags = msg_in->sats[i].obs[L1_FREQ].flags;
-    flag_bf l2_flags = msg_in->sats[i].obs[L2_FREQ].flags;
-    if (l1_flags.valid_pr && l1_flags.valid_cp &&
-        (L1_only || (l2_flags.valid_pr && l2_flags.valid_cp))) {
+    if (l1_flags.valid_pr && l1_flags.valid_cp) {
       ++num_sats;
     }
   }
@@ -679,9 +721,7 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
   for (uint8_t in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat;
        ++in_sat_idx) {
     flag_bf l1_flags = msg_in->sats[in_sat_idx].obs[L1_FREQ].flags;
-    flag_bf l2_flags = msg_in->sats[in_sat_idx].obs[L2_FREQ].flags;
-    if (!l1_flags.valid_pr || !l1_flags.valid_cp ||
-        (!L1_only && (!l2_flags.valid_pr || !l2_flags.valid_cp))) {
+    if (!l1_flags.valid_pr || !l1_flags.valid_cp) {
       continue;
     }
 
@@ -720,7 +760,11 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
       }
 
       if (in_freq->flags.valid_lock != out_freq->flags.valid_lock) {
-        printf("msgobs valid_lock not equal\n");
+        printf("msgobs valid_lock not equal for sat %u freq %u, %u vs %u\n",
+               in_sat_idx,
+               freq,
+               in_freq->flags.valid_lock,
+               out_freq->flags.valid_lock);
         return false;
       }
 
@@ -736,11 +780,18 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
       }
       if (in_freq->flags.valid_cp) {
         double frequency = freq == L1_FREQ ? GPS_L1_HZ : GPS_L2_HZ;
-        if (fabs(in_freq->carrier_phase - out_freq->carrier_phase) -
-                ((double)amb * PRUNIT_GPS / (GPS_C / frequency)) >
-            0.0005 / (GPS_C / frequency)) {
-          printf("msgobs carrier_phase not equal\n");
-          return false;
+        double diff = in_freq->carrier_phase - out_freq->carrier_phase;
+        double tol = 0.0005 / (GPS_C / frequency);
+        if (fabs(diff) - ((double)amb * PRUNIT_GPS / (GPS_C / frequency)) >
+            tol) {
+          /* check if the difference is multiple of 1500 cycles as allowed in
+           * spec (see eg DF012) */
+          if (fabs(diff - 1500 * round(diff / 1500)) > tol) {
+            printf("msgobs carrier_phase not equal: %f vs %f\n",
+                   in_freq->carrier_phase,
+                   out_freq->carrier_phase);
+            return false;
+          }
         }
       }
       if (in_freq->flags.valid_cnr) {
@@ -799,10 +850,6 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
   if (msg_in->header.msg_num != msg_out->header.msg_num) {
     return false;
   }
-  bool L1_only = false;
-  if (msg_in->header.msg_num == 1009 || msg_in->header.msg_num == 1010) {
-    L1_only = true;
-  }
   if (msg_in->header.stn_id != msg_out->header.stn_id) {
     return false;
   }
@@ -816,9 +863,7 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_in->header.n_sat; i++) {
     flag_bf l1_flags = msg_in->sats[i].obs[L1_FREQ].flags;
-    flag_bf l2_flags = msg_in->sats[i].obs[L2_FREQ].flags;
-    if (l1_flags.valid_pr && l1_flags.valid_cp &&
-        (L1_only || (l2_flags.valid_pr && l2_flags.valid_cp))) {
+    if (l1_flags.valid_pr && l1_flags.valid_cp) {
       ++num_sats;
     }
   }
@@ -836,9 +881,7 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
   for (uint8_t in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat;
        ++in_sat_idx) {
     flag_bf l1_flags = msg_in->sats[in_sat_idx].obs[L1_FREQ].flags;
-    flag_bf l2_flags = msg_in->sats[in_sat_idx].obs[L2_FREQ].flags;
-    if (!l1_flags.valid_pr || !l1_flags.valid_cp ||
-        (!L1_only && (!l2_flags.valid_pr || !l2_flags.valid_cp))) {
+    if (!l1_flags.valid_pr || !l1_flags.valid_cp) {
       continue;
     }
 
@@ -1310,7 +1353,8 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
     }
 
     if (in_data->flags.valid_lock) {
-      if (in_data->lock_time_s > out_data->lock_time_s) {
+      if (rtcm3_encode_lock_time(in_data->lock_time_s) !=
+          rtcm3_encode_lock_time(out_data->lock_time_s)) {
         printf("msm lock not equal: %.1f %.1f\n",
                in_data->lock_time_s,
                out_data->lock_time_s);
@@ -1318,7 +1362,7 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
       }
       if (in_data->lock_time_s < 524.288 &&
           fabs(in_data->lock_time_s - out_data->lock_time_s) >
-              0.05 * in_data->lock_time_s) {
+              0.5 * in_data->lock_time_s) {
         printf("msm lock not equal: %.1f %.1f\n",
                in_data->lock_time_s,
                out_data->lock_time_s);
@@ -1419,7 +1463,7 @@ void test_rtcm_msm4(void) {
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
-  uint16_t num_bytes = rtcm3_encode_msm(&msg_msm4, buff);
+  uint16_t num_bytes = rtcm3_encode_msm4(&msg_msm4, buff);
   assert(num_bytes > 0 && num_bytes < 1024);
 
   rtcm_msm_message msg_msm4_out;
@@ -1520,7 +1564,7 @@ void test_rtcm_msm5(void) {
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
-  uint16_t num_bytes = rtcm3_encode_msm(&msg_msm5, buff);
+  uint16_t num_bytes = rtcm3_encode_msm5(&msg_msm5, buff);
   assert(num_bytes > 0 && num_bytes < 1024);
 
   rtcm_msm_message msg_msm5_out;
@@ -1631,13 +1675,34 @@ void test_msm_bit_utils(void) {
   }
 }
 
+static void test_lock_time_decoding(void) {
+  double lock_time_s = 0;
+  assert(rtcm3_encode_lock_time(lock_time_s) == 0);
+
+  for (uint8_t lock_indicator = 1; lock_indicator < 16; lock_indicator++) {
+    /* minimum lock time possible with this indicator value */
+    lock_time_s = rtcm3_decode_lock_time(lock_indicator);
+    assert(rtcm3_encode_lock_time(lock_time_s) == lock_indicator);
+
+    /* slightly larger time should result in the same indicator value */
+    assert(rtcm3_encode_lock_time(lock_time_s + 0.001) == lock_indicator);
+    /* smaller time should result in a change in the indicator value */
+    assert(rtcm3_encode_lock_time(lock_time_s - 0.0001) == lock_indicator - 1);
+  }
+
+  lock_time_s = UINT32_MAX / 1000;
+  assert(rtcm3_encode_lock_time(lock_time_s) == 15);
+  assert(rtcm3_encode_lock_time(lock_time_s + 1) == 15);
+}
+
 #define TEST_LOG_LEVEL LOG_WARNING
 #define TEST_LOG_MSG "A message of length 22"
 #define TEST_LOG_LEN sizeof(TEST_LOG_MSG)
 
-
-static void test_rtcm_log_callback(uint8_t level, uint8_t *msg, uint16_t length, void *context)
-{
+static void test_rtcm_log_callback(uint8_t level,
+                                   uint8_t *msg,
+                                   uint16_t length,
+                                   void *context) {
   int *callback_count = (int *)context;
   assert(level == TEST_LOG_LEVEL);
   assert(length == TEST_LOG_LEN);
@@ -1645,8 +1710,7 @@ static void test_rtcm_log_callback(uint8_t level, uint8_t *msg, uint16_t length,
   (*callback_count)++;
 }
 
-void test_logging(void)
-{
+void test_logging(void) {
   int callback_count = 0;
   rtcm_init_logging(NULL, NULL);
   rtcm_log(0, NULL, 0);

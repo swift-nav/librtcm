@@ -24,6 +24,9 @@ void init_sat_data(rtcm_sat_data *sat_data) {
   }
 }
 
+/* Convert the 7-bit Lock Time Indicator (DF013, DF019, DF043, DF049) into
+ * integer seconds */
+/* RTCM 10403.3 Table 3.4-2 */
 static uint32_t from_lock_ind(uint8_t lock) {
   if (lock < 24) {
     return lock;
@@ -46,16 +49,19 @@ static uint32_t from_lock_ind(uint8_t lock) {
   return 937;
 }
 
-/* Returns the lock time in milliseconds */
+/* Convert the 4-bit Lock Time Indicator DF402 into seconds. */
 /* RTCM 10403.3 Table 3.5-74 */
-static uint32_t from_msm_lock_ind(uint8_t lock) {
+double rtcm3_decode_lock_time(uint8_t lock) {
+  /* Discard the MSB nibble */
+  lock &= 0x0F;
+
   if (lock == 0) {
     return 0;
   }
-  return 32 << lock;
+  return (double)(32 << (lock - 1)) / 1000;
 }
 
-/* Returns the lock time in milliseconds */
+/* Convert the Extended Lock Time Indicator DF407 into milliseconds. */
 /* RTCM 10403.3 Table 3.5-75 */
 static uint32_t from_msm_lock_ind_ext(uint16_t lock) {
   if (lock < 64) {
@@ -138,7 +144,6 @@ void decode_basic_gps_l1_freq_data(const uint8_t buff[],
 
   freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
   *bit += 7;
-  freq_data->flags.valid_lock = 1;
 }
 
 void decode_basic_glo_l1_freq_data(const uint8_t buff[],
@@ -157,7 +162,6 @@ void decode_basic_glo_l1_freq_data(const uint8_t buff[],
   *bit += 20;
   freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
   *bit += 7;
-  freq_data->flags.valid_lock = 1;
 }
 
 void decode_basic_l2_freq_data(const uint8_t buff[],
@@ -174,7 +178,6 @@ void decode_basic_l2_freq_data(const uint8_t buff[],
 
   freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
   *bit += 7;
-  freq_data->flags.valid_lock = 1;
 }
 
 uint16_t rtcm3_read_header(const uint8_t buff[], rtcm_obs_header *header) {
@@ -375,6 +378,7 @@ rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001) {
     l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, 0);
     l1_freq_data->flags.valid_cp =
         construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_HZ);
+    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
   }
 
   return RC_OK;
@@ -420,6 +424,7 @@ rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
         construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
     l1_freq_data->flags.valid_cp =
         construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_HZ);
+    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
   }
 
   return RC_OK;
@@ -462,6 +467,7 @@ rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
     l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, 0);
     l1_freq_data->flags.valid_cp =
         construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_HZ);
+    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
 
     rtcm_freq_data *l2_freq_data = &msg_1003->sats[i].obs[L2_FREQ];
 
@@ -471,6 +477,7 @@ rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
         construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
     l2_freq_data->flags.valid_cp =
         construct_L2_phase(l2_freq_data, l1_freq_data, phr_pr_diff, GPS_L2_HZ);
+    l2_freq_data->flags.valid_lock = l2_freq_data->flags.valid_cp;
   }
 
   return RC_OK;
@@ -518,6 +525,7 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
         construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
     l1_freq_data->flags.valid_cp =
         construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_HZ);
+    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
 
     rtcm_freq_data *l2_freq_data = &msg_1004->sats[i].obs[L2_FREQ];
 
@@ -528,6 +536,7 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
         construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
     l2_freq_data->flags.valid_cp =
         construct_L2_phase(l2_freq_data, l1_freq_data, phr_pr_diff, GPS_L2_HZ);
+    l2_freq_data->flags.valid_lock = l2_freq_data->flags.valid_cp;
   }
 
   return RC_OK;
@@ -715,6 +724,7 @@ rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
         (msg_1010->sats[i].fcn <= MT1012_GLO_MAX_FCN) &&
         construct_L1_phase(
             l1_freq_data, phr_pr_diff, GLO_L1_HZ + glo_fcn * GLO_L1_DELTA_HZ);
+    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
   }
 
   return RC_OK;
@@ -765,6 +775,7 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
         (msg_1012->sats[i].fcn <= MT1012_GLO_MAX_FCN) &&
         construct_L1_phase(
             l1_freq_data, phr_pr_diff, GLO_L1_HZ + glo_fcn * GLO_L1_DELTA_HZ);
+    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
 
     rtcm_freq_data *l2_freq_data = &msg_1012->sats[i].obs[L2_FREQ];
 
@@ -778,6 +789,7 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
                            l1_freq_data,
                            phr_pr_diff,
                            GLO_L2_HZ + glo_fcn * GLO_L2_DELTA_HZ);
+    l2_freq_data->flags.valid_lock = l2_freq_data->flags.valid_cp;
   }
 
   return RC_OK;
@@ -836,6 +848,9 @@ rtcm3_rc rtcm3_decode_1033(const uint8_t buff[], rtcm_msg_1033 *msg_1033) {
   if (msg_num != 1033) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
   }
+
+  /* make sure all the strings gets initialized */
+  memset(msg_1033, 0, sizeof(*msg_1033));
 
   msg_1033->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
@@ -908,18 +923,26 @@ rtcm3_rc rtcm3_decode_1230(const uint8_t buff[], rtcm_msg_1230 *msg_1230) {
   if (msg_1230->fdma_signal_mask & 0x08) {
     msg_1230->L1_CA_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
     bit += 16;
+  } else {
+    msg_1230->L1_CA_cpb_meter = 0.0;
   }
   if (msg_1230->fdma_signal_mask & 0x04) {
     msg_1230->L1_P_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
     bit += 16;
+  } else {
+    msg_1230->L1_P_cpb_meter = 0.0;
   }
   if (msg_1230->fdma_signal_mask & 0x02) {
     msg_1230->L2_CA_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
     bit += 16;
+  } else {
+    msg_1230->L2_CA_cpb_meter = 0.0;
   }
   if (msg_1230->fdma_signal_mask & 0x01) {
     msg_1230->L2_P_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
     bit += 16;
+  } else {
+    msg_1230->L2_P_cpb_meter = 0.0;
   }
 
   return RC_OK;
@@ -1044,7 +1067,7 @@ static void decode_msm_lock_times(const uint8_t buff[],
   for (uint16_t i = 0; i < num_cells; i++) {
     uint32_t lock_ind = rtcm_getbitu(buff, *bit, 4);
     *bit += 4;
-    lock_time[i] = (double)from_msm_lock_ind(lock_ind) / 1000;
+    lock_time[i] = rtcm3_decode_lock_time(lock_ind);
     flags[i].valid_lock = 1;
   }
 }

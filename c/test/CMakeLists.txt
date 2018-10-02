@@ -4,7 +4,7 @@ if (CMAKE_CROSSCOMPILING)
     message(STATUS "Skipping unit tests, cross compiling")
 
 else (CMAKE_CROSSCOMPILING)
-    add_executable (rtcm_test rtcm_decoder_tests.c rtcm_encoder.c)
+    add_executable (rtcm_test rtcm_decoder_tests.c)
 
     target_link_libraries(rtcm_test LINK_PUBLIC rtcm)
 

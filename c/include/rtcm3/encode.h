@@ -15,11 +15,14 @@
  * would need to handle ambiguity rollover and code carrier divergance at least
  */
 
-#ifndef LIBRTCM_RTCM_ENCODER_H
-#define LIBRTCM_RTCM_ENCODER_H
+#ifndef SWIFTNAV_RTCM3_ENCODE_H
+#define SWIFTNAV_RTCM3_ENCODE_H
 
-#include <rtcm3/messages.h>
-#include <rtcm3/msm_utils.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "rtcm3/messages.h"
 
 uint16_t rtcm3_write_header(const rtcm_obs_header *header,
                             uint8_t num_sats,
@@ -38,6 +41,13 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]);
 uint16_t rtcm3_encode_1029(const rtcm_msg_1029 *msg_1029, uint8_t buff[]);
 uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t buff[]);
 uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t buff[]);
-uint16_t rtcm3_encode_msm(const rtcm_msm_message *msg_1074, uint8_t buff[]);
+uint16_t rtcm3_encode_msm4(const rtcm_msm_message *msg_msm4, uint8_t buff[]);
+uint16_t rtcm3_encode_msm5(const rtcm_msm_message *msg_msm5, uint8_t buff[]);
 
-#endif /* LIBRTCM_RTCM_ENCODER_H */
+uint8_t rtcm3_encode_lock_time(double time);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* SWIFTNAV_RTCM3_ENCODE_H */

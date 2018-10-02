@@ -13,13 +13,13 @@
 #ifndef SWIFTNAV_RTCM3_MESSAGES_H
 #define SWIFTNAV_RTCM3_MESSAGES_H
 
-#include <rtcm3/constants.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include "rtcm3/constants.h"
 
-typedef enum { L1_FREQ, L2_FREQ, NUM_FREQS } freq_enum;
+typedef enum freq_e { L1_FREQ, L2_FREQ, NUM_FREQS } freq_t;
 
-typedef enum {
+typedef enum msm_type_e {
   MSM_UNKNOWN = 0,
   MSM1,
   MSM2,
@@ -95,7 +95,7 @@ typedef struct {
   uint8_t code;
   double pseudorange;
   double carrier_phase;
-  uint32_t lock;
+  double lock;
   double cnr;
   flag_bf flags;
 
