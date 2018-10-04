@@ -199,6 +199,10 @@ rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   }
   bit += 12;
   msg_eph->sat_id = rtcm_getbitu(buff, bit, 6);
+  if (msg_eph->sat_id <= BEIDOU_GEOS_MAX_PRN) {
+    /* We do not support Beidou GEO satellites */
+    return RC_INVALID_MESSAGE;
+  }
   bit += 6;
   msg_eph->wn = rtcm_getbitu(buff, bit, 13);
   bit += 13;
@@ -214,7 +218,7 @@ rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 11;
   msg_eph->kepler.af1 = rtcm_getbits(buff, bit, 22);
   bit += 22;
-  msg_eph->kepler.af2 = rtcm_getbits(buff, bit, 24);
+  msg_eph->kepler.af0 = rtcm_getbits(buff, bit, 24);
   bit += 24;
   msg_eph->kepler.iodc = rtcm_getbitu(buff, bit, 5);
   bit += 5;
@@ -240,7 +244,7 @@ rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 32;
   msg_eph->kepler.cis = rtcm_getbits(buff, bit, 18);
   bit += 18;
-  /* i0 */ rtcm_getbits(buff, bit, 32);
+  msg_eph->kepler.inc = rtcm_getbits(buff, bit, 32);
   bit += 32;
   msg_eph->kepler.crc = rtcm_getbits(buff, bit, 18);
   bit += 18;
@@ -252,7 +256,7 @@ rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 10;
   msg_eph->kepler.tgd_bds_s[1] = rtcm_getbits(buff, bit, 10);
   bit += 10;
-  msg_eph->valid = rtcm_getbits(buff, bit, 1);
+  msg_eph->valid = rtcm_getbitu(buff, bit, 1);
   bit += 1;
   return RC_OK;
 }
@@ -263,7 +267,8 @@ rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
  * \param msg_eph RTCM message struct
  * \return bit position in the RTCM frame
  */
-static uint16_t rtcm3_decode_gal_eph_common(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+static uint16_t rtcm3_decode_gal_eph_common(const uint8_t buff[],
+                                            rtcm_msg_eph *msg_eph) {
   uint16_t bit = 12;
   msg_eph->sat_id = rtcm_getbitu(buff, bit, 6);
   bit += 6;
@@ -327,7 +332,7 @@ static uint16_t rtcm3_decode_gal_eph_common(const uint8_t buff[], rtcm_msg_eph *
 rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   uint16_t bit = 0;
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  if(msg_num != 1046) {
+  if (msg_num != 1046) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
@@ -354,10 +359,11 @@ rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
-rtcm3_rc rtcm3_decode_gal_eph_fnav(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+rtcm3_rc rtcm3_decode_gal_eph_fnav(const uint8_t buff[],
+                                   rtcm_msg_eph *msg_eph) {
   uint16_t bit = 0;
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  if(msg_num != 1045) {
+  if (msg_num != 1045) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 

@@ -14,6 +14,7 @@
 #define SWIFTNAV_RTCM3_EPH_DECODE_H
 
 #include <rtcm3/messages.h>
+#define BEIDOU_GEOS_MAX_PRN 5
 
 rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);
 rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);

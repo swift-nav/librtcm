@@ -214,7 +214,7 @@ rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[],
     bit += number_of_bits_for_iode;
     if (msg_orbit_clock->header.constellation == RTCM_CONSTELLATION_BDS ||
         msg_orbit_clock->header.constellation == RTCM_CONSTELLATION_SBAS) {
-      // iodcrc = rtcm_getbitu(buff, bit, 24);
+      orbit->iodcrc = rtcm_getbitu(buff, bit, 24);
       bit += 24;
     }
 
