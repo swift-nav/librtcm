@@ -16,10 +16,12 @@
 #define PRUNIT_GPS 299792.458 /**< RTCM v3 Unit of GPS Pseudorange (m) */
 #define PRUNIT_GLO 599584.916 /**< RTCM v3 Unit of GLO Pseudorange (m) */
 #define RTCM_MAX_SATS 32
-#define CP_INVALID 0xFFF80000    /* Unsigned bit pattern 0x80000 */
-#define PR_L1_INVALID 0xFFF80000 /* Unsigned bit pattern 0x80000 */
-#define PR_L2_INVALID 0xFFFFE000 /* Unsigned bit pattern 0x20000 */
-#define MSM_MAX_CELLS 64         /* Maximum number of cells in MSM message */
+#define CP_INVALID 0xFFF80000      /* Unsigned bit pattern 0x80000 */
+#define PR_L1_INVALID 0xFFF80000   /* Unsigned bit pattern 0x80000 */
+#define PR_L2_INVALID 0xFFFFE000   /* Unsigned bit pattern 0x20000 */
+#define MSM_MAX_CELLS 64           /* Maximum number of cells in MSM message */
+#define MSM_SATELLITE_MASK_SIZE 64 /* Maximum size of MSM satellite mask */
+#define MSM_SIGNAL_MASK_SIZE 32    /* Maximum size of MSM signal mask */
 #define MSM_ROUGH_RANGE_INVALID 0xFF  /* Unsigned bit pattern 0xFF */
 #define MSM_ROUGH_RATE_INVALID 0x2000 /* Unsigned bit pattern 0x2000 */
 #define MSM_PR_INVALID (-16384)       /* Signed bit pattern 0x4000 */
@@ -42,12 +44,18 @@
 
 /** 2^-4 */
 #define C_1_2P4 0.0625
+/** 2^-8 */
+#define C_1_2P8 0.00390625
+/** 2^-10 */
+#define C_1_2P10 0.0009765625
 /** 2^-24 */
 #define C_1_2P24 5.960464477539063e-08
 /** 2^-29 */
 #define C_1_2P29 1.862645149230957e-09
 /** 2^-31 */
 #define C_1_2P31 4.656612873077393e-10
+/** 2^14 */
+#define C_2P14 16384
 /** 2^19 */
 #define C_2P19 524288
 /** 2^30 */
@@ -78,21 +86,6 @@
 
 /** Frequency range between two adjacent GLO channel in Hz for L2 band */
 #define GLO_L2_DELTA_HZ 4.375e5
-
-/** Valid PRN ranges, Tables 3.5.90 to 3.5-107 */
-/* Note that libswiftnav/constants.h defines only the first PRNs */
-#define GPS_FIRST_PRN 1
-#define GPS_LAST_PRN 63
-#define SBAS_FIRST_PRN 120
-#define SBAS_LAST_PRN 158
-#define GLO_FIRST_PRN 1
-#define GLO_LAST_PRN 24
-#define BDS2_FIRST_PRN 1
-#define BDS2_LAST_PRN 37
-#define GAL_FIRST_PRN 1
-#define GAL_LAST_PRN 50
-#define QZS_FIRST_PRN 193
-#define QZS_LAST_PRN 202
 
 #define PRN_INVALID 0
 

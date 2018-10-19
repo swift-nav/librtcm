@@ -994,7 +994,7 @@ static void decode_msm_sat_data(const uint8_t buff[],
       int16_t rate = rtcm_getbits(buff, *bit, 14);
       *bit += 14;
       rough_rate_m_s[i] = (double)rate;
-      rough_rate_valid[i] = (MSM_ROUGH_RANGE_INVALID != rate);
+      rough_rate_valid[i] = (MSM_ROUGH_RATE_INVALID != rate);
     } else {
       rough_rate_m_s[i] = 0;
       rough_rate_valid[i] = false;

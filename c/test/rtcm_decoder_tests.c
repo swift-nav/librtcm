@@ -43,6 +43,7 @@ int main(void) {
   test_rtcm_1230();
   test_rtcm_msm4();
   test_rtcm_msm5();
+  test_rtcm_msm5_glo();
   test_rtcm_msm7();
   test_rtcm_random_bits();
   test_logging();
@@ -1279,7 +1280,7 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
   }
 
   uint8_t num_cells =
-      count_mask_values(MSM_MAX_CELLS, msg_in->header.cell_mask);
+      count_mask_values(cell_mask_size, msg_in->header.cell_mask);
 
   for (uint8_t i = 0; i < num_cells; i++) {
     const rtcm_msm_signal_data *in_data = &msg_in->signals[i];
@@ -1573,6 +1574,110 @@ void test_rtcm_msm5(void) {
   assert(RC_OK == ret && msg_msm_equals(&msg_msm5, &msg_msm5_out));
 }
 
+void test_rtcm_msm5_glo(void) {
+  rtcm_msm_header header;
+  header.msg_num = 1085;
+  header.stn_id = 7;
+  header.tow_ms = 49800;
+  header.iods = 5;
+  header.reserved = 0;
+  header.multiple = 0;
+  header.steering = 0;
+  header.ext_clock = 0;
+  header.div_free = 0;
+  header.smooth = 0;
+
+  /* PRNs 1, 2 and 3 */
+  memset((void *)&header.satellite_mask, 0, sizeof(header.satellite_mask));
+  header.satellite_mask[0] = true;
+  header.satellite_mask[1] = true;
+  header.satellite_mask[2] = true;
+  /* signal ids 2 (L1OF) and 8 (L2OF) */
+  memset((void *)&header.signal_mask, 0, sizeof(header.signal_mask));
+  header.signal_mask[1] = true;
+  header.signal_mask[7] = true;
+  /* each of the 3 sats transmit each of the 2 signals */
+  memset((void *)&header.cell_mask, 0, sizeof(header.cell_mask));
+  header.cell_mask[0] = true;
+  header.cell_mask[1] = true;
+  header.cell_mask[2] = true;
+  header.cell_mask[3] = true;
+  header.cell_mask[4] = true;
+  header.cell_mask[5] = true;
+
+  rtcm_msm_message msg_msm5;
+  memset((void *)&msg_msm5, 0, sizeof(msg_msm5));
+  msg_msm5.header = header;
+  msg_msm5.sats[0].rough_range_ms =
+      round(20000004.4 / PRUNIT_GPS * 1024) / 1024;
+  msg_msm5.sats[0].rough_range_rate_m_s = round(1001.3);
+  msg_msm5.sats[0].glo_fcn = 7;
+  msg_msm5.signals[0].pseudorange_ms = 20000004.4 / PRUNIT_GPS;
+  msg_msm5.signals[0].carrier_phase_ms = msg_msm5.signals[0].pseudorange_ms;
+  msg_msm5.signals[0].range_rate_m_s = 1001.3;
+  msg_msm5.signals[0].lock_time_s = 900;
+  msg_msm5.signals[0].flags.valid_pr = 1;
+  msg_msm5.signals[0].flags.valid_cp = 1;
+  msg_msm5.signals[0].flags.valid_lock = 1;
+  msg_msm5.signals[0].flags.valid_dop = 1;
+  msg_msm5.signals[0].cnr = 34;
+  msg_msm5.signals[0].hca_indicator = 1;
+  msg_msm5.signals[0].flags.valid_cnr = 1;
+  msg_msm5.signals[1] = msg_msm5.signals[0];
+  msg_msm5.signals[1].pseudorange_ms = 20000124.4 / PRUNIT_GPS;
+  msg_msm5.signals[1].carrier_phase_ms = msg_msm5.signals[1].pseudorange_ms;
+  msg_msm5.signals[1].range_rate_m_s = 1001.3;
+  msg_msm5.signals[1].cnr = 35;
+
+  msg_msm5.sats[1].rough_range_ms =
+      round(22000004.4 / PRUNIT_GPS * 1024) / 1024;
+  msg_msm5.sats[1].rough_range_rate_m_s = round(-1001.5);
+  msg_msm5.sats[1].glo_fcn = 0;
+  msg_msm5.signals[2].pseudorange_ms = 22000004.4 / PRUNIT_GPS;
+  msg_msm5.signals[2].carrier_phase_ms = msg_msm5.signals[2].pseudorange_ms;
+  msg_msm5.signals[2].range_rate_m_s = -1001.5;
+  msg_msm5.signals[2].lock_time_s = 254;
+  msg_msm5.signals[2].flags.valid_pr = 1;
+  msg_msm5.signals[2].flags.valid_cp = 1;
+  msg_msm5.signals[2].flags.valid_lock = 1;
+  msg_msm5.signals[2].flags.valid_dop = 1;
+  msg_msm5.signals[2].cnr = 50.2;
+  msg_msm5.signals[2].flags.valid_cnr = 1;
+  msg_msm5.signals[3] = msg_msm5.signals[2];
+  msg_msm5.signals[3].pseudorange_ms = 22000024.4 / PRUNIT_GPS;
+  msg_msm5.signals[3].carrier_phase_ms = msg_msm5.signals[3].pseudorange_ms;
+  msg_msm5.signals[3].range_rate_m_s = -1001.5;
+
+  msg_msm5.sats[2].rough_range_ms =
+      round(22000004.55 / PRUNIT_GPS * 1024) / 1024;
+  msg_msm5.sats[2].rough_range_rate_m_s = round(555.2);
+  msg_msm5.sats[2].glo_fcn = 15;
+  msg_msm5.signals[4].pseudorange_ms = 22000004.55 / PRUNIT_GPS;
+  msg_msm5.signals[4].carrier_phase_ms = msg_msm5.signals[4].pseudorange_ms;
+  msg_msm5.signals[4].range_rate_m_s = 555.2;
+  msg_msm5.signals[4].lock_time_s = 254;
+  msg_msm5.signals[4].flags.valid_pr = 1;
+  msg_msm5.signals[4].flags.valid_cp = 0;
+  msg_msm5.signals[4].flags.valid_lock = 1;
+  msg_msm5.signals[4].flags.valid_dop = 1;
+  msg_msm5.signals[4].cnr = 50.2;
+  msg_msm5.signals[4].flags.valid_cnr = 0;
+  msg_msm5.signals[5] = msg_msm5.signals[4];
+  msg_msm5.signals[5].cnr = 54.2;
+  msg_msm5.signals[5].flags.valid_cnr = 1;
+  msg_msm5.signals[5].flags.valid_dop = 0;
+
+  uint8_t buff[1024];
+  memset(buff, 0, 1024);
+  uint16_t num_bytes = rtcm3_encode_msm5(&msg_msm5, buff);
+  assert(num_bytes > 0 && num_bytes < 1024);
+
+  rtcm_msm_message msg_msm5_out;
+  int8_t ret = rtcm3_decode_msm5(buff, &msg_msm5_out);
+
+  assert(RC_OK == ret && msg_msm_equals(&msg_msm5, &msg_msm5_out));
+}
+
 void test_rtcm_msm7(void) {
   rtcm_msm_message msg_msm7_decoded;
   int8_t ret = rtcm3_decode_msm7(msm7_raw, &msg_msm7_decoded);
@@ -1594,8 +1699,10 @@ void test_rtcm_random_bits(void) {
    * failure code or manage to decode something, but not crash */
 
   uint8_t buff[1024];
+  uint8_t out_buff[1024];
+
   rtcm_msm_message msg_msm;
-  for (uint16_t rep = 0; rep < 10000; rep++) {
+  for (uint32_t rep = 0; rep < 100000; rep++) {
     /* fill with random garbage */
     for (uint16_t i = 0; i < 1024; i++) {
       buff[i] = rand() & 0xFF;
@@ -1612,8 +1719,25 @@ void test_rtcm_random_bits(void) {
       }
     }
 
-    rtcm3_decode_msm4(buff, &msg_msm);
-    rtcm3_decode_msm5(buff, &msg_msm);
+    if (RC_OK == rtcm3_decode_msm4(buff, &msg_msm)) {
+      /* test the round-trip conversion of the valid random msg */
+      memset(out_buff, 0, sizeof(out_buff));
+      uint16_t len = rtcm3_encode_msm4(&msg_msm, out_buff);
+      assert(len > 0 && len < 1024);
+      rtcm_msm_message msg_msm_out;
+      assert(RC_OK == rtcm3_decode_msm4(out_buff, &msg_msm_out) &&
+             msg_msm_equals(&msg_msm, &msg_msm_out));
+    }
+
+    if (RC_OK == rtcm3_decode_msm5(buff, &msg_msm)) {
+      /* test the round-trip conversion of the valid random msg */
+      memset(out_buff, 0, sizeof(out_buff));
+      uint16_t len = rtcm3_encode_msm5(&msg_msm, out_buff);
+      assert(len > 0 && len < 1024);
+      rtcm_msm_message msg_msm_out;
+      assert(RC_OK == rtcm3_decode_msm5(out_buff, &msg_msm_out) &&
+             msg_msm_equals(&msg_msm, &msg_msm_out));
+    }
     rtcm3_decode_msm6(buff, &msg_msm);
     rtcm3_decode_msm7(buff, &msg_msm);
   }

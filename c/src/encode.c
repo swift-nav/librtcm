@@ -15,6 +15,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
+
 #include "rtcm3/bits.h"
 #include "rtcm3/constants.h"
 #include "rtcm3/msm_utils.h"
@@ -826,14 +827,27 @@ uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t buff[]) {
 }
 
 static uint16_t rtcm3_encode_msm_header(const rtcm_msm_header *header,
+                                        const rtcm_constellation_t cons,
                                         uint8_t buff[]) {
   uint16_t bit = 0;
   rtcm_setbitu(buff, bit, 12, header->msg_num);
   bit += 12;
   rtcm_setbitu(buff, bit, 12, header->stn_id);
   bit += 12;
-  rtcm_setbitu(buff, bit, 30, header->tow_ms);
-  bit += 30;
+  if (RTCM_CONSTELLATION_GLO == cons) {
+    /* day of the week */
+    uint8_t dow = (uint16_t)(header->tow_ms / (24 * 3600 * 1000));
+    rtcm_setbitu(buff, bit, 3, dow);
+    bit += 3;
+    /* time of the day */
+    uint32_t tod_ms = header->tow_ms - dow * 24 * 3600 * 1000;
+    rtcm_setbitu(buff, bit, 27, tod_ms);
+    bit += 27;
+  } else {
+    /* for other systems, epoch time is the time of week in ms */
+    rtcm_setbitu(buff, bit, 30, header->tow_ms);
+    bit += 30;
+  }
   rtcm_setbitu(buff, bit, 1, header->multiple);
   bit += 1;
   rtcm_setbitu(buff, bit, 3, header->iods);
@@ -871,6 +885,49 @@ static uint16_t rtcm3_encode_msm_header(const rtcm_msm_header *header,
   return bit;
 }
 
+static void encode_msm_sat_data(const rtcm_msm_message *msg,
+                                const uint8_t num_sats,
+                                const msm_enum msm_type,
+                                double rough_range_ms[num_sats],
+                                double rough_rate_m_s[num_sats],
+                                uint8_t buff[],
+                                uint16_t *bit) {
+  /* number of integer milliseconds, DF397 */
+  uint8_t integer_ms[num_sats];
+  for (uint8_t i = 0; i < num_sats; i++) {
+    integer_ms[i] = (uint8_t)floor(msg->sats[i].rough_range_ms);
+    rtcm_setbitu(buff, *bit, 8, integer_ms[i]);
+    *bit += 8;
+  }
+  if (MSM5 == msm_type) {
+    for (uint8_t i = 0; i < num_sats; i++) {
+      rtcm_setbitu(buff, *bit, 4, msg->sats[i].glo_fcn);
+      *bit += 4;
+    }
+  }
+
+  /* rough range modulo 1 ms, DF398 */
+  for (uint8_t i = 0; i < num_sats; i++) {
+    double pr = msg->sats[i].rough_range_ms;
+    /* remove integer ms part */
+    double range_modulo_ms = pr - integer_ms[i];
+    uint16_t range_modulo_encoded = (uint16_t)round(1024 * range_modulo_ms);
+    rtcm_setbitu(buff, *bit, 10, range_modulo_encoded);
+    *bit += 10;
+    rough_range_ms[i] = integer_ms[i] + (double)range_modulo_encoded / 1024;
+  }
+
+  /* range rate, m/s, DF399*/
+  if (MSM5 == msm_type) {
+    for (uint8_t i = 0; i < num_sats; i++) {
+      int16_t range_rate = (int16_t)msg->sats[i].rough_range_rate_m_s;
+      rtcm_setbits(buff, *bit, 14, range_rate);
+      *bit += 14;
+      rough_rate_m_s[i] = range_rate;
+    }
+  }
+}
+
 static void encode_msm_fine_pseudoranges(const uint8_t num_cells,
                                          const double fine_pr_ms[],
                                          const flag_bf flags[],
@@ -878,8 +935,8 @@ static void encode_msm_fine_pseudoranges(const uint8_t num_cells,
                                          uint16_t *bit) {
   /* DF400 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    if (flags[i].valid_pr) {
-      rtcm_setbits(buff, *bit, 15, (int16_t)(fine_pr_ms[i] / C_1_2P24));
+    if (flags[i].valid_pr && fabs(fine_pr_ms[i]) < C_1_2P10) {
+      rtcm_setbits(buff, *bit, 15, (int16_t)round(fine_pr_ms[i] / C_1_2P24));
     } else {
       rtcm_setbits(buff, *bit, 15, MSM_PR_INVALID);
     }
@@ -894,8 +951,8 @@ static void encode_msm_fine_phaseranges(const uint8_t num_cells,
                                         uint16_t *bit) {
   /* DF401 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    if (flags[i].valid_cp) {
-      rtcm_setbits(buff, *bit, 22, (int32_t)(fine_cp_ms[i] / C_1_2P29));
+    if (flags[i].valid_cp && fabs(fine_cp_ms[i]) < C_1_2P8) {
+      rtcm_setbits(buff, *bit, 22, (int32_t)round(fine_cp_ms[i] / C_1_2P29));
     } else {
       rtcm_setbits(buff, *bit, 22, MSM_CP_INVALID);
     }
@@ -937,8 +994,8 @@ static void encode_msm_cnrs(const uint8_t num_cells,
                             uint16_t *bit) {
   /* DF403 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    if (flags[i].valid_lock) {
-      rtcm_setbitu(buff, *bit, 6, (uint8_t)cnr[i]);
+    if (flags[i].valid_cnr) {
+      rtcm_setbitu(buff, *bit, 6, (uint8_t)round(cnr[i]));
     } else {
       rtcm_setbitu(buff, *bit, 6, 0);
     }
@@ -953,8 +1010,9 @@ static void encode_msm_fine_phaserangerates(const uint8_t num_cells,
                                             uint16_t *bit) {
   /* DF404 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    if (flags[i].valid_dop) {
-      rtcm_setbits(buff, *bit, 15, (int16_t)(fine_range_rate_m_s[i] / 0.0001));
+    if (flags[i].valid_dop && fabs(fine_range_rate_m_s[i]) < 0.0001 * C_2P14) {
+      rtcm_setbits(
+          buff, *bit, 15, (int16_t)round(fine_range_rate_m_s[i] / 0.0001));
     } else {
       rtcm_setbits(buff, *bit, 15, MSM_DOP_INVALID);
     }
@@ -962,12 +1020,12 @@ static void encode_msm_fine_phaserangerates(const uint8_t num_cells,
   }
 }
 
-/** Basic GPS MSM4/5 encoder
+/** MSM4/5 encoder
  *
  * \param msg The input RTCM message struct
  * \param buff Data buffer large enough to hold the message (at worst 742 bytes)
  *             (see RTCM 10403.3 Table 3.5-71)
- * \return Number of bytes written
+ * \return Number of bytes written or 0 on failure
  */
 
 static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
@@ -976,11 +1034,14 @@ static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
 
   msm_enum msm_type = to_msm_type(header->msg_num);
   if (MSM4 != msm_type && MSM5 != msm_type) {
+    /* Unexpected message type. */
     return 0;
   }
 
-  if (RTCM_CONSTELLATION_GPS != to_constellation(msg->header.msg_num)) {
-    /* Unexpected message type. */
+  rtcm_constellation_t cons = to_constellation(header->msg_num);
+
+  if (RTCM_CONSTELLATION_INVALID == cons) {
+    /* Invalid or unsupported constellation */
     return 0;
   }
 
@@ -991,51 +1052,22 @@ static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
   uint8_t cell_mask_size = num_sats * num_sigs;
   uint8_t num_cells = count_mask_values(cell_mask_size, header->cell_mask);
 
+  if (num_sats * num_sigs > MSM_MAX_CELLS) {
+    /* Too large cell mask, should already have been handled by caller */
+    return 0;
+  }
+
   /* Header */
-  uint16_t bit = rtcm3_encode_msm_header(header, buff);
+  uint16_t bit = rtcm3_encode_msm_header(header, cons, buff);
 
   /* Satellite Data */
 
-  uint8_t integer_ms[num_sats];
   double rough_range_ms[num_sats];
   double rough_rate_m_s[num_sats];
 
-  /* number of integer milliseconds, DF397 */
-  for (uint8_t i = 0; i < num_sats; i++) {
-    integer_ms[i] = (uint8_t)(msg->sats[i].rough_range_ms);
-    rtcm_setbitu(buff, bit, 8, integer_ms[i]);
-    bit += 8;
-  }
-
-  if (MSM5 == msm_type || MSM7 == msm_type) {
-    for (uint8_t i = 0; i < num_sats; i++) {
-      rtcm_setbitu(buff, bit, 4, msg->sats[i].glo_fcn);
-      bit += 4;
-    }
-  }
-
-  /* rough range modulo 1 ms, DF398 */
-  for (uint8_t i = 0; i < num_sats; i++) {
-    double pr = msg->sats[i].rough_range_ms;
-    /* remove integer ms part */
-    double range_modulo_ms = pr - integer_ms[i];
-    uint16_t range_modulo_encoded = (uint16_t)round(1024 * range_modulo_ms);
-    rtcm_setbitu(buff, bit, 10, range_modulo_encoded);
-    bit += 10;
-
-    rough_range_ms[i] = integer_ms[i] + (double)range_modulo_encoded / 1024;
-  }
-
-  if (MSM5 == msm_type) {
-    for (uint8_t i = 0; i < num_sats; i++) {
-      /* range rate, m/s, DF399*/
-      double range_rate = round(msg->sats[i].rough_range_rate_m_s);
-      rtcm_setbits(buff, bit, 14, (int16_t)range_rate);
-      bit += 14;
-
-      rough_rate_m_s[i] = range_rate;
-    }
-  }
+  /* Satellite data */
+  encode_msm_sat_data(
+      msg, num_sats, msm_type, rough_range_ms, rough_rate_m_s, buff, &bit);
 
   /* Signal Data */
 
@@ -1058,8 +1090,6 @@ static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
         if (flags[i].valid_cp) {
           fine_cp_ms[i] =
               msg->signals[i].carrier_phase_ms - rough_range_ms[sat];
-        } else {
-          flags[i].valid_cp = false;
         }
         if (flags[i].valid_lock) {
           lock_time[i] = msg->signals[i].lock_time_s;
@@ -1073,8 +1103,6 @@ static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
         if (MSM5 == msm_type && flags[i].valid_dop) {
           fine_range_rate_m_s[i] =
               msg->signals[i].range_rate_m_s - rough_rate_m_s[sat];
-        } else {
-          flags[i].valid_dop = false;
         }
         i++;
       }
@@ -1100,7 +1128,7 @@ static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
  * \param msg The input RTCM message struct
  * \param buff Data buffer large enough to hold the message (at worst 742 bytes)
  *             (see RTCM 10403.3 Table 3.5-71)
- * \return Number of bytes written
+ * \return Number of bytes written or 0 on failure
  */
 
 uint16_t rtcm3_encode_msm4(const rtcm_msm_message *msg_msm4, uint8_t buff[]) {
@@ -1116,7 +1144,7 @@ uint16_t rtcm3_encode_msm4(const rtcm_msm_message *msg_msm4, uint8_t buff[]) {
  * \param msg The input RTCM message struct
  * \param buff Data buffer large enough to hold the message (at worst 742 bytes)
  *             (see RTCM 10403.3 Table 3.5-71)
- * \return Number of bytes written
+ * \return Number of bytes written or 0 on failure
  */
 
 uint16_t rtcm3_encode_msm5(const rtcm_msm_message *msg_msm5, uint8_t buff[]) {

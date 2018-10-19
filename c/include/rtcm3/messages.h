@@ -59,8 +59,6 @@ typedef struct {
   uint8_t smooth;   /* GPS Smoothing Interval DF008 bit(3) 3 */
 } rtcm_obs_header;
 
-#define MSM_SATELLITE_MASK_SIZE 64
-#define MSM_SIGNAL_MASK_SIZE 32
 typedef struct {
   uint16_t msg_num;  /* Msg Num DF002 uint16 12*/
   uint16_t stn_id;   /* Station Id DF003 uint16 12*/
