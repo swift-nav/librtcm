@@ -586,13 +586,13 @@ uint16_t rtcm3_encode_1007_base(const rtcm_msg_1007 *msg_1007,
                                 uint16_t *bit) {
   rtcm_setbitu(buff, *bit, 12, msg_1007->stn_id);
   *bit += 12;
-  rtcm_setbitu(buff, *bit, 8, msg_1007->desc_count);
+  rtcm_setbitu(buff, *bit, 8, msg_1007->ant_descriptor_counter);
   *bit += 8;
-  for (uint8_t i = 0; i < msg_1007->desc_count; ++i) {
-    rtcm_setbitu(buff, *bit, 8, msg_1007->desc[i]);
+  for (uint8_t i = 0; i < msg_1007->ant_descriptor_counter; ++i) {
+    rtcm_setbitu(buff, *bit, 8, msg_1007->ant_descriptor[i]);
     *bit += 8;
   }
-  rtcm_setbitu(buff, *bit, 8, msg_1007->ant_id);
+  rtcm_setbitu(buff, *bit, 8, msg_1007->ant_setup_id);
   *bit += 8;
 
   /* Round number of bits up to nearest whole byte. */
@@ -611,10 +611,10 @@ uint16_t rtcm3_encode_1008(const rtcm_msg_1008 *msg_1008, uint8_t buff[]) {
   rtcm_setbitu(buff, bit, 12, 1008);
   bit += 12;
   rtcm3_encode_1007_base(&msg_1008->msg_1007, buff, &bit);
-  rtcm_setbitu(buff, bit, 8, msg_1008->serial_count);
+  rtcm_setbitu(buff, bit, 8, msg_1008->ant_serial_num_counter);
   bit += 8;
-  for (uint8_t i = 0; i < msg_1008->serial_count; ++i) {
-    rtcm_setbitu(buff, bit, 8, msg_1008->serial_num[i]);
+  for (uint8_t i = 0; i < msg_1008->ant_serial_num_counter; ++i) {
+    rtcm_setbitu(buff, bit, 8, msg_1008->ant_serial_num[i]);
     bit += 8;
   }
 
@@ -747,20 +747,20 @@ uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t buff[]) {
   rtcm_setbitu(buff, bit, 12, msg_1033->stn_id);
   bit += 12;
 
-  rtcm_setbitu(buff, bit, 8, msg_1033->antenna_desc_counter);
+  rtcm_setbitu(buff, bit, 8, msg_1033->ant_descriptor_counter);
   bit += 8;
-  for (uint8_t i = 0; i < msg_1033->antenna_desc_counter; ++i) {
-    rtcm_setbitu(buff, bit, 8, msg_1033->antenna_descriptor[i]);
+  for (uint8_t i = 0; i < msg_1033->ant_descriptor_counter; ++i) {
+    rtcm_setbitu(buff, bit, 8, msg_1033->ant_descriptor[i]);
     bit += 8;
   }
 
-  rtcm_setbits(buff, bit, 8, msg_1033->antenna_setup_ID);
+  rtcm_setbits(buff, bit, 8, msg_1033->ant_setup_id);
   bit += 8;
 
-  rtcm_setbitu(buff, bit, 8, msg_1033->antenna_serial_num_counter);
+  rtcm_setbitu(buff, bit, 8, msg_1033->ant_serial_num_counter);
   bit += 8;
-  for (uint8_t i = 0; i < msg_1033->antenna_serial_num_counter; ++i) {
-    rtcm_setbitu(buff, bit, 8, msg_1033->antenna_serial_num[i]);
+  for (uint8_t i = 0; i < msg_1033->ant_serial_num_counter; ++i) {
+    rtcm_setbitu(buff, bit, 8, msg_1033->ant_serial_num[i]);
     bit += 8;
   }
 
@@ -771,9 +771,9 @@ uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t buff[]) {
     bit += 8;
   }
 
-  rtcm_setbitu(buff, bit, 8, msg_1033->rcv_fw_counter);
+  rtcm_setbitu(buff, bit, 8, msg_1033->rcv_fw_version_counter);
   bit += 8;
-  for (uint8_t i = 0; i < msg_1033->rcv_fw_counter; ++i) {
+  for (uint8_t i = 0; i < msg_1033->rcv_fw_version_counter; ++i) {
     rtcm_setbitu(buff, bit, 8, msg_1033->rcv_fw_version[i]);
     bit += 8;
   }

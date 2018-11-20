@@ -372,9 +372,9 @@ void test_rtcm_1007(void) {
   rtcm_msg_1007 msg1007;
 
   msg1007.stn_id = 1022;
-  msg1007.desc_count = 29;
-  strcpy(msg1007.desc, "Something with 29 characters.");
-  msg1007.ant_id = 254;
+  msg1007.ant_descriptor_counter = 29;
+  strcpy(msg1007.ant_descriptor, "Something with 29 characters.");
+  msg1007.ant_setup_id = 254;
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -390,11 +390,11 @@ void test_rtcm_1008(void) {
   rtcm_msg_1008 msg1008;
 
   msg1008.msg_1007.stn_id = 22;
-  msg1008.msg_1007.desc_count = 27;
-  strcpy(msg1008.msg_1007.desc, "Something without 30 chars.");
-  msg1008.msg_1007.ant_id = 1;
-  msg1008.serial_count = 9;
-  strncpy(msg1008.serial_num, "123456789", 32);
+  msg1008.msg_1007.ant_descriptor_counter = 27;
+  strcpy(msg1008.msg_1007.ant_descriptor, "Something without 30 chars.");
+  msg1008.msg_1007.ant_setup_id = 1;
+  msg1008.ant_serial_num_counter = 9;
+  strncpy(msg1008.ant_serial_num, "123456789", 32);
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -627,14 +627,14 @@ void test_rtcm_1029(void) {
 void test_rtcm_1033(void) {
   rtcm_msg_1033 msg1033;
   msg1033.stn_id = 555;
-  msg1033.antenna_desc_counter = 5;
-  strncpy(msg1033.antenna_descriptor, "hello", 32);
-  msg1033.antenna_setup_ID = 7;
-  msg1033.antenna_serial_num_counter = 3;
-  strncpy(msg1033.antenna_serial_num, "777", 32);
+  msg1033.ant_descriptor_counter = 5;
+  strncpy(msg1033.ant_descriptor, "hello", 32);
+  msg1033.ant_setup_id = 7;
+  msg1033.ant_serial_num_counter = 3;
+  strncpy(msg1033.ant_serial_num, "777", 32);
   msg1033.rcv_descriptor_counter = 9;
   strncpy(msg1033.rcv_descriptor, "LEI - IGS", 32);
-  msg1033.rcv_fw_counter = 6;
+  msg1033.rcv_fw_version_counter = 6;
   strncpy(msg1033.rcv_fw_version, "1.2.14", 32);
   msg1033.rcv_serial_num_counter = 20;
   strncpy(msg1033.rcv_serial_num, "66666666666666666666", 32);
@@ -1032,15 +1032,15 @@ bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs) {
   if (lhs->stn_id != rhs->stn_id) {
     return false;
   }
-  if (lhs->desc_count != rhs->desc_count) {
+  if (lhs->ant_descriptor_counter != rhs->ant_descriptor_counter) {
     return false;
   }
-  for (uint8_t ch = 0; ch < lhs->desc_count; ++ch) {
-    if (lhs->desc[ch] != rhs->desc[ch]) {
+  for (uint8_t ch = 0; ch < lhs->ant_descriptor_counter; ++ch) {
+    if (lhs->ant_descriptor[ch] != rhs->ant_descriptor[ch]) {
       return false;
     }
   }
-  if (lhs->ant_id != rhs->ant_id) {
+  if (lhs->ant_setup_id != rhs->ant_setup_id) {
     return false;
   }
 
@@ -1048,8 +1048,8 @@ bool msg1007_equals(const rtcm_msg_1007 *lhs, const rtcm_msg_1007 *rhs) {
 }
 
 bool msg1008_equals(const rtcm_msg_1008 *lhs, const rtcm_msg_1008 *rhs) {
-  for (uint8_t ch = 0; ch < lhs->serial_count; ++ch) {
-    if (lhs->serial_num[ch] != rhs->serial_num[ch]) {
+  for (uint8_t ch = 0; ch < lhs->ant_serial_num_counter; ++ch) {
+    if (lhs->ant_serial_num[ch] != rhs->ant_serial_num[ch]) {
       return false;
     }
   }
@@ -1086,28 +1086,28 @@ bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs) {
     printf("1033 stn_id not equal\n");
     return false;
   }
-  if (lhs->antenna_desc_counter != rhs->antenna_desc_counter) {
-    printf("1033 antenna_desc_counter not equal\n");
+  if (lhs->ant_descriptor_counter != rhs->ant_descriptor_counter) {
+    printf("1033 ant_desc_counter not equal\n");
     return false;
   }
-  if (strncmp(lhs->antenna_descriptor,
-              rhs->antenna_descriptor,
-              lhs->antenna_desc_counter) != 0) {
-    printf("1033 antenna_descriptor not equal\n");
+  if (strncmp(lhs->ant_descriptor,
+              rhs->ant_descriptor,
+              lhs->ant_descriptor_counter) != 0) {
+    printf("1033 ant_descriptor not equal\n");
     return false;
   }
-  if (lhs->antenna_setup_ID != rhs->antenna_setup_ID) {
-    printf("1033 antenna_setup_ID not equal\n");
+  if (lhs->ant_setup_id != rhs->ant_setup_id) {
+    printf("1033 ant_setup_ID not equal\n");
     return false;
   }
-  if (lhs->antenna_serial_num_counter != rhs->antenna_serial_num_counter) {
-    printf("1033 antenna_serial_num_counter not equal\n");
+  if (lhs->ant_serial_num_counter != rhs->ant_serial_num_counter) {
+    printf("1033 ant_serial_num_counter not equal\n");
     return false;
   }
-  if (strncmp(lhs->antenna_serial_num,
-              rhs->antenna_serial_num,
-              lhs->antenna_serial_num_counter) != 0) {
-    printf("1033 antenna_serial_num not equal\n");
+  if (strncmp(lhs->ant_serial_num,
+              rhs->ant_serial_num,
+              lhs->ant_serial_num_counter) != 0) {
+    printf("1033 ant_serial_num not equal\n");
     return false;
   }
   if (lhs->rcv_descriptor_counter != rhs->rcv_descriptor_counter) {
@@ -1122,12 +1122,13 @@ bool msg1033_equals(const rtcm_msg_1033 *lhs, const rtcm_msg_1033 *rhs) {
     printf("1033 rcv_descriptor not equal\n");
     return false;
   }
-  if (lhs->rcv_fw_counter != rhs->rcv_fw_counter) {
+  if (lhs->rcv_fw_version_counter != rhs->rcv_fw_version_counter) {
     printf("1033 rcv_fw_counter not equal\n");
     return false;
   }
-  if (strncmp(lhs->rcv_fw_version, rhs->rcv_fw_version, lhs->rcv_fw_counter) !=
-      0) {
+  if (strncmp(lhs->rcv_fw_version,
+              rhs->rcv_fw_version,
+              lhs->rcv_fw_version_counter) != 0) {
     printf("1033 rcv_fw_version not equal\n");
     return false;
   }

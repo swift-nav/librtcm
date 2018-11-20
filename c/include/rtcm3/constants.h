@@ -30,6 +30,8 @@
 #define MSM_CP_EXT_INVALID (-8388608) /* Signed bit pattern 0x800000 */
 #define MSM_DOP_INVALID (-16384)      /* Signed bit pattern 0x4000 */
 
+#define RTCM_MAX_STRING_LEN 32 /* Max length of strings in 1008, 1033, etc */
+
 #define MSM_GLO_FCN_OFFSET 7 /* Offset for FCN coding in sat_info */
 #define MSM_GLO_MAX_FCN 13
 #define MSM_GLO_FCN_UNKNOWN 255

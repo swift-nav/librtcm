@@ -18,6 +18,24 @@
 #include "rtcm3/eph_decode.h"
 #include "rtcm3/msm_utils.h"
 
+/* macros for reading rcv/ant descriptor strings */
+#define GET_STR_LEN(TheBuff, TheIdx, TheOutput)   \
+  do {                                            \
+    TheOutput = rtcm_getbitu(TheBuff, TheIdx, 8); \
+    if (RTCM_MAX_STRING_LEN <= TheOutput) {       \
+      return RC_INVALID_MESSAGE;                  \
+    }                                             \
+    TheIdx += 8;                                  \
+  } while (false);
+
+#define GET_STR(TheBuff, TheIdx, TheLen, TheOutput)    \
+  do {                                                 \
+    for (uint8_t i = 0; i < TheLen; ++i) {             \
+      TheOutput[i] = rtcm_getbitu(TheBuff, TheIdx, 8); \
+      TheIdx += 8;                                     \
+    }                                                  \
+  } while (false);
+
 void init_sat_data(rtcm_sat_data *sat_data) {
   for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {
     sat_data->obs[freq].flags.data = 0;
@@ -620,13 +638,10 @@ rtcm3_rc rtcm3_decode_1007_base(const uint8_t buff[],
                                 uint16_t *bit) {
   msg_1007->stn_id = rtcm_getbitu(buff, *bit, 12);
   *bit += 12;
-  msg_1007->desc_count = rtcm_getbitu(buff, *bit, 8);
-  *bit += 8;
-  for (uint8_t i = 0; i < msg_1007->desc_count; ++i) {
-    msg_1007->desc[i] = rtcm_getbitu(buff, *bit, 8);
-    *bit += 8;
-  }
-  msg_1007->ant_id = rtcm_getbitu(buff, *bit, 8);
+  GET_STR_LEN(buff, *bit, msg_1007->ant_descriptor_counter);
+  GET_STR(
+      buff, *bit, msg_1007->ant_descriptor_counter, msg_1007->ant_descriptor);
+  msg_1007->ant_setup_id = rtcm_getbitu(buff, *bit, 8);
   *bit += 8;
 
   return RC_OK;
@@ -638,6 +653,8 @@ rtcm3_rc rtcm3_decode_1007_base(const uint8_t buff[],
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : String length too large
+ *
  */
 rtcm3_rc rtcm3_decode_1007(const uint8_t buff[], rtcm_msg_1007 *msg_1007) {
   uint16_t bit = 0;
@@ -648,9 +665,7 @@ rtcm3_rc rtcm3_decode_1007(const uint8_t buff[], rtcm_msg_1007 *msg_1007) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  rtcm3_decode_1007_base(buff, msg_1007, &bit);
-
-  return RC_OK;
+  return rtcm3_decode_1007_base(buff, msg_1007, &bit);
 }
 
 /** Decode an RTCMv3 message type 1008 (Antenna Descriptor & Serial Number)
@@ -659,6 +674,7 @@ rtcm3_rc rtcm3_decode_1007(const uint8_t buff[], rtcm_msg_1007 *msg_1007) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : String length too large
  */
 rtcm3_rc rtcm3_decode_1008(const uint8_t buff[], rtcm_msg_1008 *msg_1008) {
   uint16_t bit = 0;
@@ -669,13 +685,15 @@ rtcm3_rc rtcm3_decode_1008(const uint8_t buff[], rtcm_msg_1008 *msg_1008) {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  rtcm3_decode_1007_base(buff, &msg_1008->msg_1007, &bit);
-  msg_1008->serial_count = rtcm_getbitu(buff, bit, 8);
-  bit += 8;
-  for (uint8_t i = 0; i < msg_1008->serial_count; ++i) {
-    msg_1008->serial_num[i] = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
+  rtcm3_rc ret = rtcm3_decode_1007_base(buff, &msg_1008->msg_1007, &bit);
+  if (RC_OK != ret) {
+    return ret;
   }
+
+  GET_STR_LEN(buff, bit, msg_1008->ant_serial_num_counter);
+  GET_STR(
+      buff, bit, msg_1008->ant_serial_num_counter, msg_1008->ant_serial_num);
+
   return RC_OK;
 }
 
@@ -839,6 +857,7 @@ rtcm3_rc rtcm3_decode_1029(const uint8_t buff[], rtcm_msg_1029 *msg_1029) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : String length too large
  */
 rtcm3_rc rtcm3_decode_1033(const uint8_t buff[], rtcm_msg_1033 *msg_1033) {
   uint16_t bit = 0;
@@ -855,43 +874,28 @@ rtcm3_rc rtcm3_decode_1033(const uint8_t buff[], rtcm_msg_1033 *msg_1033) {
   msg_1033->stn_id = rtcm_getbitu(buff, bit, 12);
   bit += 12;
 
-  msg_1033->antenna_desc_counter = rtcm_getbitu(buff, bit, 8);
-  bit += 8;
-  for (uint8_t i = 0; i < msg_1033->antenna_desc_counter; ++i) {
-    msg_1033->antenna_descriptor[i] = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
-  }
+  GET_STR_LEN(buff, bit, msg_1033->ant_descriptor_counter);
+  GET_STR(
+      buff, bit, msg_1033->ant_descriptor_counter, msg_1033->ant_descriptor);
 
-  msg_1033->antenna_setup_ID = rtcm_getbitu(buff, bit, 8);
+  msg_1033->ant_setup_id = rtcm_getbitu(buff, bit, 8);
   bit += 8;
 
-  msg_1033->antenna_serial_num_counter = rtcm_getbitu(buff, bit, 8);
-  bit += 8;
-  for (uint8_t i = 0; i < msg_1033->antenna_serial_num_counter; ++i) {
-    msg_1033->antenna_serial_num[i] = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
-  }
+  GET_STR_LEN(buff, bit, msg_1033->ant_serial_num_counter);
+  GET_STR(
+      buff, bit, msg_1033->ant_serial_num_counter, msg_1033->ant_serial_num);
 
-  msg_1033->rcv_descriptor_counter = rtcm_getbitu(buff, bit, 8);
-  bit += 8;
-  for (uint8_t i = 0; i < msg_1033->rcv_descriptor_counter; ++i) {
-    msg_1033->rcv_descriptor[i] = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
-  }
+  GET_STR_LEN(buff, bit, msg_1033->rcv_descriptor_counter);
+  GET_STR(
+      buff, bit, msg_1033->rcv_descriptor_counter, msg_1033->rcv_descriptor);
 
-  msg_1033->rcv_fw_counter = rtcm_getbitu(buff, bit, 8);
-  bit += 8;
-  for (uint8_t i = 0; i < msg_1033->rcv_fw_counter; ++i) {
-    msg_1033->rcv_fw_version[i] = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
-  }
+  GET_STR_LEN(buff, bit, msg_1033->rcv_fw_version_counter);
+  GET_STR(
+      buff, bit, msg_1033->rcv_fw_version_counter, msg_1033->rcv_fw_version);
 
-  msg_1033->rcv_serial_num_counter = rtcm_getbitu(buff, bit, 8);
-  bit += 8;
-  for (uint8_t i = 0; i < msg_1033->rcv_serial_num_counter; ++i) {
-    msg_1033->rcv_serial_num[i] = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
-  }
+  GET_STR_LEN(buff, bit, msg_1033->rcv_serial_num_counter);
+  GET_STR(
+      buff, bit, msg_1033->rcv_serial_num_counter, msg_1033->rcv_serial_num);
 
   return RC_OK;
 }
