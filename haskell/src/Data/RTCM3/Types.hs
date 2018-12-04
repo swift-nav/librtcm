@@ -26,6 +26,7 @@ import           Data.Binary
 import qualified Data.Binary.Bits.Get     as B
 import           Data.Binary.Get
 import           Data.Binary.Put
+import           Data.Bits
 import           Data.ByteString.Base64   as Base64
 import           Data.ByteString.Builder
 import           Data.ByteString.Lazy     hiding (ByteString)
@@ -78,7 +79,7 @@ instance FromJSON Msg where
 
 instance Binary Msg where
   get = do
-    _msgRTCM3Len     <- getWord16be
+    _msgRTCM3Len     <- (.&. 1023) <$> getWord16be
     _msgRTCM3Payload <- fmap Bytes $ getByteString $ fromIntegral _msgRTCM3Len
     _msgRTCM3Crc     <- getWord24be
     pure Msg {..}
