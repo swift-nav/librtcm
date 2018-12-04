@@ -62,6 +62,7 @@ instance ToJSON Msg where
     [ "len"     .= _msgRTCM3Len
     , "payload" .= _msgRTCM3Payload
     , "crc"     .= _msgRTCM3Crc
+    , "num"     .= checkNum (unBytes _msgRTCM3Payload)
     ]
 
 instance FromJSON Bytes where

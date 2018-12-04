@@ -89,7 +89,7 @@ data RTCM3Msg =
    | RTCM3Msg1230    Msg1230 Msg
    | RTCM3Msg1265    Msg1265 Msg
    | RTCM3Msg1266    Msg1266 Msg
-   | RTCM3MsgUnknown Word16  Msg
+   | RTCM3MsgUnknown         Msg
    | RTCM3MsgBadCrc          Msg
    | RTCM3MsgEmpty           Msg
    deriving ( Show, Read, Eq )
@@ -156,7 +156,7 @@ instance Binary RTCM3Msg where
           | num == msg1230 = RTCM3Msg1230 (decode $ fromStrict $ unBytes _msgRTCM3Payload) m
           | num == msg1265 = RTCM3Msg1265 (decode $ fromStrict $ unBytes _msgRTCM3Payload) m
           | num == msg1266 = RTCM3Msg1266 (decode $ fromStrict $ unBytes _msgRTCM3Payload) m
-          | otherwise = RTCM3MsgUnknown num m where
+          | otherwise = RTCM3MsgUnknown m where
             crc = checkCrc _msgRTCM3Len $ unBytes _msgRTCM3Payload
             num = checkNum $ unBytes _msgRTCM3Payload
 
@@ -215,7 +215,7 @@ instance Binary RTCM3Msg where
       encoder (RTCM3Msg1230    _n m) = put m
       encoder (RTCM3Msg1265    _n m) = put m
       encoder (RTCM3Msg1266    _n m) = put m
-      encoder (RTCM3MsgUnknown _n m) = put m
+      encoder (RTCM3MsgUnknown    m) = put m
       encoder (RTCM3MsgBadCrc     m) = put m
       encoder (RTCM3MsgEmpty      m) = put m
 
@@ -272,7 +272,7 @@ instance HasMsg RTCM3Msg where
   msg f (RTCM3Msg1230    n m) = RTCM3Msg1230    n <$> f m
   msg f (RTCM3Msg1265    n m) = RTCM3Msg1265    n <$> f m
   msg f (RTCM3Msg1266    n m) = RTCM3Msg1266    n <$> f m
-  msg f (RTCM3MsgUnknown n m) = RTCM3MsgUnknown n <$> f m
+  msg f (RTCM3MsgUnknown   m) = RTCM3MsgUnknown   <$> f m
   msg f (RTCM3MsgBadCrc    m) = RTCM3MsgBadCrc    <$> f m
   msg f (RTCM3MsgEmpty     m) = RTCM3MsgEmpty     <$> f m
 
@@ -335,7 +335,7 @@ instance ToJSON RTCM3Msg where
   toJSON (RTCM3Msg1230    n m) = toJSON n <<>> toJSON m
   toJSON (RTCM3Msg1265    n m) = toJSON n <<>> toJSON m
   toJSON (RTCM3Msg1266    n m) = toJSON n <<>> toJSON m
-  toJSON (RTCM3MsgUnknown n m) = object [ "num" .= n ] <<>> toJSON m
+  toJSON (RTCM3MsgUnknown   m) = toJSON m
   toJSON (RTCM3MsgBadCrc    m) = toJSON m
   toJSON (RTCM3MsgEmpty     m) = toJSON m
 
@@ -372,5 +372,5 @@ instance FromJSON RTCM3Msg where
         | num == msg1074 = RTCM3Msg1074 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
         | num == msg1230 = RTCM3Msg1230 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
         | num == msg1265 = RTCM3Msg1265 <$> pure (decode $ fromStrict $ unBytes payload) <*> parseJSON obj
-        | otherwise = RTCM3MsgUnknown <$> pure num <*> parseJSON obj
+        | otherwise = RTCM3MsgUnknown <$> parseJSON obj
   parseJSON _ = mzero
