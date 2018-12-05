@@ -44,6 +44,9 @@
 /* maximum value for time-of-day in integer milliseconds */
 #define RTCM_GLO_MAX_TOW_MS (24 * 3600 * 1000 - 1)
 
+/* maximum value for antenna height DF028 */
+#define RTCM_1006_MAX_ANTENNA_HEIGHT_M 6.5535
+
 /** 2^-4 */
 #define C_1_2P4 0.0625
 /** 2^-8 */

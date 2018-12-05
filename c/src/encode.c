@@ -574,7 +574,13 @@ uint16_t rtcm3_encode_1006(const rtcm_msg_1006 *msg_1006, uint8_t buff[]) {
   rtcm_setbitu(buff, bit, 12, 1006);
   bit += 12;
   rtcm3_encode_1005_base(&msg_1006->msg_1005, buff, &bit);
-  rtcm_setbitu(buff, bit, 16, (uint16_t)round(msg_1006->ant_height * 10000.0));
+  double ant_height = msg_1006->ant_height;
+  if (ant_height < 0.0) {
+    ant_height = 0.0;
+  } else if (ant_height > RTCM_1006_MAX_ANTENNA_HEIGHT_M) {
+    ant_height = RTCM_1006_MAX_ANTENNA_HEIGHT_M;
+  }
+  rtcm_setbitu(buff, bit, 16, (uint16_t)round(ant_height * 10000.0));
   bit += 16;
 
   /* Round number of bits up to nearest whole byte. */
