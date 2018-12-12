@@ -207,10 +207,10 @@ typedef struct {
  */
 typedef struct {
   union {
-    int8_t tgd_gps_s;
-    double tgd_qzss_s;
-    double tgd_bds_s[2];
-    double tgd_gal_s[2];
+	int32_t tgd_gps_s;
+    int32_t tgd_qzss_s;
+    int32_t tgd_bds_s[2];
+    int32_t tgd_gal_s[2];
   };
   int32_t crc;
   int32_t crs;
@@ -233,7 +233,7 @@ typedef struct {
   uint32_t toc;
   uint16_t iodc;
   uint16_t iode;
-} ephemeris_kepler_t;
+} ephemeris_kepler_raw_rtcm_t;
 
 /** Structure containing the SBAS ephemeris for one satellite. */
 typedef struct {
@@ -242,7 +242,7 @@ typedef struct {
   double acc[3];
   double a_gf0;
   double a_gf1;
-} ephemeris_xyz_t;
+} ephemeris_xyz_rtcm_t;
 
 /** Structure containing the GLONASS ephemeris for one satellite. */
 typedef struct {
@@ -256,7 +256,7 @@ typedef struct {
 
   uint8_t fcn;
   uint8_t iod;
-} ephemeris_glo_t;
+} ephemeris_glo_raw_rtcm_t;
 
 /** Structure containing the ephemeris for one satellite. */
 typedef struct {
@@ -269,9 +269,9 @@ typedef struct {
   uint8_t valid;
   uint8_t health_bits;
   union {
-    ephemeris_kepler_t kepler;
-    ephemeris_xyz_t xyz;
-    ephemeris_glo_t glo;
+	  ephemeris_kepler_raw_rtcm_t kepler;
+	  ephemeris_xyz_rtcm_t xyz;
+	  ephemeris_glo_raw_rtcm_t glo;
   };
 } rtcm_msg_eph;
 
