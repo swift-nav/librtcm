@@ -45,6 +45,10 @@ target_compile_options(rtcm PRIVATE "-fno-unwind-tables")
 target_compile_options(rtcm PRIVATE "-fno-asynchronous-unwind-tables")
 target_compile_options(rtcm PRIVATE "-std=gnu99")
 target_compile_options(rtcm PRIVATE "-fPIC")
+# require at least gcc 5.0
+if (CMAKE_C_COMPILER_VERSION VERSION_GREATER 5.0)
+   target_compile_options(rtcm PRIVATE "-Wfloat-conversion")
+endif()
 
 install(TARGETS rtcm DESTINATION lib${LIB_SUFFIX})
 install(FILES ${librtcm_HEADERS} DESTINATION include/rtcm3)

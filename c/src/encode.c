@@ -29,22 +29,22 @@
  */
 static uint8_t to_lock_ind(double time) {
   if (time < 24) {
-    return time;
+    return (uint8_t)time;
   }
   if (time < 72) {
-    return (time + 24) / 2;
+    return (uint8_t)((time + 24) / 2);
   }
   if (time < 168) {
-    return (time + 120) / 4;
+    return (uint8_t)((time + 120) / 4);
   }
   if (time < 360) {
-    return (time + 408) / 8;
+    return (uint8_t)((time + 408) / 8);
   }
   if (time < 744) {
-    return (time + 1176) / 16;
+    return (uint8_t)((time + 1176) / 16);
   }
   if (time < 937) {
-    return (time + 3096) / 32;
+    return (uint8_t)((time + 3096) / 32);
   }
   return 127;
 }
@@ -107,7 +107,7 @@ uint8_t rtcm3_encode_lock_time(double time) {
 /* Encode PhaseRange – L1 Pseudorange (DF012, DF018 ,DF042, DF048) */
 static int32_t encode_diff_phaserange(double cp_pr, double freq) {
   double phase_unit = (GPS_C / freq) / 0.0005;
-  int32_t ppr = round(cp_pr * phase_unit);
+  int32_t ppr = lround(cp_pr * phase_unit);
 
   /* From specification: "Certain ionospheric conditions might cause the GPS
    * L1 Phaserange – L1 Pseudorange to diverge over time across the range
@@ -118,11 +118,11 @@ static int32_t encode_diff_phaserange(double cp_pr, double freq) {
   if (ppr <= -C_2P19) {
     /* add multiples of 1500 cycles */
     cp_pr += 1500 * ceil((-C_2P19 / phase_unit - cp_pr) / 1500);
-    ppr = round(cp_pr * phase_unit);
+    ppr = lround(cp_pr * phase_unit);
   } else if (ppr >= C_2P19) {
     /* substract multiples of 1500 cycles */
     cp_pr -= 1500 * ceil((cp_pr - C_2P19 / phase_unit) / 1500);
-    ppr = round(cp_pr * phase_unit);
+    ppr = lround(cp_pr * phase_unit);
   }
   return ppr;
 }
@@ -808,22 +808,22 @@ uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t buff[]) {
   rtcm_setbitu(buff, bit, 4, msg_1230->fdma_signal_mask);
   bit += 4;
   if (msg_1230->fdma_signal_mask & 0x08) {
-    int16_t bias = round(msg_1230->L1_CA_cpb_meter * 50);
+    int16_t bias = (int16_t)round(msg_1230->L1_CA_cpb_meter * 50);
     rtcm_setbits(buff, bit, 16, bias);
     bit += 16;
   }
   if (msg_1230->fdma_signal_mask & 0x04) {
-    int16_t bias = round(msg_1230->L1_P_cpb_meter * 50);
+    int16_t bias = (int16_t)round(msg_1230->L1_P_cpb_meter * 50);
     rtcm_setbits(buff, bit, 16, bias);
     bit += 16;
   }
   if (msg_1230->fdma_signal_mask & 0x02) {
-    int16_t bias = round(msg_1230->L2_CA_cpb_meter * 50);
+    int16_t bias = (int16_t)round(msg_1230->L2_CA_cpb_meter * 50);
     rtcm_setbits(buff, bit, 16, bias);
     bit += 16;
   }
   if (msg_1230->fdma_signal_mask & 0x01) {
-    int16_t bias = round(msg_1230->L2_P_cpb_meter * 50);
+    int16_t bias = (int16_t)round(msg_1230->L2_P_cpb_meter * 50);
     rtcm_setbits(buff, bit, 16, bias);
     bit += 16;
   }
