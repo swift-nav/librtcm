@@ -416,246 +416,249 @@ instance BinaryBit GalEphemerisHeader where
     B.putWord16be 12 _galEphemerisHeader_num
     B.putWord8    6  _galEphemerisHeader_sat
 
-data GalEphemeris_fnav = GalEphemeris
-  { _galEphemeris_wn          :: Word16
+data GalEphemerisFnav = GalEphemerisFnav
+  { _galEphemerisFnav_wn          :: Word16
     -- ^ Galileo week number, mod 1024 (0-1023).
-  , _galEphemeris_iodnav      :: Word16
+  , _galEphemerisFnav_iodnav      :: Word16
     -- ^ Galileo IODnav.
-  , _galEphemeris_sisa        :: Word8
+  , _galEphemerisFnav_sisa        :: Word8
     -- ^ Galileo SISA index
-  , _galEphemeris_idot        :: Int16
+  , _galEphemerisFnav_idot        :: Int16
     -- ^ Galileo IDOT (rate of inclination angle). Unit: semi-circles/sec. Scale factor: 2^(-43)
-  , _galEphemeris_toc         :: Word16
+  , _galEphemerisFnav_toc         :: Word16
     -- ^ Galileo t_oc. Unit: Seconds. Scale factor: 2^4
-  , _galEphemeris_af2         :: Int8
+  , _galEphemerisFnav_af2         :: Int8
     -- ^ Galileo a_f2. Unit: sec/sec^2. Scale factor: 2^(-55)
-  , _galEphemeris_af1         :: Int32
+  , _galEphemerisFnav_af1         :: Int32
     -- ^ Galileo a_f1. Unit: sec/sec. Scale factor: 2^(-43)
-  , _galEphemeris_af0         :: Int32
+  , _galEphemerisFnav_af0         :: Int32
     -- ^ Galileo a_f0. Unit: seconds. Scale factor: 2^(-31)
-  , _galEphemeris_c_rs        :: Int16
+  , _galEphemerisFnav_c_rs        :: Int16
     -- ^ Galileo C_rs. Unit: Meters. Scale factor: 2^(-5)
-  , _galEphemeris_dn          :: Int16
+  , _galEphemerisFnav_dn          :: Int16
     -- ^ Galileo delta n. Unit: semi-circles/sec. Scale factor: 2^(-43)
-  , _galEphemeris_m0          :: Int32
+  , _galEphemerisFnav_m0          :: Int32
     -- ^ Galileo M_0. Unit: semi-circles. Scale factor: 2^(-31)
-  , _galEphemeris_c_uc        :: Int16
+  , _galEphemerisFnav_c_uc        :: Int16
     -- ^ Galileo C_uc. Unit: radians. Scale factor: 2^(-29)
-  , _galEphemeris_ecc         :: Word32
+  , _galEphemerisFnav_ecc         :: Word32
     -- ^ Galileo Eccentricity (e). Unit: Dimensionless. Scale factor: 2^(-33)
-  , _galEphemeris_c_us        :: Int16
+  , _galEphemerisFnav_c_us        :: Int16
     -- ^ Galileo C_us. Unit: radians. Scale factor: 2^(-29)
-  , _galEphemeris_sqrta       :: Word32
+  , _galEphemerisFnav_sqrta       :: Word32
     -- ^ Galileo A^(1/2). Unit: meters^(1/2). Scale factor: 2^(-19)
-  , _galEphemeris_toe         :: Word16
+  , _galEphemerisFnav_toe         :: Word16
     -- ^ Galileo t_oe. Unit: seconds. Scale factor: 2^4
-  , _galEphemeris_c_ic        :: Int16
+  , _galEphemerisFnav_c_ic        :: Int16
     -- ^ Galileo C_ic. Unit: radians. Scale factor: 2^(-29)
-  , _galEphemeris_omega0      :: Int32
+  , _galEphemerisFnav_omega0      :: Int32
     -- ^ Galileo Omega_0. Unit: semi-circles. Scale factor: 2^(-31)
-  , _galEphemeris_c_is        :: Int16
+  , _galEphemerisFnav_c_is        :: Int16
     -- ^ Galileo C_is. Unit: radians. Scale factor: 2^(-29)
-  , _galEphemeris_i0          :: Int32
+  , _galEphemerisFnav_i0          :: Int32
     -- ^ Galileo i_0 (inclination angle at reference time; inc). Unit: semi-circles. Scale factor: 2^(-31)
-  , _galEphemeris_c_rc        :: Int16
+  , _galEphemerisFnav_c_rc        :: Int16
     -- ^ Galileo C_rc. Unit: meters. Scale factor: 2^(-5)
-  , _galEphemeris_w           :: Int32
+  , _galEphemerisFnav_w           :: Int32
     -- ^ Galileo Argument of Perigee (omega, w). Unit: semi-circles. Scale factor: 2^(-31)
-  , _galEphemeris_omegadot    :: Int32
+  , _galEphemerisFnav_omegadot    :: Int32
     -- ^ Galileo Omegadot - rate or right ascension. Unit: semi-circles/sec. Scale factor: 2^(-43)
-  , _galEphemeris_bgdE5b      :: Int16
+  , _galEphemerisFnav_bgdE5b      :: Int16
     -- ^ Galileo E5b/E1 t_GD. Unit: seconds. Scale factor: 2^(-31)
-  , _galEphemeris_nav_health  :: Word8
+  , _galEphemerisFnav_nav_health  :: Word8
     -- ^ Galileo nav health
-  , _galEphemeris_validity    :: Bool
+  , _galEphemerisFnav_validity    :: Bool
     -- ^ Galileo signal validity
   } deriving (Show, Read, Eq)
 
-instance BinaryBit GalEphemeris_fnav where
+instance BinaryBit GalEphemerisFnav where
   getBits _n = do
-    _galEphemeris_wn          <- B.getWord16be 10
-    _galEphemeris_iodnav      <- B.getWord16be 10
-    _galEphemeris_sisa        <- B.getWord8    8
-    _galEphemeris_idot        <- getInt16be    14
-    _galEphemeris_toc         <- B.getWord16be 14
-    _galEphemeris_af2         <- getInt8       6
-    _galEphemeris_af1         <- getInt32be    21
-    _galEphemeris_af0         <- getInt32be    31
-    _galEphemeris_c_rs        <- getInt16be    16
-    _galEphemeris_dn          <- getInt16be    16
-    _galEphemeris_m0          <- getInt32be    32
-    _galEphemeris_c_uc        <- getInt16be    16
-    _galEphemeris_ecc         <- B.getWord32be 32
-    _galEphemeris_c_us        <- getInt16be    16
-    _galEphemeris_sqrta       <- B.getWord32be 32
-    _galEphemeris_toe         <- B.getWord16be 14
-    _galEphemeris_c_ic        <- getInt16be    16
-    _galEphemeris_omega0      <- getInt32be    32
-    _galEphemeris_c_is        <- getInt16be    16
-    _galEphemeris_i0          <- getInt32be    32
-    _galEphemeris_c_rc        <- getInt16be    16
-    _galEphemeris_w           <- getInt32be    32
-    _galEphemeris_omegadot    <- getInt32be    24
-    _galEphemeris_bgdE5b      <- getInt16      10
-    _galEphemeris_nav_health  <- B.getWord8    2
-    _galEphemeris_validity    <- B.getBool
-    pure GalEphemeris_fnav {..}
+    _galEphemerisFnav_wn          <- B.getWord16be 10
+    _galEphemerisFnav_iodnav      <- B.getWord16be 10
+    _galEphemerisFnav_sisa        <- B.getWord8    8
+    _galEphemerisFnav_idot        <- getInt16be    14
+    _galEphemerisFnav_toc         <- B.getWord16be 14
+    _galEphemerisFnav_af2         <- getInt8       6
+    _galEphemerisFnav_af1         <- getInt32be    21
+    _galEphemerisFnav_af0         <- getInt32be    31
+    _galEphemerisFnav_c_rs        <- getInt16be    16
+    _galEphemerisFnav_dn          <- getInt16be    16
+    _galEphemerisFnav_m0          <- getInt32be    32
+    _galEphemerisFnav_c_uc        <- getInt16be    16
+    _galEphemerisFnav_ecc         <- B.getWord32be 32
+    _galEphemerisFnav_c_us        <- getInt16be    16
+    _galEphemerisFnav_sqrta       <- B.getWord32be 32
+    _galEphemerisFnav_toe         <- B.getWord16be 14
+    _galEphemerisFnav_c_ic        <- getInt16be    16
+    _galEphemerisFnav_omega0      <- getInt32be    32
+    _galEphemerisFnav_c_is        <- getInt16be    16
+    _galEphemerisFnav_i0          <- getInt32be    32
+    _galEphemerisFnav_c_rc        <- getInt16be    16
+    _galEphemerisFnav_w           <- getInt32be    32
+    _galEphemerisFnav_omegadot    <- getInt32be    24
+    _galEphemerisFnav_bgdE5b      <- getInt16be    10
+    _galEphemerisFnav_nav_health  <- B.getWord8    2
+    _galEphemerisFnav_validity    <- B.getBool
+    pure GalEphemerisFnav {..}
 
-  putBits _n GalEphemeris_fnav {..} = do
-    B.putWord16be 10 _galEphemeris_wn
-    B.putWord16be 10 _galEphemeris_iodnav
-    B.putWord8    8  _galEphemeris_sisa
-    putInt16be    14 _galEphemeris_idot
-    B.putWord16be 16 _galEphemeris_toc
-    putInt8       6  _galEphemeris_af2
-    putInt32be    21 _galEphemeris_af1
-    putInt32be    31 _galEphemeris_af0
-    putInt16be    16 _galEphemeris_c_rs
-    putInt16be    16 _galEphemeris_dn
-    putInt32be    32 _galEphemeris_m0
-    putInt16be    16 _galEphemeris_c_uc
-    B.putWord32be 32 _galEphemeris_ecc
-    putInt16be    16 _galEphemeris_c_us
-    B.putWord32be 32 _galEphemeris_sqrta
-    B.putWord16be 16 _galEphemeris_toe
-    putInt16be    16 _galEphemeris_c_ic
-    putInt32be    32 _galEphemeris_omega0
-    putInt16be    16 _galEphemeris_c_is
-    putInt32be    32 _galEphemeris_i0
-    putInt16be    16 _galEphemeris_c_rc
-    putInt32be    32 _galEphemeris_w
-    putInt32be    24 _galEphemeris_omegadot
-    putInt16      10 _galEphemeris_bgdE5b
-    B.putWord8    2  _galEphemeris_nav_health
-    B.putBool        _galEphemeris_validity
+  putBits _n GalEphemerisFnav {..} = do
+    B.putWord16be 10 _galEphemerisFnav_wn
+    B.putWord16be 10 _galEphemerisFnav_iodnav
+    B.putWord8    8  _galEphemerisFnav_sisa
+    putInt16be    14 _galEphemerisFnav_idot
+    B.putWord16be 16 _galEphemerisFnav_toc
+    putInt8       6  _galEphemerisFnav_af2
+    putInt32be    21 _galEphemerisFnav_af1
+    putInt32be    31 _galEphemerisFnav_af0
+    putInt16be    16 _galEphemerisFnav_c_rs
+    putInt16be    16 _galEphemerisFnav_dn
+    putInt32be    32 _galEphemerisFnav_m0
+    putInt16be    16 _galEphemerisFnav_c_uc
+    B.putWord32be 32 _galEphemerisFnav_ecc
+    putInt16be    16 _galEphemerisFnav_c_us
+    B.putWord32be 32 _galEphemerisFnav_sqrta
+    B.putWord16be 16 _galEphemerisFnav_toe
+    putInt16be    16 _galEphemerisFnav_c_ic
+    putInt32be    32 _galEphemerisFnav_omega0
+    putInt16be    16 _galEphemerisFnav_c_is
+    putInt32be    32 _galEphemerisFnav_i0
+    putInt16be    16 _galEphemerisFnav_c_rc
+    putInt32be    32 _galEphemerisFnav_w
+    putInt32be    24 _galEphemerisFnav_omegadot
+    putInt16be    10 _galEphemerisFnav_bgdE5b
+    B.putWord8    2  _galEphemerisFnav_nav_health
+    B.putBool        _galEphemerisFnav_validity
 
-$(makeLenses ''GalEphemeris)
-$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_galEphemeris_" . stripPrefix "_galEphemeris_"} ''GalEphemeris)
+$(makeLenses ''GalEphemerisFnav)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_galEphemerisFnav_" . stripPrefix "_galEphemerisFnav_"} ''GalEphemerisFnav)
 
-data GalEphemeris_inav = GalEphemeris
-  { _galEphemeris_wn          :: Word16
+data GalEphemerisInav = GalEphemerisInav
+  { _galEphemerisInav_wn          :: Word16
     -- ^ Galileo week number, mod 1024 (0-1023).
-  , _galEphemeris_iodnav      :: Word16
+  , _galEphemerisInav_iodnav      :: Word16
     -- ^ Galileo IODnav.
-  , _galEphemeris_sisa        :: Word8
+  , _galEphemerisInav_sisa        :: Word8
     -- ^ Galileo SISA index
-  , _galEphemeris_idot        :: Int16
+  , _galEphemerisInav_idot        :: Int16
     -- ^ Galileo IDOT (rate of inclination angle). Unit: semi-circles/sec. Scale factor: 2^(-43)
-  , _galEphemeris_toc         :: Word16
+  , _galEphemerisInav_toc         :: Word16
     -- ^ Galileo t_oc. Unit: Seconds. Scale factor: 2^4
-  , _galEphemeris_af2         :: Int8
+  , _galEphemerisInav_af2         :: Int8
     -- ^ Galileo a_f2. Unit: sec/sec^2. Scale factor: 2^(-55)
-  , _galEphemeris_af1         :: Int32
+  , _galEphemerisInav_af1         :: Int32
     -- ^ Galileo a_f1. Unit: sec/sec. Scale factor: 2^(-43)
-  , _galEphemeris_af0         :: Int32
+  , _galEphemerisInav_af0         :: Int32
     -- ^ Galileo a_f0. Unit: seconds. Scale factor: 2^(-31)
-  , _galEphemeris_c_rs        :: Int16
+  , _galEphemerisInav_c_rs        :: Int16
     -- ^ Galileo C_rs. Unit: Meters. Scale factor: 2^(-5)
-  , _galEphemeris_dn          :: Int16
+  , _galEphemerisInav_dn          :: Int16
     -- ^ Galileo delta n. Unit: semi-circles/sec. Scale factor: 2^(-43)
-  , _galEphemeris_m0          :: Int32
+  , _galEphemerisInav_m0          :: Int32
     -- ^ Galileo M_0. Unit: semi-circles. Scale factor: 2^(-31)
-  , _galEphemeris_c_uc        :: Int16
+  , _galEphemerisInav_c_uc        :: Int16
     -- ^ Galileo C_uc. Unit: radians. Scale factor: 2^(-29)
-  , _galEphemeris_ecc         :: Word32
+  , _galEphemerisInav_ecc         :: Word32
     -- ^ Galileo Eccentricity (e). Unit: Dimensionless. Scale factor: 2^(-33)
-  , _galEphemeris_c_us        :: Int16
+  , _galEphemerisInav_c_us        :: Int16
     -- ^ Galileo C_us. Unit: radians. Scale factor: 2^(-29)
-  , _galEphemeris_sqrta       :: Word32
+  , _galEphemerisInav_sqrta       :: Word32
     -- ^ Galileo A^(1/2). Unit: meters^(1/2). Scale factor: 2^(-19)
-  , _galEphemeris_toe         :: Word16
+  , _galEphemerisInav_toe         :: Word16
     -- ^ Galileo t_oe. Unit: seconds. Scale factor: 2^4
-  , _galEphemeris_c_ic        :: Int16
+  , _galEphemerisInav_c_ic        :: Int16
     -- ^ Galileo C_ic. Unit: radians. Scale factor: 2^(-29)
-  , _galEphemeris_omega0      :: Int32
+  , _galEphemerisInav_omega0      :: Int32
     -- ^ Galileo Omega_0. Unit: semi-circles. Scale factor: 2^(-31)
-  , _galEphemeris_c_is        :: Int16
+  , _galEphemerisInav_c_is        :: Int16
     -- ^ Galileo C_is. Unit: radians. Scale factor: 2^(-29)
-  , _galEphemeris_i0          :: Int32
+  , _galEphemerisInav_i0          :: Int32
     -- ^ Galileo i_0 (inclination angle at reference time; inc). Unit: semi-circles. Scale factor: 2^(-31)
-  , _galEphemeris_c_rc        :: Int16
+  , _galEphemerisInav_c_rc        :: Int16
     -- ^ Galileo C_rc. Unit: meters. Scale factor: 2^(-5)
-  , _galEphemeris_w           :: Int32
+  , _galEphemerisInav_w           :: Int32
     -- ^ Galileo Argument of Perigee (omega, w). Unit: semi-circles. Scale factor: 2^(-31)
-  , _galEphemeris_omegadot    :: Int32
+  , _galEphemerisInav_omegadot    :: Int32
     -- ^ Galileo Omegadot - rate or right ascension. Unit: semi-circles/sec. Scale factor: 2^(-43)
-  , _galEphemeris_bgdE5a      :: Int16
+  , _galEphemerisInav_bgdE5a      :: Int16
     -- ^ Galileo E5a/E1 t_GD. Unit: seconds. Scale factor: 2^(-31)
-  , _galEphemeris_bgdE5b      :: Int16
+  , _galEphemerisInav_bgdE5b      :: Int16
     -- ^ Galileo E5b/E1 t_GD. Unit: seconds. Scale factor: 2^(-31)
-  , _galEphemeris_E5b_health  :: Word8
+  , _galEphemerisInav_E5b_health  :: Word8
     -- ^ Galileo E5b signal health
-  , _galEphemeris_E5b_validity:: Bool
+  , _galEphemerisInav_E5b_validity:: Bool
     -- ^ Galileo E5b data flag
-  , _galEphemeris_E1b_health  :: Word8
+  , _galEphemerisInav_E1b_health  :: Word8
     -- ^ Galileo E1b signal health
-  , _galEphemeris_E1b_validity:: Bool
+  , _galEphemerisInav_E1b_validity:: Bool
     -- ^ Galileo E1b data flag
   } deriving (Show, Read, Eq)
 
-instance BinaryBit GalEphemeris_inav where
+instance BinaryBit GalEphemerisInav where
   getBits _n = do
-    _galEphemeris_wn          <- B.getWord16be 10
-    _galEphemeris_iodnav      <- B.getWord16be 10
-    _galEphemeris_sisa        <- B.getWord8    8
-    _galEphemeris_idot        <- getInt16be    14
-    _galEphemeris_toc         <- B.getWord16be 14
-    _galEphemeris_af2         <- getInt8       6
-    _galEphemeris_af1         <- getInt32be    21
-    _galEphemeris_af0         <- getInt32be    31
-    _galEphemeris_c_rs        <- getInt16be    16
-    _galEphemeris_dn          <- getInt16be    16
-    _galEphemeris_m0          <- getInt32be    32
-    _galEphemeris_c_uc        <- getInt16be    16
-    _galEphemeris_ecc         <- B.getWord32be 32
-    _galEphemeris_c_us        <- getInt16be    16
-    _galEphemeris_sqrta       <- B.getWord32be 32
-    _galEphemeris_toe         <- B.getWord16be 14
-    _galEphemeris_c_ic        <- getInt16be    16
-    _galEphemeris_omega0      <- getInt32be    32
-    _galEphemeris_c_is        <- getInt16be    16
-    _galEphemeris_i0          <- getInt32be    32
-    _galEphemeris_c_rc        <- getInt16be    16
-    _galEphemeris_w           <- getInt32be    32
-    _galEphemeris_omegadot    <- getInt32be    24
-    _galEphemeris_bgdE5a      <- getInt16      10
-    _galEphemeris_bgdE5b      <- getInt16      10
-    _galEphemeris_E5b_health  <- B.getWord8    2
-    _galEphemeris_E5b_validity<- B.getBool
-    _galEphemeris_E1b_health  <- B.getWord8    2
-    _galEphemeris_E1b_validity<- B.getBool
-    pure GalEphemeris_inav {..}
+    _galEphemerisInav_wn          <- B.getWord16be 10
+    _galEphemerisInav_iodnav      <- B.getWord16be 10
+    _galEphemerisInav_sisa        <- B.getWord8    8
+    _galEphemerisInav_idot        <- getInt16be    14
+    _galEphemerisInav_toc         <- B.getWord16be 14
+    _galEphemerisInav_af2         <- getInt8       6
+    _galEphemerisInav_af1         <- getInt32be    21
+    _galEphemerisInav_af0         <- getInt32be    31
+    _galEphemerisInav_c_rs        <- getInt16be    16
+    _galEphemerisInav_dn          <- getInt16be    16
+    _galEphemerisInav_m0          <- getInt32be    32
+    _galEphemerisInav_c_uc        <- getInt16be    16
+    _galEphemerisInav_ecc         <- B.getWord32be 32
+    _galEphemerisInav_c_us        <- getInt16be    16
+    _galEphemerisInav_sqrta       <- B.getWord32be 32
+    _galEphemerisInav_toe         <- B.getWord16be 14
+    _galEphemerisInav_c_ic        <- getInt16be    16
+    _galEphemerisInav_omega0      <- getInt32be    32
+    _galEphemerisInav_c_is        <- getInt16be    16
+    _galEphemerisInav_i0          <- getInt32be    32
+    _galEphemerisInav_c_rc        <- getInt16be    16
+    _galEphemerisInav_w           <- getInt32be    32
+    _galEphemerisInav_omegadot    <- getInt32be    24
+    _galEphemerisInav_bgdE5a      <- getInt16be    10
+    _galEphemerisInav_bgdE5b      <- getInt16be    10
+    _galEphemerisInav_E5b_health  <- B.getWord8    2
+    _galEphemerisInav_E5b_validity<- B.getBool
+    _galEphemerisInav_E1b_health  <- B.getWord8    2
+    _galEphemerisInav_E1b_validity<- B.getBool
+    pure GalEphemerisInav {..}
 
-  putBits _n GalEphemeris_inav {..} = do
-    B.putWord16be 10 _galEphemeris_wn
-    B.putWord16be 10 _galEphemeris_iodnav
-    B.putWord8    8  _galEphemeris_sisa
-    putInt16be    14 _galEphemeris_idot
-    B.putWord16be 16 _galEphemeris_toc
-    putInt8       6  _galEphemeris_af2
-    putInt32be    21 _galEphemeris_af1
-    putInt32be    31 _galEphemeris_af0
-    putInt16be    16 _galEphemeris_c_rs
-    putInt16be    16 _galEphemeris_dn
-    putInt32be    32 _galEphemeris_m0
-    putInt16be    16 _galEphemeris_c_uc
-    B.putWord32be 32 _galEphemeris_ecc
-    putInt16be    16 _galEphemeris_c_us
-    B.putWord32be 32 _galEphemeris_sqrta
-    B.putWord16be 16 _galEphemeris_toe
-    putInt16be    16 _galEphemeris_c_ic
-    putInt32be    32 _galEphemeris_omega0
-    putInt16be    16 _galEphemeris_c_is
-    putInt32be    32 _galEphemeris_i0
-    putInt16be    16 _galEphemeris_c_rc
-    putInt32be    32 _galEphemeris_w
-    putInt32be    24 _galEphemeris_omegadot
-    putInt16      10 _galEphemeris_bgdE5a
-    putInt16      10 _galEphemeris_bgdE5b
-    B.putWord8    2  _galEphemeris_E5b_health
-    B.putBool        _galEphemeris_E5b_validity
-    B.putWord8    2  _galEphemeris_E1b_health
-    B.putBool        _galEphemeris_E1b_validity
+  putBits _n GalEphemerisInav {..} = do
+    B.putWord16be 10 _galEphemerisInav_wn
+    B.putWord16be 10 _galEphemerisInav_iodnav
+    B.putWord8    8  _galEphemerisInav_sisa
+    putInt16be    14 _galEphemerisInav_idot
+    B.putWord16be 16 _galEphemerisInav_toc
+    putInt8       6  _galEphemerisInav_af2
+    putInt32be    21 _galEphemerisInav_af1
+    putInt32be    31 _galEphemerisInav_af0
+    putInt16be    16 _galEphemerisInav_c_rs
+    putInt16be    16 _galEphemerisInav_dn
+    putInt32be    32 _galEphemerisInav_m0
+    putInt16be    16 _galEphemerisInav_c_uc
+    B.putWord32be 32 _galEphemerisInav_ecc
+    putInt16be    16 _galEphemerisInav_c_us
+    B.putWord32be 32 _galEphemerisInav_sqrta
+    B.putWord16be 16 _galEphemerisInav_toe
+    putInt16be    16 _galEphemerisInav_c_ic
+    putInt32be    32 _galEphemerisInav_omega0
+    putInt16be    16 _galEphemerisInav_c_is
+    putInt32be    32 _galEphemerisInav_i0
+    putInt16be    16 _galEphemerisInav_c_rc
+    putInt32be    32 _galEphemerisInav_w
+    putInt32be    24 _galEphemerisInav_omegadot
+    putInt16be    10 _galEphemerisInav_bgdE5a
+    putInt16be    10 _galEphemerisInav_bgdE5b
+    B.putWord8    2  _galEphemerisInav_E5b_health
+    B.putBool        _galEphemerisInav_E5b_validity
+    B.putWord8    2  _galEphemerisInav_E1b_health
+    B.putBool        _galEphemerisInav_E1b_validity
+
+$(makeLenses ''GalEphemerisInav)
+$(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_galEphemerisInav_" . stripPrefix "_galEphemerisInav_"} ''GalEphemerisInav)
 
 msg1019 :: Word16
 msg1019 = 1019
@@ -733,7 +736,7 @@ msg1045 = 1045
 data Msg1045 = Msg1045
   { _msg1045_header    :: GalEphemerisHeader
     -- ^ GAL ephemeris header.
-  , _msg1045_ephemeris :: GalEphemeris
+  , _msg1045_ephemeris :: GalEphemerisFnav
     -- ^ GAL ephemeris body.
   } deriving ( Show, Read, Eq )
 
@@ -765,7 +768,7 @@ msg1046 = 1046
 data Msg1046 = Msg1046
   { _msg1046_header    :: GalEphemerisHeader
     -- ^ GAL ephemeris header.
-  , _msg1046_ephemeris :: GalEphemeris
+  , _msg1046_ephemeris :: GalEphemerisInav
     -- ^ GAL ephemeris body.
   } deriving ( Show, Read, Eq )
 
