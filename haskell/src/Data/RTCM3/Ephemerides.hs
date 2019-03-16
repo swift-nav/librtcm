@@ -463,8 +463,8 @@ data GalEphemerisFnav = GalEphemerisFnav
     -- ^ Galileo Argument of Perigee (omega, w). Unit: semi-circles. Scale factor: 2^(-31)
   , _galEphemerisFnav_omegadot    :: Int32
     -- ^ Galileo Omegadot - rate or right ascension. Unit: semi-circles/sec. Scale factor: 2^(-43)
-  , _galEphemerisFnav_bgdE5b      :: Int16
-    -- ^ Galileo E5b/E1 t_GD. Unit: seconds. Scale factor: 2^(-31)
+  , _galEphemerisFnav_bgdE5a      :: Int16
+    -- ^ Galileo E5a/E1 t_GD. Unit: seconds. Scale factor: 2^(-31)
   , _galEphemerisFnav_nav_health  :: Word8
     -- ^ Galileo nav health
   , _galEphemerisFnav_validity    :: Bool
@@ -473,7 +473,7 @@ data GalEphemerisFnav = GalEphemerisFnav
 
 instance BinaryBit GalEphemerisFnav where
   getBits _n = do
-    _galEphemerisFnav_wn          <- B.getWord16be 10
+    _galEphemerisFnav_wn          <- B.getWord16be 12
     _galEphemerisFnav_iodnav      <- B.getWord16be 10
     _galEphemerisFnav_sisa        <- B.getWord8    8
     _galEphemerisFnav_idot        <- getInt16be    14
@@ -496,17 +496,17 @@ instance BinaryBit GalEphemerisFnav where
     _galEphemerisFnav_c_rc        <- getInt16be    16
     _galEphemerisFnav_w           <- getInt32be    32
     _galEphemerisFnav_omegadot    <- getInt32be    24
-    _galEphemerisFnav_bgdE5b      <- getInt16be    10
+    _galEphemerisFnav_bgdE5a      <- getInt16be    10
     _galEphemerisFnav_nav_health  <- B.getWord8    2
     _galEphemerisFnav_validity    <- B.getBool
     pure GalEphemerisFnav {..}
 
   putBits _n GalEphemerisFnav {..} = do
-    B.putWord16be 10 _galEphemerisFnav_wn
+    B.putWord16be 12 _galEphemerisFnav_wn
     B.putWord16be 10 _galEphemerisFnav_iodnav
     B.putWord8    8  _galEphemerisFnav_sisa
     putInt16be    14 _galEphemerisFnav_idot
-    B.putWord16be 16 _galEphemerisFnav_toc
+    B.putWord16be 14 _galEphemerisFnav_toc
     putInt8       6  _galEphemerisFnav_af2
     putInt32be    21 _galEphemerisFnav_af1
     putInt32be    31 _galEphemerisFnav_af0
@@ -517,7 +517,7 @@ instance BinaryBit GalEphemerisFnav where
     B.putWord32be 32 _galEphemerisFnav_ecc
     putInt16be    16 _galEphemerisFnav_c_us
     B.putWord32be 32 _galEphemerisFnav_sqrta
-    B.putWord16be 16 _galEphemerisFnav_toe
+    B.putWord16be 14 _galEphemerisFnav_toe
     putInt16be    16 _galEphemerisFnav_c_ic
     putInt32be    32 _galEphemerisFnav_omega0
     putInt16be    16 _galEphemerisFnav_c_is
@@ -525,7 +525,7 @@ instance BinaryBit GalEphemerisFnav where
     putInt16be    16 _galEphemerisFnav_c_rc
     putInt32be    32 _galEphemerisFnav_w
     putInt32be    24 _galEphemerisFnav_omegadot
-    putInt16be    10 _galEphemerisFnav_bgdE5b
+    putInt16be    10 _galEphemerisFnav_bgdE5a
     B.putWord8    2  _galEphemerisFnav_nav_health
     B.putBool        _galEphemerisFnav_validity
 
@@ -595,7 +595,7 @@ data GalEphemerisInav = GalEphemerisInav
 
 instance BinaryBit GalEphemerisInav where
   getBits _n = do
-    _galEphemerisInav_wn          <- B.getWord16be 10
+    _galEphemerisInav_wn          <- B.getWord16be 12
     _galEphemerisInav_iodnav      <- B.getWord16be 10
     _galEphemerisInav_sisa        <- B.getWord8    8
     _galEphemerisInav_idot        <- getInt16be    14
@@ -627,11 +627,11 @@ instance BinaryBit GalEphemerisInav where
     pure GalEphemerisInav {..}
 
   putBits _n GalEphemerisInav {..} = do
-    B.putWord16be 10 _galEphemerisInav_wn
+    B.putWord16be 12 _galEphemerisInav_wn
     B.putWord16be 10 _galEphemerisInav_iodnav
     B.putWord8    8  _galEphemerisInav_sisa
     putInt16be    14 _galEphemerisInav_idot
-    B.putWord16be 16 _galEphemerisInav_toc
+    B.putWord16be 14 _galEphemerisInav_toc
     putInt8       6  _galEphemerisInav_af2
     putInt32be    21 _galEphemerisInav_af1
     putInt32be    31 _galEphemerisInav_af0
@@ -642,7 +642,7 @@ instance BinaryBit GalEphemerisInav where
     B.putWord32be 32 _galEphemerisInav_ecc
     putInt16be    16 _galEphemerisInav_c_us
     B.putWord32be 32 _galEphemerisInav_sqrta
-    B.putWord16be 16 _galEphemerisInav_toe
+    B.putWord16be 14 _galEphemerisInav_toe
     putInt16be    16 _galEphemerisInav_c_ic
     putInt32be    32 _galEphemerisInav_omega0
     putInt16be    16 _galEphemerisInav_c_is
