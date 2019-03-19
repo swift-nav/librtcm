@@ -467,8 +467,10 @@ data GalEphemerisFnav = GalEphemerisFnav
     -- ^ Galileo E5a/E1 t_GD. Unit: seconds. Scale factor: 2^(-31)
   , _galEphemerisFnav_nav_health  :: Word8
     -- ^ Galileo nav health
-  , _galEphemerisFnav_validity    :: Bool
+  , _galEphemerisFnav_validity    :: Word8
     -- ^ Galileo signal validity
+  , _galEphemerisFnav_reserved    :: Word8
+  -- ^ Reserved field.
   } deriving (Show, Read, Eq)
 
 instance BinaryBit GalEphemerisFnav where
@@ -498,7 +500,8 @@ instance BinaryBit GalEphemerisFnav where
     _galEphemerisFnav_omegadot    <- getInt32be    24
     _galEphemerisFnav_bgdE5a      <- getInt16be    10
     _galEphemerisFnav_nav_health  <- B.getWord8    2
-    _galEphemerisFnav_validity    <- B.getBool
+    _galEphemerisFnav_validity    <- B.getWord8    1
+    _galEphemerisFnav_reserved    <- B.getWord8    7
     pure GalEphemerisFnav {..}
 
   putBits _n GalEphemerisFnav {..} = do
@@ -527,7 +530,8 @@ instance BinaryBit GalEphemerisFnav where
     putInt32be    24 _galEphemerisFnav_omegadot
     putInt16be    10 _galEphemerisFnav_bgdE5a
     B.putWord8    2  _galEphemerisFnav_nav_health
-    B.putBool        _galEphemerisFnav_validity
+    B.putWord8    1  _galEphemerisFnav_validity
+    B.putWord8    7  _galEphemerisFnav_reserved
 
 $(makeLenses ''GalEphemerisFnav)
 $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_galEphemerisFnav_" . stripPrefix "_galEphemerisFnav_"} ''GalEphemerisFnav)
@@ -585,12 +589,14 @@ data GalEphemerisInav = GalEphemerisInav
     -- ^ Galileo E5b/E1 t_GD. Unit: seconds. Scale factor: 2^(-31)
   , _galEphemerisInav_E5b_health  :: Word8
     -- ^ Galileo E5b signal health
-  , _galEphemerisInav_E5b_validity:: Bool
+  , _galEphemerisInav_E5b_validity:: Word8
     -- ^ Galileo E5b data flag
   , _galEphemerisInav_E1b_health  :: Word8
     -- ^ Galileo E1b signal health
-  , _galEphemerisInav_E1b_validity:: Bool
+  , _galEphemerisInav_E1b_validity:: Word8
     -- ^ Galileo E1b data flag
+  , _galEphemerisInav_reserved    :: Word8
+  -- ^ Reserved field.
   } deriving (Show, Read, Eq)
 
 instance BinaryBit GalEphemerisInav where
@@ -621,9 +627,10 @@ instance BinaryBit GalEphemerisInav where
     _galEphemerisInav_bgdE5a      <- getInt16be    10
     _galEphemerisInav_bgdE5b      <- getInt16be    10
     _galEphemerisInav_E5b_health  <- B.getWord8    2
-    _galEphemerisInav_E5b_validity<- B.getBool
+    _galEphemerisInav_E5b_validity<- B.getWord8    1
     _galEphemerisInav_E1b_health  <- B.getWord8    2
-    _galEphemerisInav_E1b_validity<- B.getBool
+    _galEphemerisInav_E1b_validity<- B.getWord8    1
+    _galEphemerisInav_reserved    <- B.getWord8    2
     pure GalEphemerisInav {..}
 
   putBits _n GalEphemerisInav {..} = do
@@ -653,9 +660,10 @@ instance BinaryBit GalEphemerisInav where
     putInt16be    10 _galEphemerisInav_bgdE5a
     putInt16be    10 _galEphemerisInav_bgdE5b
     B.putWord8    2  _galEphemerisInav_E5b_health
-    B.putBool        _galEphemerisInav_E5b_validity
+    B.putWord8    1  _galEphemerisInav_E5b_validity
     B.putWord8    2  _galEphemerisInav_E1b_health
-    B.putBool        _galEphemerisInav_E1b_validity
+    B.putWord8    1  _galEphemerisInav_E1b_validity
+    B.putWord8    2  _galEphemerisInav_reserved
 
 $(makeLenses ''GalEphemerisInav)
 $(deriveJSON defaultOptions {fieldLabelModifier = fromMaybe "_galEphemerisInav_" . stripPrefix "_galEphemerisInav_"} ''GalEphemerisInav)
