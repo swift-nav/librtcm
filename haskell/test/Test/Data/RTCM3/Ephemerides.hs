@@ -113,9 +113,92 @@ instance Arbitrary GlonassEphemeris where
 
 instance Arbitrary Msg1020 where
   arbitrary = do
-    _msg1020_header <- arbitrary
+    _msg1020_header    <- arbitrary
     _msg1020_ephemeris <- arbitrary
     pure Msg1020 {..}
+
+instance Arbitrary GalEphemerisHeader where
+  arbitrary = do
+    _galEphemerisHeader_num <- arbitraryWord 12
+    _galEphemerisHeader_sat <- arbitraryWord 6
+    pure GalEphemerisHeader {..}
+
+instance Arbitrary GalEphemerisFnav where
+  arbitrary = do
+    _galEphemerisFnav_wn          <- arbitraryWord 12
+    _galEphemerisFnav_iodnav      <- arbitraryWord 10
+    _galEphemerisFnav_sisa        <- arbitraryWord 8
+    _galEphemerisFnav_idot        <- arbitraryInt 14
+    _galEphemerisFnav_toc         <- arbitraryWord 14
+    _galEphemerisFnav_af2         <- arbitraryInt 6
+    _galEphemerisFnav_af1         <- arbitraryInt 21
+    _galEphemerisFnav_af0         <- arbitraryInt 31
+    _galEphemerisFnav_c_rs        <- arbitraryInt 16
+    _galEphemerisFnav_dn          <- arbitraryInt 16
+    _galEphemerisFnav_m0          <- arbitraryInt 32
+    _galEphemerisFnav_c_uc        <- arbitraryInt 16
+    _galEphemerisFnav_ecc         <- arbitraryWord 32
+    _galEphemerisFnav_c_us        <- arbitraryInt 16
+    _galEphemerisFnav_sqrta       <- arbitraryWord 32
+    _galEphemerisFnav_toe         <- arbitraryWord 14
+    _galEphemerisFnav_c_ic        <- arbitraryInt 16
+    _galEphemerisFnav_omega0      <- arbitraryInt 32
+    _galEphemerisFnav_c_is        <- arbitraryInt 16
+    _galEphemerisFnav_i0          <- arbitraryInt 32
+    _galEphemerisFnav_c_rc        <- arbitraryInt 16
+    _galEphemerisFnav_w           <- arbitraryInt 32
+    _galEphemerisFnav_omegadot    <- arbitraryInt 24
+    _galEphemerisFnav_bgdE5a      <- arbitraryInt 10
+    _galEphemerisFnav_nav_health  <- arbitraryWord 2
+    _galEphemerisFnav_validity    <- arbitraryWord 1
+    _galEphemerisFnav_reserved    <- arbitraryWord 7
+    pure GalEphemerisFnav {..}
+
+instance Arbitrary GalEphemerisInav where
+  arbitrary = do
+    _galEphemerisInav_wn           <- arbitraryWord 12
+    _galEphemerisInav_iodnav       <- arbitraryWord 10
+    _galEphemerisInav_sisa         <- arbitraryWord 8
+    _galEphemerisInav_idot         <- arbitraryInt 14
+    _galEphemerisInav_toc          <- arbitraryWord 14
+    _galEphemerisInav_af2          <- arbitraryInt 6
+    _galEphemerisInav_af1          <- arbitraryInt 21
+    _galEphemerisInav_af0          <- arbitraryInt 31
+    _galEphemerisInav_c_rs         <- arbitraryInt 16
+    _galEphemerisInav_dn           <- arbitraryInt 16
+    _galEphemerisInav_m0           <- arbitraryInt 32
+    _galEphemerisInav_c_uc         <- arbitraryInt 16
+    _galEphemerisInav_ecc          <- arbitraryWord 32
+    _galEphemerisInav_c_us         <- arbitraryInt 16
+    _galEphemerisInav_sqrta        <- arbitraryWord 32
+    _galEphemerisInav_toe          <- arbitraryWord 14
+    _galEphemerisInav_c_ic         <- arbitraryInt 16
+    _galEphemerisInav_omega0       <- arbitraryInt 32
+    _galEphemerisInav_c_is         <- arbitraryInt 16
+    _galEphemerisInav_i0           <- arbitraryInt 32
+    _galEphemerisInav_c_rc         <- arbitraryInt 16
+    _galEphemerisInav_w            <- arbitraryInt 32
+    _galEphemerisInav_omegadot     <- arbitraryInt 24
+    _galEphemerisInav_bgdE5a       <- arbitraryInt 10
+    _galEphemerisInav_bgdE5b       <- arbitraryInt 10
+    _galEphemerisInav_E5b_health   <- arbitraryWord 2
+    _galEphemerisInav_E5b_validity <- arbitraryWord 1
+    _galEphemerisInav_E1b_health   <- arbitraryWord 2
+    _galEphemerisInav_E1b_validity <- arbitraryWord 1
+    _galEphemerisInav_reserved     <- arbitraryWord 2
+    pure GalEphemerisInav {..}
+
+instance Arbitrary Msg1045 where
+  arbitrary = do
+    _msg1045_header    <- arbitrary
+    _msg1045_ephemeris <- arbitrary
+    pure Msg1045 {..}
+
+instance Arbitrary Msg1046 where
+  arbitrary = do
+    _msg1046_header    <- arbitrary
+    _msg1046_ephemeris <- arbitrary
+    pure Msg1046 {..}
 
 testMsg1019 :: TestTree
 testMsg1019 =
@@ -127,9 +210,21 @@ testMsg1020 =
   testProperty "Roundtrip Msg1020" $ \m ->
     decode (encode m) == (m :: Msg1020)
 
+testMsg1045 :: TestTree
+testMsg1045 =
+  testProperty "Roundtrip Msg1045" $ \m ->
+    decode (encode m) == (m :: Msg1045)
+
+testMsg1046 :: TestTree
+testMsg1046 =
+  testProperty "Roundtrip Msg1046" $ \m ->
+    decode (encode m) == (m :: Msg1046)
+
 tests :: TestTree
 tests =
   testGroup "Ephemeris tests"
     [ testMsg1019
     , testMsg1020
+    , testMsg1045
+    , testMsg1046
     ]

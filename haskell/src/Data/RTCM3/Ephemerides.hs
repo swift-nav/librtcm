@@ -601,36 +601,36 @@ data GalEphemerisInav = GalEphemerisInav
 
 instance BinaryBit GalEphemerisInav where
   getBits _n = do
-    _galEphemerisInav_wn          <- B.getWord16be 12
-    _galEphemerisInav_iodnav      <- B.getWord16be 10
-    _galEphemerisInav_sisa        <- B.getWord8    8
-    _galEphemerisInav_idot        <- getInt16be    14
-    _galEphemerisInav_toc         <- B.getWord16be 14
-    _galEphemerisInav_af2         <- getInt8       6
-    _galEphemerisInav_af1         <- getInt32be    21
-    _galEphemerisInav_af0         <- getInt32be    31
-    _galEphemerisInav_c_rs        <- getInt16be    16
-    _galEphemerisInav_dn          <- getInt16be    16
-    _galEphemerisInav_m0          <- getInt32be    32
-    _galEphemerisInav_c_uc        <- getInt16be    16
-    _galEphemerisInav_ecc         <- B.getWord32be 32
-    _galEphemerisInav_c_us        <- getInt16be    16
-    _galEphemerisInav_sqrta       <- B.getWord32be 32
-    _galEphemerisInav_toe         <- B.getWord16be 14
-    _galEphemerisInav_c_ic        <- getInt16be    16
-    _galEphemerisInav_omega0      <- getInt32be    32
-    _galEphemerisInav_c_is        <- getInt16be    16
-    _galEphemerisInav_i0          <- getInt32be    32
-    _galEphemerisInav_c_rc        <- getInt16be    16
-    _galEphemerisInav_w           <- getInt32be    32
-    _galEphemerisInav_omegadot    <- getInt32be    24
-    _galEphemerisInav_bgdE5a      <- getInt16be    10
-    _galEphemerisInav_bgdE5b      <- getInt16be    10
-    _galEphemerisInav_E5b_health  <- B.getWord8    2
-    _galEphemerisInav_E5b_validity<- B.getWord8    1
-    _galEphemerisInav_E1b_health  <- B.getWord8    2
-    _galEphemerisInav_E1b_validity<- B.getWord8    1
-    _galEphemerisInav_reserved    <- B.getWord8    2
+    _galEphemerisInav_wn           <- B.getWord16be 12
+    _galEphemerisInav_iodnav       <- B.getWord16be 10
+    _galEphemerisInav_sisa         <- B.getWord8    8
+    _galEphemerisInav_idot         <- getInt16be    14
+    _galEphemerisInav_toc          <- B.getWord16be 14
+    _galEphemerisInav_af2          <- getInt8       6
+    _galEphemerisInav_af1          <- getInt32be    21
+    _galEphemerisInav_af0          <- getInt32be    31
+    _galEphemerisInav_c_rs         <- getInt16be    16
+    _galEphemerisInav_dn           <- getInt16be    16
+    _galEphemerisInav_m0           <- getInt32be    32
+    _galEphemerisInav_c_uc         <- getInt16be    16
+    _galEphemerisInav_ecc          <- B.getWord32be 32
+    _galEphemerisInav_c_us         <- getInt16be    16
+    _galEphemerisInav_sqrta        <- B.getWord32be 32
+    _galEphemerisInav_toe          <- B.getWord16be 14
+    _galEphemerisInav_c_ic         <- getInt16be    16
+    _galEphemerisInav_omega0       <- getInt32be    32
+    _galEphemerisInav_c_is         <- getInt16be    16
+    _galEphemerisInav_i0           <- getInt32be    32
+    _galEphemerisInav_c_rc         <- getInt16be    16
+    _galEphemerisInav_w            <- getInt32be    32
+    _galEphemerisInav_omegadot     <- getInt32be    24
+    _galEphemerisInav_bgdE5a       <- getInt16be    10
+    _galEphemerisInav_bgdE5b       <- getInt16be    10
+    _galEphemerisInav_E5b_health   <- B.getWord8    2
+    _galEphemerisInav_E5b_validity <- B.getWord8    1
+    _galEphemerisInav_E1b_health   <- B.getWord8    2
+    _galEphemerisInav_E1b_validity <- B.getWord8    1
+    _galEphemerisInav_reserved     <- B.getWord8    2
     pure GalEphemerisInav {..}
 
   putBits _n GalEphemerisInav {..} = do
