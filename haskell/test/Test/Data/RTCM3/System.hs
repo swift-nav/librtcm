@@ -58,9 +58,8 @@ instance Arbitrary Msg1013 where
     pure $ Msg1013 header messages
 
 instance Arbitrary Msg1029 where
-  arbitrary = do
-    message <- arbitrary
-    pure $ Msg1029 message
+  arbitrary =
+    Msg1029 <$> arbitrary
 
 testMsg1013 :: TestTree
 testMsg1013 =
