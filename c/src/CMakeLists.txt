@@ -50,5 +50,5 @@ if (CMAKE_C_COMPILER_VERSION VERSION_GREATER 5.0)
    target_compile_options(rtcm PRIVATE "-Wfloat-conversion")
 endif()
 
-install(TARGETS rtcm DESTINATION lib${LIB_SUFFIX})
-install(FILES ${librtcm_HEADERS} DESTINATION include/rtcm3)
+install(TARGETS rtcm DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
+install(FILES ${librtcm_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/rtcm3)
