@@ -32,6 +32,7 @@ static void test_rtcm_msm4(void);
 static void test_rtcm_msm5(void);
 static void test_rtcm_msm5_glo(void);
 static void test_rtcm_msm7(void);
+static void test_rtcm_4062(void);
 static void test_rtcm_random_bits(void);
 static void test_msm_bit_utils(void);
 static void test_lock_time_decoding(void);

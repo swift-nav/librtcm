@@ -1357,3 +1357,36 @@ rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[], rtcm_msm_message *msg) {
 rtcm3_rc rtcm3_decode_msm7(const uint8_t buff[], rtcm_msm_message *msg) {
   return rtcm3_decode_msm_internal(buff, MSM7, msg);
 }
+
+rtcm3_rc rtcm3_decode_4062(const uint8_t buff[], rtcm_msg_swift_proprietary *msg) {
+  uint16_t bit = 0;
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
+  bit += 12;
+
+  if (msg_num != 4062) { /* Unexpected message type. */
+    return RC_MESSAGE_TYPE_MISMATCH;
+  }
+
+  uint8_t reserved_bits = rtcm_getbitu(buff, bit, 4);
+  bit += 4;
+
+  // These bits are reserved for future use, if they aren't 0 it must be a
+  // new format we don't know how to handle.
+  if (reserved_bits != 0) {
+    return RC_INVALID_MESSAGE;
+  }
+
+  msg->msg_type = rtcm_getbitu(buff, bit, 16);
+  bit += 16;
+  msg->sender_id = rtcm_getbitu(buff, bit, 16);
+  bit += 16;
+  msg->len = rtcm_getbitu(buff, bit, 8);
+  bit += 8;
+
+  for (uint8_t i = 0; i < msg->len; ++i) {
+    msg->data[i] = rtcm_getbitu(buff, bit, 8);
+    bit += 8;
+  }
+
+  return RC_OK;
+}

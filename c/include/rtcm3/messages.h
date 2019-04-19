@@ -355,4 +355,12 @@ typedef struct {
   rtcm_msg_ssr_phase_bias_sat sats[MAX_SSR_SATELLITES];
 } rtcm_msg_phase_bias;
 
+/* Encodes a SBP message */
+typedef struct {
+  uint16_t msg_type;
+  uint16_t sender_id;
+  uint8_t len;
+  uint8_t data[255];
+} rtcm_msg_swift_proprietary;
+
 #endif /* SWIFTNAV_RTCM3_MESSAGES_H */

@@ -45,6 +45,7 @@ int main(void) {
   test_rtcm_msm5();
   test_rtcm_msm5_glo();
   test_rtcm_msm7();
+  test_rtcm_4062();
   test_rtcm_random_bits();
   test_logging();
 }
@@ -1693,6 +1694,31 @@ void test_rtcm_msm7(void) {
          sizeof(msm7_expected_sig_data));
 
   assert(RC_OK == ret && msg_msm_equals(&msg_msm7_expected, &msg_msm7_decoded));
+}
+
+void test_rtcm_4062(void) {
+  rtcm_msg_swift_proprietary msg_in;
+  msg_in.msg_type = 12345;
+  msg_in.sender_id = 56789;
+  msg_in.len = 255;
+  for (uint8_t i = 0; i < msg_in.len; ++i) {
+    msg_in.data[i] = rand();
+  }
+
+  uint8_t buff[1024];
+  uint16_t num_bytes = rtcm3_encode_4062(&msg_in, buff);
+
+  assert(num_bytes == (msg_in.len + 7)); // RTCM msg type + SBP msg type +
+                                         // SBP sender id + SBP len
+
+  rtcm_msg_swift_proprietary msg_out;
+  uint8_t ret = rtcm3_decode_4062(buff, &msg_out);
+
+  assert((RC_OK == ret) && (msg_in.msg_type == msg_out.msg_type)
+        && (msg_in.sender_id == msg_out.sender_id) && (msg_in.len == msg_out.len));
+  for (uint8_t i = 0; i < msg_in.len; ++i) {
+    assert(msg_in.data[i] == msg_out.data[i]);
+  }
 }
 
 void test_rtcm_random_bits(void) {

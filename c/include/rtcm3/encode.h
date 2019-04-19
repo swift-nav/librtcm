@@ -43,6 +43,7 @@ uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t buff[]);
 uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t buff[]);
 uint16_t rtcm3_encode_msm4(const rtcm_msm_message *msg_msm4, uint8_t buff[]);
 uint16_t rtcm3_encode_msm5(const rtcm_msm_message *msg_msm5, uint8_t buff[]);
+rtcm3_rc rtcm3_encode_4062(const rtcm_msg_swift_proprietary *msg, uint8_t buff[]);
 
 uint8_t rtcm3_encode_lock_time(double time);
 

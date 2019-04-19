@@ -1160,3 +1160,26 @@ uint16_t rtcm3_encode_msm5(const rtcm_msm_message *msg_msm5, uint8_t buff[]) {
 
   return rtcm3_encode_msm_internal(msg_msm5, buff);
 }
+
+rtcm3_rc rtcm3_encode_4062(const rtcm_msg_swift_proprietary *msg, uint8_t buff[]) {
+  uint16_t bit = 0;
+  rtcm_setbitu(buff, bit, 12, 4062);
+  bit += 12;
+  // These 4 bits are currently reserved, and should always be 0
+  rtcm_setbitu(buff, bit, 4, 0);
+  bit += 4;
+  rtcm_setbitu(buff, bit, 16, msg->msg_type);
+  bit += 16;
+  rtcm_setbitu(buff, bit, 16, msg->sender_id);
+  bit += 16;
+  rtcm_setbitu(buff, bit, 8, msg->len);
+  bit += 8;
+
+  for (uint8_t i = 0; i < msg->len; ++i) {
+    rtcm_setbitu(buff, bit, 8, msg->data[i]);
+    bit += 8;
+  }
+
+  /* Round number of bits up to nearest whole byte. */
+  return (bit + 7) / 8;
+}
