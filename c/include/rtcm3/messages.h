@@ -207,7 +207,7 @@ typedef struct {
  */
 typedef struct {
   union {
-	int32_t tgd_gps_s;
+    int32_t tgd_gps_s;
     int32_t tgd_qzss_s;
     int32_t tgd_bds_s[2];
     int32_t tgd_gal_s[2];
@@ -266,12 +266,11 @@ typedef struct {
   uint32_t toe;
   uint16_t ura;
   uint32_t fit_interval;
-  uint8_t valid;
   uint8_t health_bits;
   union {
-	  ephemeris_kepler_raw_rtcm_t kepler;
-	  ephemeris_xyz_rtcm_t xyz;
-	  ephemeris_glo_raw_rtcm_t glo;
+    ephemeris_kepler_raw_rtcm_t kepler;
+    ephemeris_xyz_rtcm_t xyz;
+    ephemeris_glo_raw_rtcm_t glo;
   };
 } rtcm_msg_eph;
 

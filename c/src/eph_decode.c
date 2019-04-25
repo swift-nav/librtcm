@@ -19,7 +19,6 @@
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   uint16_t bit = 0;
@@ -98,7 +97,6 @@ rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   uint16_t bit = 0;
@@ -119,7 +117,8 @@ rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 2;
   /* tk */ rtcm_getbitu(buff, bit, 12);
   bit += 12;
-  /* MSB of Bn word */ rtcm_getbitu(buff, bit, 1);
+  /* most significant bit of Bn */
+  uint8_t bn_msb = rtcm_getbitu(buff, bit, 1);
   bit += 1;
   /* P2 */ rtcm_getbitu(buff, bit, 1);
   bit += 1;
@@ -149,7 +148,8 @@ rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 11;
   /* P */ rtcm_getbitu(buff, bit, 2);
   bit += 2;
-  uint32_t mln3 = rtcm_getbitu(buff, bit, 1);
+  /* health flag in string 3 */
+  uint8_t mln3 = rtcm_getbitu(buff, bit, 1);
   bit += 1;
   msg_eph->glo.tau = rtcm_get_sign_magnitude_bit(buff, bit, 22);
   bit += 22;
@@ -165,21 +165,25 @@ rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 11;
   /* M */ rtcm_getbitu(buff, bit, 2);
   bit += 2;
-  /* Avail Add Data */ rtcm_getbitu(buff, bit, 1);
+  bool additional_data = (1 == rtcm_getbitu(buff, bit, 1));
   bit += 1;
-  /* NA */ rtcm_getbitu(buff, bit, 11);
-  bit += 11;
-  /* Tc */ rtcm_get_sign_magnitude_bit(buff, bit, 32);
-  bit += 32;
-  /* N4 */ rtcm_getbitu(buff, bit, 5);
-  bit += 5;
-  /* Tgps */ rtcm_get_sign_magnitude_bit(buff, bit, 22);
-  bit += 22;
-  uint32_t mln5 = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
-  /* reserved */ rtcm_getbitu(buff, bit, 7);
-  bit += 7;
-  msg_eph->health_bits = mln3 || mln5;
+  uint8_t mln5 = 0;
+  if (additional_data) {
+    /* NA  */ rtcm_getbitu(buff, bit, 11);
+    bit += 11;
+    /* Tc */ rtcm_get_sign_magnitude_bit(buff, bit, 32);
+    bit += 32;
+    /* N4 */ rtcm_getbitu(buff, bit, 5);
+    bit += 5;
+    /* Tgps */ rtcm_get_sign_magnitude_bit(buff, bit, 22);
+    bit += 22;
+    /* health flag in string 5 */
+    mln5 = rtcm_getbitu(buff, bit, 1);
+    bit += 1;
+    /* reserved */ rtcm_getbitu(buff, bit, 7);
+    bit += 7;
+  }
+  msg_eph->health_bits = bn_msb | mln3 | mln5;
   return RC_OK;
 }
 
@@ -189,7 +193,7 @@ rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
+ *          - RC_INVALID_MESSAGE : Satellite is geostationary
  */
 rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   uint16_t bit = 0;
@@ -256,8 +260,7 @@ rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 10;
   msg_eph->kepler.tgd_bds_s[1] = rtcm_getbits(buff, bit, 10);
   bit += 10;
-  msg_eph->valid = rtcm_getbitu(buff, bit, 1);
-  msg_eph->health_bits = msg_eph->valid;
+  msg_eph->health_bits = rtcm_getbitu(buff, bit, 1);
   bit += 1;
   return RC_OK;
 }
@@ -328,7 +331,6 @@ static uint16_t rtcm3_decode_gal_eph_common(const uint8_t buff[],
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   uint16_t bit = 0;
@@ -358,7 +360,6 @@ rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
 rtcm3_rc rtcm3_decode_gal_eph_fnav(const uint8_t buff[],
                                    rtcm_msg_eph *msg_eph) {
