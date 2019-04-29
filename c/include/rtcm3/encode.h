@@ -24,10 +24,6 @@ extern "C" {
 
 #include "rtcm3/messages.h"
 
-uint16_t rtcm3_write_header(const rtcm_obs_header *header,
-                            uint8_t num_sats,
-                            uint8_t buff[]);
-
 uint16_t rtcm3_encode_1001(const rtcm_obs_message *msg_1001, uint8_t buff[]);
 uint16_t rtcm3_encode_1002(const rtcm_obs_message *msg_1002, uint8_t buff[]);
 uint16_t rtcm3_encode_1003(const rtcm_obs_message *msg_1003, uint8_t buff[]);
@@ -43,7 +39,8 @@ uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t buff[]);
 uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t buff[]);
 uint16_t rtcm3_encode_msm4(const rtcm_msm_message *msg_msm4, uint8_t buff[]);
 uint16_t rtcm3_encode_msm5(const rtcm_msm_message *msg_msm5, uint8_t buff[]);
-rtcm3_rc rtcm3_encode_4062(const rtcm_msg_swift_proprietary *msg, uint8_t buff[]);
+uint16_t rtcm3_encode_4062(const rtcm_msg_swift_proprietary *msg,
+                           uint8_t buff[]);
 
 uint8_t rtcm3_encode_lock_time(double time);
 

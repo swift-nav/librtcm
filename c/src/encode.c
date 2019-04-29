@@ -12,9 +12,11 @@
 
 #include "rtcm3/encode.h"
 
+#include <assert.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "rtcm3/bits.h"
 #include "rtcm3/constants.h"
@@ -282,9 +284,9 @@ static void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data,
  * \param num_sats number of satellites in message
  * \param buff A pointer to the RTCM data message buffer.
  */
-uint16_t rtcm3_write_header(const rtcm_obs_header *header,
-                            uint8_t num_sats,
-                            uint8_t buff[]) {
+static uint16_t rtcm3_write_header(const rtcm_obs_header *header,
+                                   uint8_t num_sats,
+                                   uint8_t buff[]) {
   uint16_t bit = 0;
   rtcm_setbitu(buff, bit, 12, header->msg_num);
   bit += 12;
@@ -342,9 +344,9 @@ uint16_t rtcm3_write_header(const rtcm_obs_header *header,
  * \param num_sats number of satellites in message
  * \param buff A pointer to the RTCM data message buffer.
  */
-uint16_t rtcm3_write_glo_header(const rtcm_obs_header *header,
-                                uint8_t num_sats,
-                                uint8_t buff[]) {
+static uint16_t rtcm3_write_glo_header(const rtcm_obs_header *header,
+                                       uint8_t num_sats,
+                                       uint8_t buff[]) {
   uint16_t bit = 0;
   rtcm_setbitu(buff, bit, 12, header->msg_num);
   bit += 12;
@@ -364,6 +366,7 @@ uint16_t rtcm3_write_glo_header(const rtcm_obs_header *header,
 }
 
 uint16_t rtcm3_encode_1001(const rtcm_obs_message *msg_1001, uint8_t buff[]) {
+  assert(msg_1001);
   uint16_t bit = 64; /* Start at end of header. */
 
   uint8_t num_sats = 0;
@@ -405,6 +408,7 @@ uint16_t rtcm3_encode_1001(const rtcm_obs_message *msg_1001, uint8_t buff[]) {
  * \return The message length in bytes.
  */
 uint16_t rtcm3_encode_1002(const rtcm_obs_message *msg_1002, uint8_t buff[]) {
+  assert(msg_1002);
   uint16_t bit = 64; /* Start at end of header. */
 
   uint8_t num_sats = 0;
@@ -445,6 +449,7 @@ uint16_t rtcm3_encode_1002(const rtcm_obs_message *msg_1002, uint8_t buff[]) {
 }
 
 uint16_t rtcm3_encode_1003(const rtcm_obs_message *msg_1003, uint8_t buff[]) {
+  assert(msg_1003);
   uint16_t bit = 64; /* Start at end of header. */
 
   uint8_t num_sats = 0;
@@ -480,6 +485,7 @@ uint16_t rtcm3_encode_1003(const rtcm_obs_message *msg_1003, uint8_t buff[]) {
 }
 
 uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
+  assert(msg_1004);
   uint16_t bit = 64; /* Start at end of header. */
 
   uint8_t num_sats = 0;
@@ -530,9 +536,9 @@ uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
   return (bit + 7) / 8;
 }
 
-uint16_t rtcm3_encode_1005_base(const rtcm_msg_1005 *msg_1005,
-                                uint8_t buff[],
-                                uint16_t *bit) {
+static uint16_t rtcm3_encode_1005_base(const rtcm_msg_1005 *msg_1005,
+                                       uint8_t buff[],
+                                       uint16_t *bit) {
   rtcm_setbitu(buff, *bit, 12, msg_1005->stn_id);
   *bit += 12;
   rtcm_setbitu(buff, *bit, 6, msg_1005->ITRF);
@@ -563,6 +569,7 @@ uint16_t rtcm3_encode_1005_base(const rtcm_msg_1005 *msg_1005,
 }
 
 uint16_t rtcm3_encode_1005(const rtcm_msg_1005 *msg_1005, uint8_t buff[]) {
+  assert(msg_1005);
   uint16_t bit = 0;
   rtcm_setbitu(buff, bit, 12, 1005);
   bit += 12;
@@ -570,6 +577,7 @@ uint16_t rtcm3_encode_1005(const rtcm_msg_1005 *msg_1005, uint8_t buff[]) {
 }
 
 uint16_t rtcm3_encode_1006(const rtcm_msg_1006 *msg_1006, uint8_t buff[]) {
+  assert(msg_1006);
   uint16_t bit = 0;
   rtcm_setbitu(buff, bit, 12, 1006);
   bit += 12;
@@ -587,9 +595,9 @@ uint16_t rtcm3_encode_1006(const rtcm_msg_1006 *msg_1006, uint8_t buff[]) {
   return (bit + 7) / 8;
 }
 
-uint16_t rtcm3_encode_1007_base(const rtcm_msg_1007 *msg_1007,
-                                uint8_t buff[],
-                                uint16_t *bit) {
+static uint16_t rtcm3_encode_1007_base(const rtcm_msg_1007 *msg_1007,
+                                       uint8_t buff[],
+                                       uint16_t *bit) {
   rtcm_setbitu(buff, *bit, 12, msg_1007->stn_id);
   *bit += 12;
   rtcm_setbitu(buff, *bit, 8, msg_1007->ant_descriptor_counter);
@@ -606,6 +614,7 @@ uint16_t rtcm3_encode_1007_base(const rtcm_msg_1007 *msg_1007,
 }
 
 uint16_t rtcm3_encode_1007(const rtcm_msg_1007 *msg_1007, uint8_t buff[]) {
+  assert(msg_1007);
   uint16_t bit = 0;
   rtcm_setbitu(buff, bit, 12, 1007);
   bit += 12;
@@ -613,6 +622,7 @@ uint16_t rtcm3_encode_1007(const rtcm_msg_1007 *msg_1007, uint8_t buff[]) {
 }
 
 uint16_t rtcm3_encode_1008(const rtcm_msg_1008 *msg_1008, uint8_t buff[]) {
+  assert(msg_1008);
   uint16_t bit = 0;
   rtcm_setbitu(buff, bit, 12, 1008);
   bit += 12;
@@ -629,6 +639,7 @@ uint16_t rtcm3_encode_1008(const rtcm_msg_1008 *msg_1008, uint8_t buff[]) {
 }
 
 uint16_t rtcm3_encode_1010(const rtcm_obs_message *msg_1010, uint8_t buff[]) {
+  assert(msg_1010);
   uint16_t bit = 61; /* Start at end of header. */
 
   uint8_t num_sats = 0;
@@ -668,6 +679,7 @@ uint16_t rtcm3_encode_1010(const rtcm_obs_message *msg_1010, uint8_t buff[]) {
 }
 
 uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
+  assert(msg_1012);
   uint16_t bit = 61; /* Start at end of header. */
 
   uint8_t num_sats = 0;
@@ -717,7 +729,9 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
 }
 
 uint16_t rtcm3_encode_1029(const rtcm_msg_1029 *msg_1029, uint8_t buff[]) {
-  uint16_t bit = 0, byte = 0;
+  assert(msg_1029);
+  uint16_t bit = 0;
+  uint16_t byte = 0;
 
   rtcm_setbitu(buff, bit, 12, 1029);
   bit += 12;
@@ -746,6 +760,7 @@ uint16_t rtcm3_encode_1029(const rtcm_msg_1029 *msg_1029, uint8_t buff[]) {
 }
 
 uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t buff[]) {
+  assert(msg_1033);
   uint16_t bit = 0;
   rtcm_setbitu(buff, bit, 12, 1033);
   bit += 12;
@@ -795,6 +810,7 @@ uint16_t rtcm3_encode_1033(const rtcm_msg_1033 *msg_1033, uint8_t buff[]) {
 }
 
 uint16_t rtcm3_encode_1230(const rtcm_msg_1230 *msg_1230, uint8_t buff[]) {
+  assert(msg_1230);
   uint16_t bit = 0;
   rtcm_setbitu(buff, bit, 12, 1230);
   bit += 12;
@@ -1084,6 +1100,7 @@ static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
   double cnr[num_cells];
   double fine_range_rate_m_s[num_cells];
   flag_bf flags[num_cells];
+  memset(flags, 0, sizeof(flags));
 
   uint8_t i = 0;
   for (uint8_t sat = 0; sat < num_sats; sat++) {
@@ -1138,6 +1155,7 @@ static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
  */
 
 uint16_t rtcm3_encode_msm4(const rtcm_msm_message *msg_msm4, uint8_t buff[]) {
+  assert(msg_msm4);
   if (MSM4 != to_msm_type(msg_msm4->header.msg_num)) {
     return 0;
   }
@@ -1154,6 +1172,7 @@ uint16_t rtcm3_encode_msm4(const rtcm_msm_message *msg_msm4, uint8_t buff[]) {
  */
 
 uint16_t rtcm3_encode_msm5(const rtcm_msm_message *msg_msm5, uint8_t buff[]) {
+  assert(msg_msm5);
   if (MSM5 != to_msm_type(msg_msm5->header.msg_num)) {
     return 0;
   }
@@ -1161,11 +1180,20 @@ uint16_t rtcm3_encode_msm5(const rtcm_msm_message *msg_msm5, uint8_t buff[]) {
   return rtcm3_encode_msm_internal(msg_msm5, buff);
 }
 
-rtcm3_rc rtcm3_encode_4062(const rtcm_msg_swift_proprietary *msg, uint8_t buff[]) {
+/** Encode the Swift Proprietary Message
+ *
+ * \param msg The input RTCM message struct
+ * \param buff Data buffer large enough to hold the message
+ * \return Number of bytes written or 0 on failure
+ */
+
+uint16_t rtcm3_encode_4062(const rtcm_msg_swift_proprietary *msg,
+                           uint8_t buff[]) {
+  assert(msg);
   uint16_t bit = 0;
   rtcm_setbitu(buff, bit, 12, 4062);
   bit += 12;
-  // These 4 bits are currently reserved, and should always be 0
+  /* These 4 bits are currently reserved, and should always be 0 */
   rtcm_setbitu(buff, bit, 4, 0);
   bit += 4;
   rtcm_setbitu(buff, bit, 16, msg->msg_type);

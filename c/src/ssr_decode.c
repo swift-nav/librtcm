@@ -10,10 +10,11 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include <rtcm3/bits.h>
-#include <rtcm3/msm_utils.h>
-#include <rtcm3/ssr_decode.h>
+#include "rtcm3/ssr_decode.h"
+#include <assert.h>
 #include <stdio.h>
+#include "rtcm3/bits.h"
+#include "rtcm3/msm_utils.h"
 
 /** Get the numbers of bits for the  Epoch Time 1s field
  * \param constellation Message constellation
@@ -100,18 +101,18 @@ enum rtcm3_rc_e get_number_of_bits_for_iode(
 }
 
 /*
-*            TYPE       GPS     GLOASS    GALILEO    QZSS     BEIDOU     SBAS
-*         ----------------------------------------------------------------------
-*
-*          SSR OBT   : 1057      1063      1240*     1246*     1258*       -
-*              CLK   : 1058      1064      1241*     1247*     1259*       -
-*              BIAS  : 1059      1065      1242*     1248*     1260*       -
-*              OBTCLK: 1060      1066      1243*     1249*     1261*       -
-*              URA   : 1061      1067      1244*     1250*     1262*       -
-*              HRCLK : 1062      1068      1245*     1251*     1263*       -
-*              PHBIAS: 1265*     1266*     1267*     1268*     1270*      1269*
-*                    (* means that these RTCM messages are still draft )
-*/
+ *            TYPE       GPS     GLOASS    GALILEO    QZSS     BEIDOU     SBAS
+ *         ----------------------------------------------------------------------
+ *
+ *          SSR OBT   : 1057      1063      1240*     1246*     1258*       -
+ *              CLK   : 1058      1064      1241*     1247*     1259*       -
+ *              BIAS  : 1059      1065      1242*     1248*     1260*       -
+ *              OBTCLK: 1060      1066      1243*     1249*     1261*       -
+ *              URA   : 1061      1067      1244*     1250*     1262*       -
+ *              HRCLK : 1062      1068      1245*     1251*     1263*       -
+ *              PHBIAS: 1265*     1266*     1267*     1268*     1270*      1269*
+ *                    (* means that these RTCM messages are still draft )
+ */
 
 bool is_ssr_orbit_clock_message(const uint16_t message_num) {
   return message_num == 1060 || message_num == 1066 || message_num == 1243 ||
@@ -130,6 +131,7 @@ bool is_ssr_phase_biases_message(const uint16_t message_num) {
 enum rtcm3_rc_e decode_ssr_header(const uint8_t buff[],
                                   uint16_t *bit,
                                   rtcm_msg_ssr_header *msg_header) {
+  assert(msg_header);
   msg_header->message_num = rtcm_getbitu(buff, *bit, 12);
   *bit += 12;
   uint8_t number_of_bits_for_epoch_time;
@@ -174,10 +176,11 @@ enum rtcm3_rc_e decode_ssr_header(const uint8_t buff[],
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
+ *          - RC_INVALID_MESSAGE : Unknown constellation
  */
 rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[],
                                   rtcm_msg_orbit_clock *msg_orbit_clock) {
+  assert(msg_orbit_clock);
   uint16_t bit = 0;
   if (!(RC_OK == decode_ssr_header(buff, &bit, &msg_orbit_clock->header))) {
     return RC_INVALID_MESSAGE;
@@ -247,10 +250,11 @@ rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[],
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
+ *          - RC_INVALID_MESSAGE : Unknown constellation
  */
 rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[],
                                 rtcm_msg_code_bias *msg_code_bias) {
+  assert(msg_code_bias);
   uint16_t bit = 0;
   if (!(RC_OK == decode_ssr_header(buff, &bit, &msg_code_bias->header))) {
     return RC_INVALID_MESSAGE;
@@ -292,10 +296,11 @@ rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[],
  * \param RTCM message struct
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
- *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
+ *          - RC_INVALID_MESSAGE : Unknown constellation
  */
 rtcm3_rc rtcm3_decode_phase_bias(const uint8_t buff[],
                                  rtcm_msg_phase_bias *msg_phase_bias) {
+  assert(msg_phase_bias);
   uint16_t bit = 0;
   if (!(RC_OK == decode_ssr_header(buff, &bit, &msg_phase_bias->header))) {
     return RC_INVALID_MESSAGE;

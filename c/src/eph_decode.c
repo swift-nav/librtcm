@@ -10,8 +10,10 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include <rtcm3/bits.h>
-#include <rtcm3/eph_decode.h>
+#include "rtcm3/eph_decode.h"
+#include <assert.h>
+#include <string.h>
+#include "rtcm3/bits.h"
 
 /** Decode an RTCMv3 GPS Ephemeris Message
  *
@@ -21,6 +23,9 @@
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  */
 rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+  assert(msg_eph);
+  memset(msg_eph, 0, sizeof(*msg_eph));
+  msg_eph->constellation = RTCM_CONSTELLATION_GPS;
   uint16_t bit = 0;
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   if (msg_num != 1019) {
@@ -99,6 +104,9 @@ rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  */
 rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+  assert(msg_eph);
+  memset(msg_eph, 0, sizeof(*msg_eph));
+  msg_eph->constellation = RTCM_CONSTELLATION_GLO;
   uint16_t bit = 0;
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   if (msg_num != 1020) {
@@ -196,6 +204,9 @@ rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
  *          - RC_INVALID_MESSAGE : Satellite is geostationary
  */
 rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+  assert(msg_eph);
+  memset(msg_eph, 0, sizeof(*msg_eph));
+  msg_eph->constellation = RTCM_CONSTELLATION_BDS;
   uint16_t bit = 0;
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   if (msg_num != 1042) {
@@ -273,6 +284,7 @@ rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
  */
 static uint16_t rtcm3_decode_gal_eph_common(const uint8_t buff[],
                                             rtcm_msg_eph *msg_eph) {
+  assert(msg_eph);
   uint16_t bit = 12;
   msg_eph->sat_id = rtcm_getbitu(buff, bit, 6);
   bit += 6;
@@ -333,6 +345,9 @@ static uint16_t rtcm3_decode_gal_eph_common(const uint8_t buff[],
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  */
 rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+  assert(msg_eph);
+  memset(msg_eph, 0, sizeof(*msg_eph));
+  msg_eph->constellation = RTCM_CONSTELLATION_GAL;
   uint16_t bit = 0;
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   if (msg_num != 1046) {
@@ -363,6 +378,9 @@ rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
  */
 rtcm3_rc rtcm3_decode_gal_eph_fnav(const uint8_t buff[],
                                    rtcm_msg_eph *msg_eph) {
+  assert(msg_eph);
+  memset(msg_eph, 0, sizeof(*msg_eph));
+  msg_eph->constellation = RTCM_CONSTELLATION_GAL;
   uint16_t bit = 0;
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   if (msg_num != 1045) {
