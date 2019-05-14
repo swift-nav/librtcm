@@ -115,8 +115,21 @@ enum rtcm3_rc_e get_number_of_bits_for_iode(
  */
 
 bool is_ssr_orbit_clock_message(const uint16_t message_num) {
-  return message_num == 1060 || message_num == 1066 || message_num == 1243 ||
-         message_num == 1249 || message_num == 1261;
+  return message_num == 1057 || message_num == 1060 ||
+         message_num == 1063 || message_num == 1066 ||
+         message_num == 1240 || message_num == 1243 ||
+         message_num == 1246 || message_num == 1249 ||
+         message_num == 1258 || message_num == 1261;
+}
+
+bool is_ssr_orbit_message(const uint16_t message_num) {
+  return message_num == 1057 || message_num == 1063 || message_num == 1240 ||
+      message_num == 1246 || message_num == 1258;
+}
+
+bool is_ssr_clock_message(const uint16_t message_num) {
+  return message_num == 1058 || message_num == 1064 || message_num == 1241 ||
+      message_num == 1247 || message_num == 1259;
 }
 
 bool is_ssr_code_biases_message(const uint16_t message_num) {
@@ -170,6 +183,126 @@ enum rtcm3_rc_e decode_ssr_header(const uint8_t buff[],
   return RC_OK;
 }
 
+static rtcm3_rc decode_ssr_orbit(const uint8_t buff[], uint16_t *bit,
+                                 uint8_t constellation,
+                                 rtcm_msg_ssr_orbit_corr *orbit) {
+  uint8_t number_of_bits_for_iode;
+  if (!(RC_OK ==
+      get_number_of_bits_for_iode(constellation,
+                                  &number_of_bits_for_iode))) {
+    return RC_INVALID_MESSAGE;
+  }
+
+  orbit->iode = rtcm_getbitu(buff, *bit, number_of_bits_for_iode);
+  *bit += number_of_bits_for_iode;
+  if (constellation == RTCM_CONSTELLATION_BDS ||
+      constellation == RTCM_CONSTELLATION_SBAS) {
+    orbit->iodcrc = rtcm_getbitu(buff, *bit, 24);
+    *bit += 24;
+  }
+
+  orbit->radial = rtcm_getbits(buff, *bit, 22);
+  *bit += 22;
+  orbit->along_track = rtcm_getbits(buff, *bit, 20);
+  *bit += 20;
+  orbit->cross_track = rtcm_getbits(buff, *bit, 20);
+  *bit += 20;
+  orbit->dot_radial = rtcm_getbits(buff, *bit, 21);
+  *bit += 21;
+  orbit->dot_along_track = rtcm_getbits(buff, *bit, 19);
+  *bit += 19;
+  orbit->dot_cross_track = rtcm_getbits(buff, *bit, 19);
+  *bit += 19;
+
+  return RC_OK;
+}
+
+static void decode_ssr_clock(const uint8_t buff[], uint16_t *bit,
+                             rtcm_msg_ssr_clock_corr *clock) {
+  clock->c0 = rtcm_getbits(buff, *bit, 22);
+  *bit += 22;
+  clock->c1 = rtcm_getbits(buff, *bit, 21);
+  *bit += 21;
+  clock->c2 = rtcm_getbits(buff, *bit, 27);
+  *bit += 27;
+}
+
+static rtcm3_rc decode_satellite_id(const uint8_t buff[], uint16_t *bit,
+                                    uint8_t constellation, uint8_t *sat_id) {
+  uint8_t number_of_bits_for_sat_id;
+  if (!(RC_OK ==
+      get_number_of_bits_for_sat_id(constellation,
+                                    &number_of_bits_for_sat_id))) {
+    return RC_INVALID_MESSAGE;
+  }
+
+  *sat_id = rtcm_getbitu(buff, *bit, number_of_bits_for_sat_id);
+  *bit += number_of_bits_for_sat_id;
+
+  return RC_OK;
+}
+
+rtcm3_rc rtcm3_decode_orbit(const uint8_t buff[], rtcm_msg_orbit *msg_orbit) {
+  assert(msg_orbit);
+  uint16_t bit = 0;
+  if (!(RC_OK == decode_ssr_header(buff, &bit, &msg_orbit->header))) {
+    return RC_INVALID_MESSAGE;
+  }
+
+  if (!is_ssr_orbit_message(msg_orbit->header.message_num)) {
+    return RC_MESSAGE_TYPE_MISMATCH;
+  }
+
+  for (int sat_count = 0; sat_count < msg_orbit->header.num_sats;
+       sat_count++) {
+    rtcm_msg_ssr_orbit_corr *orbit = &msg_orbit->orbit[sat_count];
+
+    uint8_t sat_id;
+    if (!(RC_OK == decode_satellite_id(buff, &bit,
+                                       msg_orbit->header.constellation,
+                                       &sat_id))) {
+      return RC_INVALID_MESSAGE;
+    }
+
+    orbit->sat_id = sat_id;
+
+    if (!(RC_OK ==  decode_ssr_orbit(buff, &bit,
+                                     msg_orbit->header.constellation,
+                                     orbit))) {
+      return RC_INVALID_MESSAGE;
+    }
+  }
+  return RC_OK;
+}
+
+rtcm3_rc rtcm3_decode_clock(const uint8_t buff[], rtcm_msg_clock *msg_clock) {
+  assert(msg_clock);
+  uint16_t bit = 0;
+  if (!(RC_OK == decode_ssr_header(buff, &bit, &msg_clock->header))) {
+    return RC_INVALID_MESSAGE;
+  }
+
+  if (!is_ssr_clock_message(msg_clock->header.message_num)) {
+    return RC_MESSAGE_TYPE_MISMATCH;
+  }
+
+  for (int sat_count = 0; sat_count < msg_clock->header.num_sats;
+       sat_count++) {
+    rtcm_msg_ssr_clock_corr *clock = &msg_clock->clock[sat_count];
+
+    uint8_t sat_id;
+    if (!(RC_OK == decode_satellite_id(buff, &bit,
+                                       msg_clock->header.constellation,
+                                       &sat_id))) {
+      return RC_INVALID_MESSAGE;
+    }
+
+    clock->sat_id = sat_id;
+    decode_ssr_clock(buff, &bit, clock);
+  }
+  return RC_OK;
+}
+
 /** Decode an RTCMv3 Combined SSR Orbit and Clock message
  *
  * \param buff The input data buffer
@@ -195,51 +328,22 @@ rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[],
     rtcm_msg_ssr_orbit_corr *orbit = &msg_orbit_clock->orbit[sat_count];
     rtcm_msg_ssr_clock_corr *clock = &msg_orbit_clock->clock[sat_count];
 
-    uint8_t number_of_bits_for_sat_id;
-    if (!(RC_OK ==
-          get_number_of_bits_for_sat_id(msg_orbit_clock->header.constellation,
-                                        &number_of_bits_for_sat_id))) {
+    uint8_t sat_id;
+    if (!(RC_OK == decode_satellite_id(buff, &bit,
+                                       msg_orbit_clock->header.constellation,
+                                       &sat_id))) {
       return RC_INVALID_MESSAGE;
     }
 
-    orbit->sat_id = rtcm_getbitu(buff, bit, number_of_bits_for_sat_id);
-    bit += number_of_bits_for_sat_id;
+    orbit->sat_id = sat_id;
+    clock->sat_id = sat_id;
 
-    clock->sat_id = orbit->sat_id;
-
-    uint8_t number_of_bits_for_iode;
-    if (!(RC_OK ==
-          get_number_of_bits_for_iode(msg_orbit_clock->header.constellation,
-                                      &number_of_bits_for_iode))) {
+    if (!(RC_OK ==  decode_ssr_orbit(buff, &bit,
+                                     msg_orbit_clock->header.constellation,
+                                     orbit))) {
       return RC_INVALID_MESSAGE;
     }
-    orbit->iode = rtcm_getbitu(buff, bit, number_of_bits_for_iode);
-    bit += number_of_bits_for_iode;
-    if (msg_orbit_clock->header.constellation == RTCM_CONSTELLATION_BDS ||
-        msg_orbit_clock->header.constellation == RTCM_CONSTELLATION_SBAS) {
-      orbit->iodcrc = rtcm_getbitu(buff, bit, 24);
-      bit += 24;
-    }
-
-    orbit->radial = rtcm_getbits(buff, bit, 22);
-    bit += 22;
-    orbit->along_track = rtcm_getbits(buff, bit, 20);
-    bit += 20;
-    orbit->cross_track = rtcm_getbits(buff, bit, 20);
-    bit += 20;
-    orbit->dot_radial = rtcm_getbits(buff, bit, 21);
-    bit += 21;
-    orbit->dot_along_track = rtcm_getbits(buff, bit, 19);
-    bit += 19;
-    orbit->dot_cross_track = rtcm_getbits(buff, bit, 19);
-    bit += 19;
-
-    clock->c0 = rtcm_getbits(buff, bit, 22);
-    bit += 22;
-    clock->c1 = rtcm_getbits(buff, bit, 21);
-    bit += 21;
-    clock->c2 = rtcm_getbits(buff, bit, 27);
-    bit += 27;
+    decode_ssr_clock(buff, &bit, clock);
   }
   return RC_OK;
 }

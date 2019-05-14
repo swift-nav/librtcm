@@ -341,6 +341,16 @@ typedef struct {
 typedef struct {
   rtcm_msg_ssr_header header;
   rtcm_msg_ssr_orbit_corr orbit[MAX_SSR_SATELLITES];
+} rtcm_msg_orbit;
+
+typedef struct {
+  rtcm_msg_ssr_header header;
+  rtcm_msg_ssr_clock_corr clock[MAX_SSR_SATELLITES];
+} rtcm_msg_clock;
+
+typedef struct {
+  rtcm_msg_ssr_header header;
+  rtcm_msg_ssr_orbit_corr orbit[MAX_SSR_SATELLITES];
   rtcm_msg_ssr_clock_corr clock[MAX_SSR_SATELLITES];
 } rtcm_msg_orbit_clock;
 
