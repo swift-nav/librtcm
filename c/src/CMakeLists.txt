@@ -46,7 +46,7 @@ target_compile_options(rtcm PRIVATE "-fno-asynchronous-unwind-tables")
 target_compile_options(rtcm PRIVATE "-std=gnu99")
 target_compile_options(rtcm PRIVATE "-fPIC")
 # require at least gcc 5.0
-if (CMAKE_C_COMPILER_VERSION VERSION_GREATER 5.0)
+if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR CMAKE_C_COMPILER_VERSION VERSION_GREATER 5.0)
    target_compile_options(rtcm PRIVATE "-Wfloat-conversion")
 endif()
 
