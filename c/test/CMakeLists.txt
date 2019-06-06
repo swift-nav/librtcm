@@ -1,19 +1,11 @@
-cmake_minimum_required(VERSION 2.8.7)
+add_executable (rtcm_test rtcm_decoder_tests.c)
 
-if (CMAKE_CROSSCOMPILING)
-    message(STATUS "Skipping unit tests, cross compiling")
+target_link_libraries(rtcm_test rtcm)
 
-else (CMAKE_CROSSCOMPILING)
-    add_executable (rtcm_test rtcm_decoder_tests.c)
-
-    target_link_libraries(rtcm_test LINK_PUBLIC rtcm)
-
-    add_custom_command(
-        TARGET rtcm_test POST_BUILD
-        COMMENT "Running unit tests"
-        COMMAND rtcm_test
-    )
-    target_compile_options(rtcm_test PRIVATE "-std=gnu99")
-
-endif(CMAKE_CROSSCOMPILING)
+add_custom_command(
+    TARGET rtcm_test POST_BUILD
+    COMMENT "Running unit tests"
+    COMMAND rtcm_test
+)
+set_target_properties(rtcm_test PROPERTIES C_STANDARD 99)
 
