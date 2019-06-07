@@ -17,8 +17,11 @@
 
 rtcm3_rc rtcm3_decode_orbit(const uint8_t buff[], rtcm_msg_orbit *msg_orbit);
 rtcm3_rc rtcm3_decode_clock(const uint8_t buff[], rtcm_msg_clock *msg_clock);
-rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[], rtcm_msg_orbit_clock *msg_orbit_clock);
-rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[], rtcm_msg_code_bias *msg_code_bias);
-rtcm3_rc rtcm3_decode_phase_bias(const uint8_t buff[], rtcm_msg_phase_bias *msg_phase_bias);
+rtcm3_rc rtcm3_decode_orbit_clock(const uint8_t buff[],
+                                  rtcm_msg_orbit_clock *msg_orbit_clock);
+rtcm3_rc rtcm3_decode_code_bias(const uint8_t buff[],
+                                rtcm_msg_code_bias *msg_code_bias);
+rtcm3_rc rtcm3_decode_phase_bias(const uint8_t buff[],
+                                 rtcm_msg_phase_bias *msg_phase_bias);
 
 #endif /* SWIFTNAV_RTCM3_SSR_DECODE_H */

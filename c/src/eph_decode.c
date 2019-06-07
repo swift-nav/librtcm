@@ -96,6 +96,84 @@ rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   return RC_OK;
 }
 
+/** Decode an RTCMv3 QZSS Ephemeris Message
+ *
+ * \param buff The input data buffer
+ * \param RTCM message struct
+ * \return  - RC_OK : Success
+ *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ */
+rtcm3_rc rtcm3_decode_qzss_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+  assert(msg_eph);
+  memset(msg_eph, 0, sizeof(*msg_eph));
+  msg_eph->constellation = RTCM_CONSTELLATION_QZS;
+  uint16_t bit = 0;
+  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
+  if (msg_num != 1044) {
+    return RC_MESSAGE_TYPE_MISMATCH;
+  }
+  bit += 12;
+  msg_eph->sat_id = rtcm_getbitu(buff, bit, 4);
+  bit += 4;
+  msg_eph->kepler.toc = rtcm_getbitu(buff, bit, 16);
+  bit += 16;
+  msg_eph->kepler.af2 = rtcm_getbits(buff, bit, 8);
+  bit += 8;
+  msg_eph->kepler.af1 = rtcm_getbits(buff, bit, 16);
+  bit += 16;
+  msg_eph->kepler.af0 = rtcm_getbits(buff, bit, 22);
+  bit += 22;
+  msg_eph->kepler.iode = rtcm_getbitu(buff, bit, 8);
+  bit += 8;
+  msg_eph->kepler.crs = rtcm_getbits(buff, bit, 16);
+  bit += 16;
+  msg_eph->kepler.dn = rtcm_getbits(buff, bit, 16);
+  bit += 16;
+  msg_eph->kepler.m0 = rtcm_getbits(buff, bit, 32);
+  bit += 32;
+  msg_eph->kepler.cuc = rtcm_getbits(buff, bit, 16);
+  bit += 16;
+  msg_eph->kepler.ecc = rtcm_getbitu(buff, bit, 32);
+  bit += 32;
+  msg_eph->kepler.cus = rtcm_getbits(buff, bit, 16);
+  bit += 16;
+  msg_eph->kepler.sqrta = rtcm_getbitu(buff, bit, 32);
+  bit += 32;
+  msg_eph->toe = rtcm_getbitu(buff, bit, 16);
+  bit += 16;
+  msg_eph->kepler.cic = rtcm_getbits(buff, bit, 16);
+  bit += 16;
+  msg_eph->kepler.omega0 = rtcm_getbits(buff, bit, 32);
+  bit += 32;
+  msg_eph->kepler.cis = rtcm_getbits(buff, bit, 16);
+  bit += 16;
+  msg_eph->kepler.inc = rtcm_getbits(buff, bit, 32);
+  bit += 32;
+  msg_eph->kepler.crc = rtcm_getbits(buff, bit, 16);
+  bit += 16;
+  msg_eph->kepler.w = rtcm_getbits(buff, bit, 32);
+  bit += 32;
+  msg_eph->kepler.omegadot = rtcm_getbits(buff, bit, 24);
+  bit += 24;
+  msg_eph->kepler.inc_dot = rtcm_getbits(buff, bit, 14);
+  bit += 14;
+  /* L2 data bit */ rtcm_getbitu(buff, bit, 2);
+  bit += 2;
+  msg_eph->wn = rtcm_getbitu(buff, bit, 10);
+  bit += 10;
+  msg_eph->ura = rtcm_getbitu(buff, bit, 4);
+  bit += 4;
+  msg_eph->health_bits = rtcm_getbitu(buff, bit, 6);
+  bit += 6;
+  msg_eph->kepler.tgd_gps_s = rtcm_getbits(buff, bit, 8);
+  bit += 8;
+  msg_eph->kepler.iodc = rtcm_getbitu(buff, bit, 10);
+  bit += 10;
+  msg_eph->fit_interval = rtcm_getbitu(buff, bit, 1);
+  bit += 1;
+  return RC_OK;
+}
+
 /** Decode an RTCMv3 GLO Ephemeris Message
  *
  * \param buff The input data buffer

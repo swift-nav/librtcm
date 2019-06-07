@@ -1708,14 +1708,15 @@ void test_rtcm_4062(void) {
   uint8_t buff[1024];
   uint16_t num_bytes = rtcm3_encode_4062(&msg_in, buff);
 
-  assert(num_bytes == (msg_in.len + 7)); // RTCM msg type + SBP msg type +
-                                         // SBP sender id + SBP len
+  assert(num_bytes == (msg_in.len + 7));  // RTCM msg type + SBP msg type +
+                                          // SBP sender id + SBP len
 
   rtcm_msg_swift_proprietary msg_out;
   uint8_t ret = rtcm3_decode_4062(buff, &msg_out);
 
-  assert((RC_OK == ret) && (msg_in.msg_type == msg_out.msg_type)
-        && (msg_in.sender_id == msg_out.sender_id) && (msg_in.len == msg_out.len));
+  assert((RC_OK == ret) && (msg_in.msg_type == msg_out.msg_type) &&
+         (msg_in.sender_id == msg_out.sender_id) &&
+         (msg_in.len == msg_out.len));
   for (uint8_t i = 0; i < msg_in.len; ++i) {
     assert(msg_in.data[i] == msg_out.data[i]);
   }
