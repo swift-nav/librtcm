@@ -8,6 +8,7 @@ set(librtcm_HEADERS
   ${PROJECT_SOURCE_DIR}/include/rtcm3/encode.h
   ${PROJECT_SOURCE_DIR}/include/rtcm3/decode.h
   ${PROJECT_SOURCE_DIR}/include/rtcm3/eph_decode.h
+  ${PROJECT_SOURCE_DIR}/include/rtcm3/eph_encode.h
   ${PROJECT_SOURCE_DIR}/include/rtcm3/ssr_decode.h
   ${PROJECT_SOURCE_DIR}/include/rtcm3/msm_utils.h
   ${PROJECT_SOURCE_DIR}/include/rtcm3/logging.h
@@ -18,6 +19,7 @@ add_library(rtcm
   encode.c
   msm_utils.c
   eph_decode.c
+  eph_encode.c
   ssr_decode.c
   bits.c
   logging.c

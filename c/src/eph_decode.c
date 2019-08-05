@@ -38,7 +38,7 @@ rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 10;
   msg_eph->ura = rtcm_getbitu(buff, bit, 4);
   bit += 4;
-  /*uint8_t l2_code = */ rtcm_getbitu(buff, bit, 2);
+  msg_eph->kepler.codeL2 = rtcm_getbitu(buff, bit, 2);
   bit += 2;
   msg_eph->kepler.inc_dot = rtcm_getbits(buff, bit, 14);
   bit += 14;
@@ -88,7 +88,7 @@ rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   bit += 8;
   msg_eph->health_bits = rtcm_getbitu(buff, bit, 6);
   bit += 6;
-  /* L2 data bit */ rtcm_getbitu(buff, bit, 1);
+  msg_eph->kepler.L2_data_bit = rtcm_getbitu(buff, bit, 1);
   bit += 1;
   msg_eph->fit_interval = rtcm_getbitu(buff, bit, 1);
   bit += 1;

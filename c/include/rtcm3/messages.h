@@ -233,6 +233,8 @@ typedef struct {
   uint32_t toc;
   uint16_t iodc;
   uint16_t iode;
+  uint8_t codeL2;
+  bool L2_data_bit;
 } ephemeris_kepler_raw_rtcm_t;
 
 /** Structure containing the SBAS ephemeris for one satellite. */
