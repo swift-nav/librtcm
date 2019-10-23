@@ -16,6 +16,8 @@ swift_setup_clang_format()
 include(ClangTidy)
 swift_setup_clang_tidy(PATTERNS "src/*.c")
 
+include(TestTargets)
+
 add_subdirectory (src)
 
 if(librtcm_BUILD_TESTS)
