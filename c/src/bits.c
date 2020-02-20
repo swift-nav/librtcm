@@ -180,3 +180,17 @@ int32_t rtcm_get_sign_magnitude_bit(const uint8_t *buff,
   int32_t value = rtcm_getbitu(buff, pos + 1, len - 1);
   return rtcm_getbitu(buff, pos, 1) ? -value : value;
 }
+
+/* Set sign-magnitude bits, See Note 1, Table 3.3-1, RTCM 3.3
+ * \param buff
+ * \param pos Position in buffer of start of bit field in bits.
+ * \param len Length of bit field in bits.
+ * \data data to encode
+ */
+void rtcm_set_sign_magnitude_bit(uint8_t *buff,
+                                 uint32_t pos,
+                                 uint8_t len,
+                                 int64_t data) {
+  rtcm_setbitu(buff, pos, 1, (data < 0) ? 1 : 0);
+  rtcm_setbitu(buff, pos + 1, len - 1, ((data < 0) ? -data : data));
+}

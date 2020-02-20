@@ -30,6 +30,10 @@ void rtcm_setbitsl(uint8_t *buff, uint32_t pos, uint32_t len, int64_t data);
 int32_t rtcm_get_sign_magnitude_bit(const uint8_t *buff,
                                     uint32_t pos,
                                     uint8_t len);
+void rtcm_set_sign_magnitude_bit(uint8_t *buff,
+                                    uint32_t pos,
+                                    uint8_t len,
+                                    int64_t data);
 #ifdef __cplusplus
 }
 #endif

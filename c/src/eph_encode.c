@@ -85,6 +85,153 @@ uint16_t rtcm3_encode_gps_eph(const rtcm_msg_eph *msg_1019, uint8_t buff[]) {
   return (bit + 7) / 8;
 }
 
+uint16_t rtcm3_encode_glo_eph(const rtcm_msg_eph *msg_1020, uint8_t buff[]) {
+  assert(msg_1020);
+  uint16_t bit = 0;
+  rtcm_setbitu(buff, bit, 12, 1020);
+  bit += 12;
+  rtcm_setbitu(buff, bit, 6, msg_1020->sat_id);
+  bit += 6;
+  rtcm_setbitu(buff, bit, 5, msg_1020->glo.fcn);
+  bit += 5;
+  // Almanac health
+  rtcm_setbitu(buff, bit, 1, 1);
+  bit += 1;
+  // Almanac health availability
+  rtcm_setbitu(buff, bit, 1, 0);
+  bit += 1;
+  rtcm_setbitu(buff, bit, 2, msg_1020->fit_interval);
+  bit += 2;
+  // T_k
+  rtcm_setbitu(buff, bit, 12, 0);
+  bit += 12;
+  rtcm_setbitu(buff, bit, 1, msg_1020->health_bits);
+  bit += 1;
+  // P2
+  rtcm_setbitu(buff, bit, 1, 0);
+  bit += 1;
+  rtcm_setbitu(buff, bit, 7, msg_1020->glo.t_b);
+  bit += 7;
+  rtcm_set_sign_magnitude_bit(buff, bit, 24, msg_1020->glo.vel[0]);
+  bit += 24;
+  rtcm_set_sign_magnitude_bit(buff, bit, 27, msg_1020->glo.pos[0]);
+  bit += 27;
+  rtcm_set_sign_magnitude_bit(buff, bit, 5, msg_1020->glo.acc[0]);
+  bit += 5;
+  rtcm_set_sign_magnitude_bit(buff, bit, 24, msg_1020->glo.vel[1]);
+  bit += 24;
+  rtcm_set_sign_magnitude_bit(buff, bit, 27, msg_1020->glo.pos[1]);
+  bit += 27;
+  rtcm_set_sign_magnitude_bit(buff, bit, 5, msg_1020->glo.acc[1]);
+  bit += 5;
+  rtcm_set_sign_magnitude_bit(buff, bit, 24, msg_1020->glo.vel[2]);
+  bit += 24;
+  rtcm_set_sign_magnitude_bit(buff, bit, 27, msg_1020->glo.pos[2]);
+  bit += 27;
+  rtcm_set_sign_magnitude_bit(buff, bit, 5, msg_1020->glo.acc[2]);
+  bit += 5;
+  // P3
+  rtcm_setbitu(buff, bit, 1, 0);
+  bit += 1;
+  rtcm_set_sign_magnitude_bit(buff, bit, 11, msg_1020->glo.gamma);
+  bit += 11;
+  // P
+  rtcm_setbitu(buff, bit, 2, 0);
+  bit += 2;
+  rtcm_setbitu(buff, bit, 1, msg_1020->health_bits);
+  bit += 1;
+  rtcm_set_sign_magnitude_bit(buff, bit, 22, msg_1020->glo.tau);
+  bit += 22;
+  rtcm_set_sign_magnitude_bit(buff, bit, 5, msg_1020->glo.d_tau);
+  bit += 5;
+  // EN
+  rtcm_setbitu(buff, bit, 5, 0);
+  bit += 5;
+  // P4
+  rtcm_setbitu(buff, bit, 1, 0);
+  bit += 1;
+  rtcm_setbitu(buff, bit, 4, msg_1020->ura);
+  bit += 4;
+  // NT
+  rtcm_setbitu(buff, bit, 11, 0);
+  bit += 11;
+  // M
+  rtcm_setbitu(buff, bit, 2, 0);
+  bit += 2;
+  // Additional data
+  rtcm_setbitu(buff, bit, 79, 0);
+  bit += 79;
+
+  /* Round number of bits up to nearest whole byte. */
+  return (bit + 7) / 8;
+}
+
+uint16_t rtcm3_encode_bds_eph(const rtcm_msg_eph *msg_1042, uint8_t buff[]) {
+  assert(msg_1042);
+  uint16_t bit = 0;
+  rtcm_setbitu(buff, bit, 12, 1042);
+  bit += 12;
+  rtcm_setbitu(buff, bit, 6, msg_1042->sat_id);
+  bit += 6;
+  rtcm_setbitu(buff, bit, 13, msg_1042->wn);
+  bit += 13;
+  rtcm_setbitu(buff, bit, 4, msg_1042->ura);
+  bit += 4;
+  rtcm_setbits(buff, bit, 14, msg_1042->kepler.inc_dot);
+  bit += 14;
+  rtcm_setbitu(buff, bit, 5, msg_1042->kepler.iode);
+  bit += 5;
+  rtcm_setbitu(buff, bit, 17, msg_1042->kepler.toc);
+  bit += 17;
+  rtcm_setbits(buff, bit, 11, msg_1042->kepler.af2);
+  bit += 11;
+  rtcm_setbits(buff, bit, 22, msg_1042->kepler.af1);
+  bit += 22;
+  rtcm_setbits(buff, bit, 24, msg_1042->kepler.af0);
+  bit += 24;
+  rtcm_setbitu(buff, bit, 5, msg_1042->kepler.iodc);
+  bit += 5;
+  rtcm_setbits(buff, bit, 18, msg_1042->kepler.crs);
+  bit += 18;
+  rtcm_setbits(buff, bit, 16, msg_1042->kepler.dn);
+  bit += 16;
+  rtcm_setbits(buff, bit, 32, msg_1042->kepler.m0);
+  bit += 32;
+  rtcm_setbits(buff, bit, 18, msg_1042->kepler.cuc);
+  bit += 18;
+  rtcm_setbitu(buff, bit, 32, msg_1042->kepler.ecc);
+  bit += 32;
+  rtcm_setbits(buff, bit, 18, msg_1042->kepler.cus);
+  bit += 18;
+  rtcm_setbitu(buff, bit, 32, msg_1042->kepler.sqrta);
+  bit += 32;
+  rtcm_setbitu(buff, bit, 17, msg_1042->toe);
+  bit += 17;
+  rtcm_setbits(buff, bit, 18, msg_1042->kepler.cic);
+  bit += 18;
+  rtcm_setbits(buff, bit, 32, msg_1042->kepler.omega0);
+  bit += 32;
+  rtcm_setbits(buff, bit, 18, msg_1042->kepler.cis);
+  bit += 18;
+  rtcm_setbits(buff, bit, 32, msg_1042->kepler.inc);
+  bit += 32;
+  rtcm_setbits(buff, bit, 18, msg_1042->kepler.crc);
+  bit += 18;
+  rtcm_setbits(buff, bit, 32, msg_1042->kepler.w);
+  bit += 32;
+  rtcm_setbits(buff, bit, 24, msg_1042->kepler.omegadot);
+  bit += 24;
+  rtcm_setbits(buff, bit, 10, msg_1042->kepler.tgd_bds_s[0]);
+  bit += 10;
+  rtcm_setbits(buff, bit, 10, msg_1042->kepler.tgd_bds_s[1]);
+  bit += 10;
+  rtcm_setbitu(buff, bit, 1, msg_1042->health_bits);
+  bit += 1;
+
+  /* Round number of bits up to nearest whole byte. */
+  return (bit + 7) / 8;
+}
+
 /** Decode an RTCMv3 GAL (common part) Ephemeris Message
  *
  * \param buff The input data buffer

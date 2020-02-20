@@ -13,12 +13,15 @@
 #include "rtcm_decoder_tests.h"
 #include <assert.h>
 #include <math.h>
+#include <rtcm3/messages.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "rtcm3/bits.h"
 #include "rtcm3/decode.h"
 #include "rtcm3/encode.h"
+#include "rtcm3/eph_decode.h"
+#include "rtcm3/eph_encode.h"
 #include "rtcm3/messages.h"
 #include "rtcm3/msm_utils.h"
 
@@ -38,8 +41,13 @@ int main(void) {
   test_rtcm_1008();
   test_rtcm_1010();
   test_rtcm_1012();
+  test_rtcm_1019();
+  test_rtcm_1020();
   test_rtcm_1029();
   test_rtcm_1033();
+  test_rtcm_1042();
+  test_rtcm_1045();
+  test_rtcm_1046();
   test_rtcm_1230();
   test_rtcm_msm4();
   test_rtcm_msm5();
@@ -1825,6 +1833,261 @@ void test_msm_bit_utils(void) {
     assert(3 == find_nth_mask_value(sizeof(mask), mask, 4));
     assert(4 == find_nth_mask_value(sizeof(mask), mask, 5));
   }
+}
+
+// Get an example Keplerian orbit for testing
+static rtcm_msg_eph get_example_keplerian_rtcm_eph(
+    const rtcm_constellation_t cons) {
+  rtcm_msg_eph ret;
+  ret.sat_id = 25;
+  ret.constellation = cons;
+
+  // Fill some parameters that are dependent upon the constellation
+  if (cons == RTCM_CONSTELLATION_GPS) {
+    // wn is mod 1024
+    ret.wn = 1022;
+    // toe is in 16 second increments
+    ret.toe = 460800 / 16;
+    // only one TGD
+    ret.kepler.tgd_gps_s = -3;
+    // toc is in 16 second increments
+    ret.kepler.toc = 460800 / 16;
+    // iodc can be 0-1023
+    ret.kepler.iodc = 954;
+    // iodc can be 0-255
+    ret.kepler.iode = 250;
+    // L2 data is only for GPS
+    ret.kepler.codeL2 = 1;
+    ret.kepler.L2_data_bit = true;
+  } else if (cons == RTCM_CONSTELLATION_GAL) {
+    // wn is mod 4096
+    ret.wn = 4000;
+    // toe is in 60 second increments
+    ret.toe = 460800 / 60;
+    // TGDs can range from -511 to +512
+    ret.kepler.tgd_gal_s[0] = -450;
+    ret.kepler.tgd_gal_s[1] = 454;
+    // toc is in 60 second increments
+    ret.kepler.toc = 460800 / 60;
+    // iode can be 0-1023
+    ret.kepler.iode = 1000;
+  } else if (cons == RTCM_CONSTELLATION_BDS) {
+    // wn is mod 8192
+    ret.wn = 8190;
+    // toe is in 8 second increments
+    ret.toe = 460800 / 8;
+    // TGDs can range from -511 to +512
+    ret.kepler.tgd_bds_s[0] = -450;
+    ret.kepler.tgd_bds_s[1] = 454;
+    // toc is in 8 second increments
+    ret.kepler.toc = 460800 / 8;
+    // iode/iodc can be 0-31
+    ret.kepler.iodc = 20;
+    ret.kepler.iode = 31;
+  } else {
+    assert(false);
+  }
+  ret.ura = 2;
+  ret.fit_interval = 0;
+  ret.health_bits = 0;
+
+  // Scale the Keplerian values from their SI units to the values that are
+  // encoded
+  ret.kepler.crc = 167.140625 * 64;
+  ret.kepler.crs = -18.828125 * 64;
+  ret.kepler.cuc = -9.0105459094047546e-07 * 65536 * 32768;
+  ret.kepler.cus = 9.4850547611713409e-06 * 65536 * 32768;
+  ret.kepler.cic = -4.0978193283081055e-08 * 65536 * 32768;
+  ret.kepler.cis = 1.0104849934577942e-07 * 65536 * 32768;
+  ret.kepler.dn = 3.9023054038264214e-09 * 65536 * 65536 * 2048 / 3.141592;
+  ret.kepler.m0 = 0.39869951815527438 * 65536 * 32768 / 3.141592;
+  ret.kepler.ecc = 0.00043709692545235157 * 65536 * 65536 * 2;
+  ret.kepler.sqrta = 5282.6194686889648 * 65536 * 8;
+  ret.kepler.omega0 = 2.2431156200949509 * 65536 * 32768 / 3.141592;
+  ret.kepler.omegadot =
+      -6.6892072037584707e-09 * 65536 * 65536 * 2048 / 3.141592;
+  ret.kepler.w = 0.39590413040186828 * 65536 * 32768 / 3.141592;
+  ret.kepler.inc = 0.95448398903792575 * 65536 * 32768 / 3.141592;
+  ret.kepler.inc_dot =
+      -6.2716898124832475e-10 * 65536 * 65536 * 2048 / 3.141592;
+  ret.kepler.af0 = -0.00050763087347149849 * 65536 * 32768;
+  ret.kepler.af1 = -1.3019807454384136e-11 * 65536 * 65536 * 2048;
+  ret.kepler.af2 = 0.000000;
+  return ret;
+}
+
+// Compare two Keplerian orbits to make sure they are the same where they need
+// to be
+static void compare_keplerian_ephs(const rtcm_msg_eph *first,
+                                   const rtcm_msg_eph *second) {
+  assert(first->sat_id == second->sat_id);
+  assert(first->constellation == second->constellation);
+  assert(first->wn == second->wn);
+  assert(first->toe == second->toe);
+  assert(first->ura == second->ura);
+  assert(first->fit_interval == second->fit_interval);
+  assert(first->health_bits == second->health_bits);
+
+  if (first->constellation == RTCM_CONSTELLATION_GPS) {
+    assert(first->kepler.tgd_gps_s == second->kepler.tgd_gps_s);
+  } else if (first->constellation == RTCM_CONSTELLATION_QZS) {
+    assert(first->kepler.tgd_qzss_s == second->kepler.tgd_qzss_s);
+  } else if (first->constellation == RTCM_CONSTELLATION_GAL) {
+    assert(first->kepler.tgd_gal_s[0] == second->kepler.tgd_gal_s[0]);
+    assert(first->kepler.tgd_gal_s[1] == second->kepler.tgd_gal_s[1]);
+  } else if (first->constellation == RTCM_CONSTELLATION_BDS) {
+    assert(first->kepler.tgd_bds_s[0] == second->kepler.tgd_bds_s[0]);
+    assert(first->kepler.tgd_bds_s[1] == second->kepler.tgd_bds_s[1]);
+  } else {
+    assert(false);
+  }
+  assert(first->kepler.crc == second->kepler.crc);
+  assert(first->kepler.crs == second->kepler.crs);
+  assert(first->kepler.cuc == second->kepler.cuc);
+  assert(first->kepler.cus == second->kepler.cus);
+  assert(first->kepler.cic == second->kepler.cic);
+  assert(first->kepler.cis == second->kepler.cis);
+  assert(first->kepler.dn == second->kepler.dn);
+  assert(first->kepler.m0 == second->kepler.m0);
+  assert(first->kepler.ecc == second->kepler.ecc);
+  assert(first->kepler.sqrta == second->kepler.sqrta);
+  assert(first->kepler.omega0 == second->kepler.omega0);
+  assert(first->kepler.omegadot == second->kepler.omegadot);
+  assert(first->kepler.w == second->kepler.w);
+  assert(first->kepler.inc == second->kepler.inc);
+  assert(first->kepler.inc_dot == second->kepler.inc_dot);
+  assert(first->kepler.af0 == second->kepler.af0);
+  assert(first->kepler.af1 == second->kepler.af1);
+  assert(first->kepler.af2 == second->kepler.af2);
+  assert(first->kepler.toc == second->kepler.toc);
+  if (first->constellation != RTCM_CONSTELLATION_GAL) {
+    assert(first->kepler.iodc == second->kepler.iodc);
+  }
+  assert(first->kepler.iode == second->kepler.iode);
+  if (first->constellation == RTCM_CONSTELLATION_GPS) {
+    assert(first->kepler.codeL2 == second->kepler.codeL2);
+    assert(first->kepler.L2_data_bit == second->kepler.L2_data_bit);
+  }
+}
+
+// Get an example GLO ephemeris
+static rtcm_msg_eph get_example_glonass_rtcm_eph(const uint8_t t_b) {
+  rtcm_msg_eph ret;
+  ret.sat_id = 25;
+  ret.constellation = RTCM_CONSTELLATION_GLO;
+  ret.wn = 2091;
+  ret.toe = 460800;
+  ret.ura = 2;
+  ret.fit_interval = 0;
+  ret.health_bits = 0;
+
+  ret.glo.gamma = 123;
+  ret.glo.tau = 345;
+  ret.glo.d_tau = -12;
+  ret.glo.t_b = t_b;
+  ret.glo.pos[0] = -456767;
+  ret.glo.pos[1] = 4567367;
+  ret.glo.pos[2] = 4578437;
+  ret.glo.vel[0] = 247;
+  ret.glo.vel[1] = -8754;
+  ret.glo.vel[2] = 45790;
+  ret.glo.acc[0] = 3;
+  ret.glo.acc[1] = -6;
+  ret.glo.acc[2] = 7;
+  ret.glo.fcn = 19;
+  ret.glo.iod = 64;
+
+  return ret;
+}
+
+// Compare two GLONASS orbits to make sure they are the same where they need to
+// be
+static void compare_glonass_ephs(const rtcm_msg_eph *first,
+                                 const rtcm_msg_eph *second) {
+  assert(first->sat_id == second->sat_id);
+  assert(first->constellation == second->constellation);
+  // GLONASS doesn't make use of the wn/toe at this stage, the t_b is the only
+  // time indicator
+  //    assert( first->wn == second->wn );
+  //    assert( first->toe == second->toe );
+  assert(first->ura == second->ura);
+  assert(first->fit_interval == second->fit_interval);
+  assert(first->health_bits == second->health_bits);
+
+  assert(first->glo.gamma == second->glo.gamma);
+  assert(first->glo.tau == second->glo.tau);
+  assert(first->glo.d_tau == second->glo.d_tau);
+  assert(first->glo.t_b == second->glo.t_b);
+  assert(first->glo.pos[0] == second->glo.pos[0]);
+  assert(first->glo.pos[1] == second->glo.pos[1]);
+  assert(first->glo.pos[2] == second->glo.pos[2]);
+  assert(first->glo.vel[0] == second->glo.vel[0]);
+  assert(first->glo.vel[1] == second->glo.vel[1]);
+  assert(first->glo.vel[2] == second->glo.vel[2]);
+  assert(first->glo.acc[0] == second->glo.acc[0]);
+  assert(first->glo.acc[1] == second->glo.acc[1]);
+  assert(first->glo.acc[2] == second->glo.acc[2]);
+  assert(first->glo.fcn == second->glo.fcn);
+  // GLO doesn't have an IODE in the traditional sense, t_b takes this task on
+  //    assert( first->glo.iod == second->glo.iod );
+}
+
+void test_rtcm_1019() {
+  rtcm_msg_eph msg_1019_in =
+      get_example_keplerian_rtcm_eph(RTCM_CONSTELLATION_GPS);
+  uint8_t frame[1023];
+  rtcm3_encode_gps_eph(&msg_1019_in, &frame[0]);
+
+  rtcm_msg_eph msg_1019_out;
+  rtcm3_decode_gps_eph(&frame[0], &msg_1019_out);
+  compare_keplerian_ephs(&msg_1019_in, &msg_1019_out);
+}
+
+void test_rtcm_1020() {
+  // Test out all 96 possible 15 minute chunks of the day.
+  for (uint8_t t_b = 0; t_b < 96; ++t_b) {
+    rtcm_msg_eph msg_1020_in = get_example_glonass_rtcm_eph(t_b);
+    uint8_t frame[1023];
+    rtcm3_encode_glo_eph(&msg_1020_in, &frame[0]);
+
+    rtcm_msg_eph msg_1020_out;
+    rtcm3_decode_glo_eph(&frame[0], &msg_1020_out);
+    compare_glonass_ephs(&msg_1020_in, &msg_1020_out);
+  }
+}
+
+void test_rtcm_1042() {
+  rtcm_msg_eph msg_1042_in =
+      get_example_keplerian_rtcm_eph(RTCM_CONSTELLATION_BDS);
+  uint8_t frame[1023];
+  rtcm3_encode_bds_eph(&msg_1042_in, &frame[0]);
+
+  rtcm_msg_eph msg_1042_out;
+  rtcm3_decode_bds_eph(&frame[0], &msg_1042_out);
+  compare_keplerian_ephs(&msg_1042_in, &msg_1042_out);
+}
+
+void test_rtcm_1045() {
+  rtcm_msg_eph msg_1045_in =
+      get_example_keplerian_rtcm_eph(RTCM_CONSTELLATION_GAL);
+  uint8_t frame[1023];
+  rtcm3_encode_gal_eph_fnav(&msg_1045_in, &frame[0]);
+
+  rtcm_msg_eph msg_1045_out;
+  rtcm3_decode_gal_eph_fnav(&frame[0], &msg_1045_out);
+  msg_1045_out.kepler.tgd_gal_s[1] = msg_1045_in.kepler.tgd_gal_s[1];
+  compare_keplerian_ephs(&msg_1045_in, &msg_1045_out);
+}
+
+void test_rtcm_1046() {
+  rtcm_msg_eph msg_1046_in =
+      get_example_keplerian_rtcm_eph(RTCM_CONSTELLATION_GAL);
+  uint8_t frame[1023];
+  rtcm3_encode_gal_eph_inav(&msg_1046_in, &frame[0]);
+
+  rtcm_msg_eph msg_1046_out;
+  rtcm3_decode_gal_eph_inav(&frame[0], &msg_1046_out);
+  compare_keplerian_ephs(&msg_1046_in, &msg_1046_out);
 }
 
 static void test_lock_time_decoding(void) {

@@ -422,7 +422,8 @@ static uint16_t rtcm3_decode_gal_eph_common(const uint8_t buff[],
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  */
-rtcm3_rc rtcm3_decode_gal_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
+rtcm3_rc rtcm3_decode_gal_eph_inav(const uint8_t buff[],
+                                   rtcm_msg_eph *msg_eph) {
   assert(msg_eph);
   memset(msg_eph, 0, sizeof(*msg_eph));
   msg_eph->constellation = RTCM_CONSTELLATION_GAL;
