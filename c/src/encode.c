@@ -731,7 +731,6 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
 uint16_t rtcm3_encode_1029(const rtcm_msg_1029 *msg_1029, uint8_t buff[]) {
   assert(msg_1029);
   uint16_t bit = 0;
-  uint16_t byte = 0;
 
   rtcm_setbitu(buff, bit, 12, 1029);
   bit += 12;
@@ -748,11 +747,11 @@ uint16_t rtcm3_encode_1029(const rtcm_msg_1029 *msg_1029, uint8_t buff[]) {
   rtcm_setbitu(buff, bit, 7, msg_1029->unicode_chars);
   bit += 7;
 
-  byte = bit / 8;
-
-  buff[byte++] = msg_1029->utf8_code_units_n;
+  rtcm_setbitu(buff, bit, 8, msg_1029->utf8_code_units_n);
+  bit += 8;
   for (uint8_t i = 0; i < msg_1029->utf8_code_units_n; i++) {
-    buff[byte++] = msg_1029->utf8_code_units[i];
+    rtcm_setbitu(buff, bit, 8, msg_1029->utf8_code_units[i]);
+    bit += 8;
   }
 
   /* Round number of bits up to nearest whole byte. */
