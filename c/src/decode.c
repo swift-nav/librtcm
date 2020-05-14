@@ -11,31 +11,16 @@
  */
 
 #include "rtcm3/decode.h"
+
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "rtcm3/bits.h"
+#include "rtcm3/decode_macros.h"
 #include "rtcm3/eph_decode.h"
 #include "rtcm3/msm_utils.h"
-
-/* macros for reading rcv/ant descriptor strings */
-#define GET_STR_LEN(TheBuff, TheIdx, TheOutput)         \
-  do {                                                  \
-    (TheOutput) = rtcm_getbitu((TheBuff), (TheIdx), 8); \
-    if (RTCM_MAX_STRING_LEN <= (TheOutput)) {           \
-      return RC_INVALID_MESSAGE;                        \
-    }                                                   \
-    (TheIdx) += 8;                                      \
-  } while (false);
-
-#define GET_STR(TheBuff, TheIdx, TheLen, TheOutput)          \
-  do {                                                       \
-    for (uint8_t i = 0; i < (TheLen); ++i) {                 \
-      (TheOutput)[i] = rtcm_getbitu((TheBuff), (TheIdx), 8); \
-      (TheIdx) += 8;                                         \
-    }                                                        \
-  } while (false);
 
 static void init_sat_data(rtcm_sat_data *sat_data) {
   for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {
