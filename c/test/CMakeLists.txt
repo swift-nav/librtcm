@@ -4,3 +4,8 @@ swift_add_test(test-rtcm
   LINK rtcm
   )
 
+swift_add_test(test-sta
+  POST_BUILD
+  SRCS sta_rtcm3_tests.c
+  LINK rtcm
+  )
