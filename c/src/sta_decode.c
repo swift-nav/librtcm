@@ -29,6 +29,8 @@ rtcm3_rc sta_decode_fwver(const uint8_t buff[], char *fw_ver, uint8_t len) {
   uint16_t subtype_id = rtcm_getbitu(buff, bit, 8);
   bit += 8;
   /* this should never be called on anything other than msg 999:25 */
+  (void) msg_num;
+  (void) subtype_id;
   assert(msg_num == 999 && subtype_id == 25);
   GET_STR_LEN(buff, bit, fw_ver_strlen);
   GET_STR(buff, bit, len, fw_ver);
