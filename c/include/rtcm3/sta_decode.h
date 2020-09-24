@@ -79,6 +79,9 @@ rtcm3_rc sta_decode_fwver(const uint8_t buff[], char *fw_ver, uint8_t len);
 rtcm3_rc sta_decode_rfstatus(const uint8_t buff[],
                              sta_rf_status *rf_status,
                              uint16_t payload_len);
+rtcm3_rc sta_decode_rcc_config(const uint8_t buff[],
+                               char *sta_config_buffer,
+                               uint8_t len);
 
 #ifdef __cplusplus
 }

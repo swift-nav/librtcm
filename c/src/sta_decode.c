@@ -20,6 +20,27 @@
 #include "rtcm3/bits.h"
 #include "rtcm3/decode_macros.h"
 
+#define RCC_FW_CONFIG_START_BIT 58
+rtcm3_rc sta_decode_rcc_config(const uint8_t buff[],
+                               char *sta_config_buffer,
+                               uint8_t len) {
+  assert(sta_config_buffer);
+  assert(len > 15);
+  /* unpack in human-friendly way */
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+      sta_config_buffer[i * 4 + j] =
+          rtcm_getbitu(buff,
+                       /* reverse each grouping of 4 chars*/
+                       (RCC_FW_CONFIG_START_BIT + 24 + (32 * i) - j * 8),
+                       8);
+      if (sta_config_buffer[i * 4 + j] == '\0') break;
+    }
+  }
+  sta_config_buffer[15] = '\0';
+  return RC_OK;
+}
+
 rtcm3_rc sta_decode_fwver(const uint8_t buff[], char *fw_ver, uint8_t len) {
   assert(fw_ver);
   uint8_t fw_ver_strlen = 0;
