@@ -17,7 +17,7 @@ function build_c() {
     cd c
     mkdir build
     cd build
-    cmake ../
+    cmake ../ -DCMAKE_BUILD_TYPE=Release
     make -j4
     cd ../
     cd ../

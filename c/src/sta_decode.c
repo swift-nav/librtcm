@@ -24,6 +24,7 @@
 rtcm3_rc sta_decode_rcc_config(const uint8_t buff[],
                                char *sta_config_buffer,
                                uint8_t len) {
+  (void)len;
   assert(sta_config_buffer);
   assert(len > 15);
   /* unpack in human-friendly way */
