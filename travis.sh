@@ -9,7 +9,7 @@ set -o pipefail
 
 function build_haskell () {
     cd haskell
-    stack build --test
+    stack install --test
     cd ../
 }
 
@@ -23,7 +23,7 @@ function build_c() {
     cd ../
 }
 
-if [ "$TESTENV" == "stack" ]; then
+if [ "$TESTENV" == "stack" ] || [ "$TESTENV" == "stack-windows" ]; then
   build_haskell
 else
   build_c
