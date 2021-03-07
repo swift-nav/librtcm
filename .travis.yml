@@ -16,9 +16,12 @@ matrix:
             - g++-6
       env: GCCVER=6 TESTENV=c
     - os: linux
-      env: TESTENV=stack
+      env: TESTENV=stack-linux
     - os: windows
       env: TESTENV=stack-windows
+    - os: osx
+      osx_image: xcode10.3
+      env: TESTENV=stack-osx
 
 cache:
   apt: true
@@ -27,11 +30,18 @@ cache:
 
 before_install:
   # Install stack
-  - if [[ "$TESTENV" == "stack" ]]; then
+  - if [[ "$TESTENV" == "stack-linux" ]]; then
       mkdir -p $HOME/.local/bin $HOME/.local/include $HOME/.local/lib;
       export PATH=~/.local/bin:$PATH;
-      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.local/lib;
-      travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack';
+      export LD_LIBRARY_PATH=$HOME/.local/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH};
+      travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 \
+        | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack';
+    fi
+  - if [[ "$TESTENV" == "stack-osx" ]]; then
+      mkdir -p $HOME/.local/bin $HOME/.local/include $HOME/.local/lib;
+      export PATH=~/.local/bin:$PATH;
+      export DYLD_LIBRARY_PATH=$HOME/.local/lib${DYLD_LIBRARY_PATH:+:$DYLD_LIBRARY_PATH};
+      brew install haskell-stack;
     fi
   - if [[ "$TESTENV" == "c" ]]; then
       export CC=gcc-$GCCVER;
@@ -48,7 +58,7 @@ before_install:
 script:
   - bash ./travis.sh
 
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
+  - if [[ "$TESTENV" == "stack-windows" ]] && [[ "$TRAVIS_OS_NAME" == "windows" ]]; then
       cp $HOME/AppData/Roaming/local/bin/json2rtcm3.exe .;
       cp $HOME/AppData/Roaming/local/bin/rtcm32json.exe .;
       7z a -tzip librtcm_windows.zip json2rtcm3.exe rtcm32json.exe;
@@ -57,7 +67,7 @@ script:
       ls -l;
     fi
 
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+  - if [[ "$TESTENV" == "stack-osx" ]] && [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       cp ~/.local/bin/json2rtcm3 .;
       cp ~/.local/bin/rtcm32json .;
       tar -czf librtcm_macos.tar.gz json2rtcm3 rtcm32json;
@@ -66,7 +76,7 @@ script:
       ls -l;
     fi
 
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+  - if [[ "$TESTENV" == "stack-linux" ]] && [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       cp ~/.local/bin/json2rtcm3 .;
       cp ~/.local/bin/rtcm32json .;
       tar -czf librtcm_linux.tar.gz json2rtcm3 rtcm32json;

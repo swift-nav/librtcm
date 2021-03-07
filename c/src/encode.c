@@ -1099,6 +1099,13 @@ static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
   double cnr[num_cells];
   double fine_range_rate_m_s[num_cells];
   flag_bf flags[num_cells];
+
+  memset(fine_pr_ms, 0, sizeof(fine_pr_ms));
+  memset(fine_cp_ms, 0, sizeof(fine_cp_ms));
+  memset(lock_time, 0, sizeof(lock_time));
+  memset(hca_indicator, 0, sizeof(hca_indicator));
+  memset(cnr, 0, sizeof(cnr));
+  memset(fine_range_rate_m_s, 0, sizeof(fine_range_rate_m_s));
   memset(flags, 0, sizeof(flags));
 
   uint8_t i = 0;

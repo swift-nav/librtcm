@@ -23,7 +23,7 @@ function build_c() {
     cd ../
 }
 
-if [ "$TESTENV" == "stack" ] || [ "$TESTENV" == "stack-windows" ]; then
+if [ "$TESTENV" == "stack-osx" ] || [ "$TESTENV" == "stack-windows" ] || [ "$TESTENV" == "stack-linux" ]; then
   build_haskell
 else
   build_c

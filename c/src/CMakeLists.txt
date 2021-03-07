@@ -27,38 +27,13 @@ add_library(rtcm
   bits.c
   logging.c
   )
+swift_set_language_standards(rtcm)
+swift_set_compile_options(rtcm REMOVE -Wconversion -Wstack-protector)
 
 target_include_directories(rtcm PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 if (NOT CMAKE_C_COMPILER_ID MATCHES "ARMCC")
   target_link_libraries(rtcm m)
-endif()
-
-if (CMAKE_C_COMPILER_ID MATCHES "GNU" OR
-    CMAKE_C_COMPILER_ID MATCHES "Clang")
-  target_compile_options(rtcm PRIVATE "-Wall")
-  target_compile_options(rtcm PRIVATE "-Wextra")
-  target_compile_options(rtcm PRIVATE "-Werror")
-  target_compile_options(rtcm PRIVATE "-Wimplicit")
-  target_compile_options(rtcm PRIVATE "-Wshadow")
-  target_compile_options(rtcm PRIVATE "-Wswitch-default")
-  target_compile_options(rtcm PRIVATE "-Wswitch-enum")
-  target_compile_options(rtcm PRIVATE "-Wundef")
-  target_compile_options(rtcm PRIVATE "-Wuninitialized")
-  target_compile_options(rtcm PRIVATE "-Wpointer-arith")
-  target_compile_options(rtcm PRIVATE "-Wcast-align")
-  target_compile_options(rtcm PRIVATE "-Wformat=2")
-  target_compile_options(rtcm PRIVATE "-Wimplicit-function-declaration")
-  target_compile_options(rtcm PRIVATE "-Wredundant-decls")
-  target_compile_options(rtcm PRIVATE "-Wformat-security")
-  target_compile_options(rtcm PRIVATE "-fno-unwind-tables")
-  target_compile_options(rtcm PRIVATE "-fno-asynchronous-unwind-tables")
-  target_compile_options(rtcm PRIVATE "-std=gnu99")
-  target_compile_options(rtcm PRIVATE "-fPIC")
-  # require at least gcc 5.0
-  if (NOT CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_C_COMPILER_VERSION VERSION_GREATER 5.0)
-     target_compile_options(rtcm PRIVATE "-Wfloat-conversion")
-  endif()
 endif()
 
 install(TARGETS rtcm DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})

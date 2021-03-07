@@ -91,7 +91,7 @@ rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   msg_eph->kepler.L2_data_bit = rtcm_getbitu(buff, bit, 1);
   bit += 1;
   msg_eph->fit_interval = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
+  bit += 1;  // NOLINT
 
   return RC_OK;
 }
@@ -170,7 +170,7 @@ rtcm3_rc rtcm3_decode_qzss_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   msg_eph->kepler.iodc = rtcm_getbitu(buff, bit, 10);
   bit += 10;
   msg_eph->fit_interval = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
+  bit += 1;  // NOLINT
   return RC_OK;
 }
 
@@ -267,7 +267,7 @@ rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
     mln5 = rtcm_getbitu(buff, bit, 1);
     bit += 1;
     /* reserved */ rtcm_getbitu(buff, bit, 7);
-    bit += 7;
+    bit += 7;  // NOLINT
   }
   msg_eph->health_bits = bn_msb | mln3 | mln5;
   return RC_OK;
@@ -350,7 +350,7 @@ rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph) {
   msg_eph->kepler.tgd_bds_s[1] = rtcm_getbits(buff, bit, 10);
   bit += 10;
   msg_eph->health_bits = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
+  bit += 1;  // NOLINT
   return RC_OK;
 }
 
@@ -443,7 +443,7 @@ rtcm3_rc rtcm3_decode_gal_eph_inav(const uint8_t buff[],
   msg_eph->health_bits = rtcm_getbits(buff, bit, 6);
   bit += 6;
   /* reserved */ rtcm_getbits(buff, bit, 2);
-  bit += 2;
+  bit += 2;  // NOLINT
 
   return RC_OK;
 }
@@ -475,7 +475,7 @@ rtcm3_rc rtcm3_decode_gal_eph_fnav(const uint8_t buff[],
   msg_eph->health_bits = rtcm_getbits(buff, bit, 3);
   bit += 3;
   /* reserved */ rtcm_getbits(buff, bit, 7);
-  bit += 7;
+  bit += 7;  // NOLINT
 
   return RC_OK;
 }

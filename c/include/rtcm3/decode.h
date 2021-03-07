@@ -38,6 +38,7 @@ rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[], rtcm_msm_message *msg);
 rtcm3_rc rtcm3_decode_msm7(const uint8_t buff[], rtcm_msm_message *msg);
 rtcm3_rc rtcm3_decode_4062(const uint8_t buff[],
                            rtcm_msg_swift_proprietary *msg);
+rtcm3_rc rtcm3_decode_4075(const uint8_t buff[], rtcm_msg_ndf *msg);
 
 double rtcm3_decode_lock_time(uint8_t lock);
 

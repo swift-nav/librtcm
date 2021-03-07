@@ -47,6 +47,10 @@
 /* maximum value for antenna height DF028 */
 #define RTCM_1006_MAX_ANTENNA_HEIGHT_M 6.5535
 
+#define MAX_NDF_FRAMES 63
+#define MAX_NDF_FRAME_SIZE_BITS 4096 /* max uint12 */
+#define MAX_NDF_FRAME_SIZE_WORDS (MAX_NDF_FRAME_SIZE_BITS / (8 * 4))
+
 /** 2^-4 */
 #define C_1_2P4 0.0625
 /** 2^-8 */

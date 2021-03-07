@@ -374,4 +374,35 @@ typedef struct {
   uint8_t data[255];
 } rtcm_msg_swift_proprietary;
 
+#define NDF_SYS_GPS 0
+#define NDF_SYS_GLO 1
+#define NDF_SYS_GAL 2
+#define NDF_SYS_SBAS 3
+#define NDF_SYS_QZS 4
+#define NDF_SYS_BDS 5
+
+typedef struct {
+  uint8_t sat_sys;      /* Satellite System uint8 4 */
+  uint8_t sat_num;      /* Satellite Number uint8 6 */
+                        /* index from MSM satellite mask bit field, see DF394 */
+  uint8_t ext_sat_info; /* Extended Satellite Information uint8 4 */
+                        /* Frequency Number + 7 for GLONASS */
+  uint8_t sig_type;     /* Signal Type uint8 5 */
+                        /* index from MSM signal mask bit field, see DF395 */
+  uint32_t epoch_time;  /* Epoch Time uint32 30 */
+  /* in milliseconds, equal to MSM */
+  bool continuous_tracking;      /* Continuous Tracking bool 1 */
+  uint16_t frame_data_size_bits; /* Frame Data Size in bits uint16 12 */
+  uint32_t frame_data[MAX_NDF_FRAME_SIZE_WORDS]; /* Frame Data uint32 */
+} rtcm_ndf_frame;
+
+/* Navigation Data Frame: encodes raw navigation data bits */
+/* TODO add reference to def */
+typedef struct {
+  uint16_t msg_type;   /* Msg Num DF002 uint16 12 */
+  uint16_t stn_id;     /* Reference Station ID uint16 12 */
+  uint8_t frame_count; /* Frame Count uint8 6 */
+  rtcm_ndf_frame frames[MAX_NDF_FRAMES];
+} rtcm_msg_ndf;
+
 #endif /* SWIFTNAV_RTCM3_MESSAGES_H */

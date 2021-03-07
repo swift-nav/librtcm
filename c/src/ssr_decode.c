@@ -194,8 +194,19 @@ static rtcm3_rc decode_ssr_orbit(const uint8_t buff[],
 
   orbit->iode = rtcm_getbitu(buff, *bit, number_of_bits_for_iode);
   *bit += number_of_bits_for_iode;
-  if (constellation == RTCM_CONSTELLATION_BDS ||
-      constellation == RTCM_CONSTELLATION_SBAS) {
+  // In ssr_1_gal_qzss_sbas_bds_v08u.pdf there are two IODE fields for BDS.
+  // The first one is a 10 bit "BDS toe Modulo" "toe modulo 8192" which we put
+  // into orbit->iode above. The second one is "BDS IOD" "IOD=mod(toe/720,240)"
+  // which is the definition starling expects in orbit->iode so we overwrite
+  // the previous value below.
+  if (constellation == RTCM_CONSTELLATION_BDS) {
+    orbit->iode = rtcm_getbitu(buff, *bit, 8);
+    *bit += 8;
+    // In ssr_1_gal_qzss_sbas_bds_v08u.pdf there are two IODE fields for SBAS.
+    // The first one is a 9 bit "SBAS t0 Modulo" "toe modulo 8192" which we put
+    // into orbit->iode above. The second one is "SBAS IOD CRC"
+    // "IOD=mod(toe/720,240)" which is put into orbit->iodcrc below.
+  } else if (constellation == RTCM_CONSTELLATION_SBAS) {
     orbit->iodcrc = rtcm_getbitu(buff, *bit, 24);
     *bit += 24;
   }

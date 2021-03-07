@@ -299,7 +299,8 @@ static void rtcm3_encode_gal_eph_common(const rtcm_msg_eph *msg_eph,
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  */
-uint16_t rtcm3_encode_gal_eph_inav(const rtcm_msg_eph *msg_eph, uint8_t buff[]) {
+uint16_t rtcm3_encode_gal_eph_inav(const rtcm_msg_eph *msg_eph,
+                                   uint8_t buff[]) {
   assert(msg_eph);
 
   uint16_t bit = 0;
@@ -345,7 +346,7 @@ uint16_t rtcm3_encode_gal_eph_fnav(const rtcm_msg_eph *msg_eph,
   bit += 10;
   rtcm_setbits(buff, bit, 3, msg_eph->health_bits);
   bit += 3;
-  /* reserved */ 
+  /* reserved */
   rtcm_setbits(buff, bit, 7, 0);
   bit += 7;
 

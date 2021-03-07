@@ -945,7 +945,7 @@ rtcm3_rc rtcm3_decode_1230(const uint8_t buff[], rtcm_msg_1230 *msg_1230) {
   }
   if (msg_1230->fdma_signal_mask & 0x01) {
     msg_1230->L2_P_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
-    bit += 16;
+    bit += 16;  // NOLINT
   } else {
     msg_1230->L2_P_cpb_meter = 0.0;
   }
@@ -1229,6 +1229,14 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
   double fine_range_rate_m_s[num_cells];
   flag_bf flags[num_cells];
 
+  memset(fine_pr_ms, 0, sizeof(fine_pr_ms));
+  memset(fine_cp_ms, 0, sizeof(fine_cp_ms));
+  memset(lock_time, 0, sizeof(lock_time));
+  memset(hca_indicator, 0, sizeof(hca_indicator));
+  memset(cnr, 0, sizeof(cnr));
+  memset(fine_range_rate_m_s, 0, sizeof(fine_range_rate_m_s));
+  memset(flags, 0, sizeof(flags));
+
   for (uint8_t i = 0; i < num_cells; i++) {
     flags[i].data = 0;
   }
@@ -1401,6 +1409,82 @@ rtcm3_rc rtcm3_decode_4062(const uint8_t buff[],
   for (uint8_t i = 0; i < msg->len; ++i) {
     msg->data[i] = rtcm_getbitu(buff, bit, 8);
     bit += 8;
+  }
+
+  return RC_OK;
+}
+
+/** Decode Navigation Data Frame
+ *
+ * \param buff The input data buffer
+ * \param msg  message struct
+ * \return  - RC_OK : Success
+ *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
+ *          - RC_INVALID_MESSAGE : Nonzero reserved bits (invalid format)
+ */
+rtcm3_rc rtcm3_decode_4075(const uint8_t buff[], rtcm_msg_ndf *msg) {
+  assert(msg);
+  uint16_t bit = 0;
+  msg->msg_type = rtcm_getbitu(buff, bit, 12);
+  bit += 12;
+
+  if (msg->msg_type != 4075) { /* Unexpected message type. */
+    return RC_MESSAGE_TYPE_MISMATCH;
+  }
+
+  msg->stn_id = rtcm_getbitu(buff, bit, 12);
+  bit += 12;
+
+  uint8_t reserved_bits = rtcm_getbitu(buff, bit, 2);
+  bit += 2;
+
+  /* These bits are reserved for future use, if they aren't 0 it must be a
+     new format we don't know how to handle. */
+  if (reserved_bits != 0) {
+    return RC_INVALID_MESSAGE;
+  }
+
+  msg->frame_count = rtcm_getbitu(buff, bit, 6);
+  bit += 6;
+
+  if (msg->frame_count > MAX_NDF_FRAMES) {
+    return RC_INVALID_MESSAGE;
+  }
+
+  for (uint8_t i = 0; i < msg->frame_count; i++) {
+    msg->frames[i].sat_sys = rtcm_getbitu(buff, bit, 4);
+    bit += 4;
+
+    msg->frames[i].sat_num = rtcm_getbitu(buff, bit, 6);
+    bit += 6;
+
+    msg->frames[i].ext_sat_info = rtcm_getbitu(buff, bit, 4);
+    bit += 4;
+
+    msg->frames[i].sig_type = rtcm_getbitu(buff, bit, 5);
+    bit += 5;
+
+    msg->frames[i].epoch_time = rtcm_getbitu(buff, bit, 30);
+    bit += 30;
+
+    msg->frames[i].continuous_tracking = rtcm_getbitu(buff, bit, 1);
+    bit += 1;
+
+    msg->frames[i].frame_data_size_bits = rtcm_getbitu(buff, bit, 12);
+    bit += 12;
+
+    uint16_t remaining_bits = msg->frames[i].frame_data_size_bits;
+    if (remaining_bits > MAX_NDF_FRAME_SIZE_BITS) {
+      return RC_INVALID_MESSAGE;
+    }
+
+    uint16_t j = 0;
+    while (remaining_bits > 0) {
+      uint32_t next_bits = remaining_bits < 32 ? remaining_bits : 32;
+      msg->frames[i].frame_data[j++] = rtcm_getbitu(buff, bit, next_bits);
+      bit += next_bits;
+      remaining_bits -= next_bits;
+    }
   }
 
   return RC_OK;

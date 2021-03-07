@@ -6,6 +6,9 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" "${CMAKE_CURRENT_LIST_DI
 include(GNUInstallDirs)
 include(CCache)
 include(SwiftCmakeOptions)
+include(LanguageStandards)
+include(CompileOptions)
+
 swift_create_project_options(
     HAS_TESTS
     )
