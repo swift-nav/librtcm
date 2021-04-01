@@ -21,6 +21,8 @@ swift_setup_clang_tidy(PATTERNS "src/*.c")
 
 include(TestTargets)
 
+find_package(Swiftnav REQUIRED)
+
 add_subdirectory (src)
 
 if(librtcm_BUILD_TESTS)

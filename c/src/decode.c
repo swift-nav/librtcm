@@ -18,9 +18,10 @@
 #include <string.h>
 
 #include "rtcm3/bits.h"
-#include "rtcm3/decode_macros.h"
 #include "rtcm3/eph_decode.h"
 #include "rtcm3/msm_utils.h"
+
+#include "decode_helpers.h"
 
 static void init_sat_data(rtcm_sat_data *sat_data) {
   for (uint8_t freq = 0; freq < NUM_FREQS; ++freq) {
@@ -134,94 +135,71 @@ static uint32_t from_msm_lock_ind_ext(uint16_t lock) {
   return 67108864;
 }
 
-static void decode_basic_gps_l1_freq_data(const uint8_t buff[],
-                                          uint16_t *bit,
+static rtcm3_rc decode_basic_gps_l1_freq_data(swiftnav_bitstream_t *buff,
+                                              rtcm_freq_data *freq_data,
+                                              uint32_t *pr,
+                                              int32_t *phr_pr_diff) {
+  BITSTREAM_DECODE_U8(buff, freq_data->code, 1);
+  BITSTREAM_DECODE_U32(buff, *pr, 24);
+  BITSTREAM_DECODE_S32(buff, *phr_pr_diff, 20);
+
+  uint8_t lock_ind;
+  BITSTREAM_DECODE_U8(buff, lock_ind, 7);
+  freq_data->lock = from_lock_ind(lock_ind);
+  return RC_OK;
+}
+
+static rtcm3_rc decode_basic_glo_l1_freq_data(swiftnav_bitstream_t *buff,
+                                              rtcm_freq_data *freq_data,
+                                              uint32_t *pr,
+                                              int32_t *phr_pr_diff,
+                                              uint8_t *fcn) {
+  BITSTREAM_DECODE_U8(buff, freq_data->code, 1);
+  BITSTREAM_DECODE_U8(buff, *fcn, 5);
+  BITSTREAM_DECODE_U32(buff, *pr, 25);
+  BITSTREAM_DECODE_S32(buff, *phr_pr_diff, 20);
+  uint8_t lock_ind;
+  BITSTREAM_DECODE_U8(buff, lock_ind, 7);
+  freq_data->lock = from_lock_ind(lock_ind);
+  return RC_OK;
+}
+
+static rtcm3_rc decode_basic_l2_freq_data(swiftnav_bitstream_t *buff,
                                           rtcm_freq_data *freq_data,
-                                          uint32_t *pr,
+                                          int32_t *pr,
                                           int32_t *phr_pr_diff) {
-  freq_data->code = rtcm_getbitu(buff, *bit, 1);
-  *bit += 1;
-  *pr = rtcm_getbitu(buff, *bit, 24);
-  *bit += 24;
-  *phr_pr_diff = rtcm_getbits(buff, *bit, 20);
-  *bit += 20;
+  BITSTREAM_DECODE_U8(buff, freq_data->code, 2);
+  BITSTREAM_DECODE_S32(buff, *pr, 14);
+  BITSTREAM_DECODE_S32(buff, *phr_pr_diff, 20);
 
-  freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
-  *bit += 7;
+  uint32_t lock_ind;
+  BITSTREAM_DECODE_U32(buff, lock_ind, 7);
+  freq_data->lock = from_lock_ind(lock_ind);
+  return RC_OK;
 }
 
-static void decode_basic_glo_l1_freq_data(const uint8_t buff[],
-                                          uint16_t *bit,
-                                          rtcm_freq_data *freq_data,
-                                          uint32_t *pr,
-                                          int32_t *phr_pr_diff,
-                                          uint8_t *fcn) {
-  freq_data->code = rtcm_getbitu(buff, *bit, 1);
-  *bit += 1;
-  *fcn = rtcm_getbitu(buff, *bit, 5);
-  *bit += 5;
-  *pr = rtcm_getbitu(buff, *bit, 25);
-  *bit += 25;
-  *phr_pr_diff = rtcm_getbits(buff, *bit, 20);
-  *bit += 20;
-  freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
-  *bit += 7;
-}
-
-static void decode_basic_l2_freq_data(const uint8_t buff[],
-                                      uint16_t *bit,
-                                      rtcm_freq_data *freq_data,
-                                      int32_t *pr,
-                                      int32_t *phr_pr_diff) {
-  freq_data->code = rtcm_getbitu(buff, *bit, 2);
-  *bit += 2;
-  *pr = rtcm_getbits(buff, *bit, 14);
-  *bit += 14;
-  *phr_pr_diff = rtcm_getbits(buff, *bit, 20);
-  *bit += 20;
-
-  freq_data->lock = from_lock_ind(rtcm_getbitu(buff, *bit, 7));
-  *bit += 7;
-}
-
-static uint16_t rtcm3_read_header(const uint8_t buff[],
+static rtcm3_rc rtcm3_read_header(swiftnav_bitstream_t *buff,
                                   rtcm_obs_header *header) {
-  uint16_t bit = 0;
-  header->msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
-  header->stn_id = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
-  header->tow_ms = rtcm_getbitu(buff, bit, 30);
-  bit += 30;
-  header->sync = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
-  header->n_sat = rtcm_getbitu(buff, bit, 5);
-  bit += 5;
-  header->div_free = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
-  header->smooth = rtcm_getbitu(buff, bit, 3);
-  bit += 3;
-  return bit;
+  BITSTREAM_DECODE_U16(buff, header->msg_num, 12);
+  BITSTREAM_DECODE_U16(buff, header->stn_id, 12);
+  BITSTREAM_DECODE_U32(buff, header->tow_ms, 30);
+  BITSTREAM_DECODE_U8(buff, header->sync, 1);
+  BITSTREAM_DECODE_U8(buff, header->n_sat, 5);
+  BITSTREAM_DECODE_U8(buff, header->div_free, 1);
+  BITSTREAM_DECODE_U8(buff, header->smooth, 3);
+  return RC_OK;
 }
 
-static uint16_t rtcm3_read_glo_header(const uint8_t buff[],
+static rtcm3_rc rtcm3_read_glo_header(swiftnav_bitstream_t *buff,
                                       rtcm_obs_header *header) {
-  uint16_t bit = 0;
-  header->msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
-  header->stn_id = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
-  header->tow_ms = rtcm_getbitu(buff, bit, 27);
-  bit += 27;
-  header->sync = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
-  header->n_sat = rtcm_getbitu(buff, bit, 5);
-  bit += 5;
-  header->div_free = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
-  header->smooth = rtcm_getbitu(buff, bit, 3);
-  bit += 3;
-  return bit;
+  BITSTREAM_DECODE_U16(buff, header->msg_num, 12);
+  BITSTREAM_DECODE_U16(buff, header->stn_id, 12);
+  BITSTREAM_DECODE_U32(buff, header->tow_ms, 27);
+  BITSTREAM_DECODE_U8(buff, header->sync, 1);
+  BITSTREAM_DECODE_U8(buff, header->n_sat, 5);
+  BITSTREAM_DECODE_U8(buff, header->div_free, 1);
+  BITSTREAM_DECODE_U8(buff, header->smooth, 3);
+  return RC_OK;
 }
 
 /* unwrap underflowed uint30 value to a wrapped tow_ms value */
@@ -233,52 +211,38 @@ static uint32_t normalize_bds2_tow(const uint32_t tow_ms) {
   return tow_ms;
 }
 
-static uint16_t rtcm3_read_msm_header(const uint8_t buff[],
+static rtcm3_rc rtcm3_read_msm_header(swiftnav_bitstream_t *buff,
                                       const rtcm_constellation_t cons,
                                       rtcm_msm_header *header) {
-  uint16_t bit = 0;
-  header->msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
-  header->stn_id = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  BITSTREAM_DECODE_U16(buff, header->stn_id, 12);
   if (RTCM_CONSTELLATION_GLO == cons) {
     /* skip the day of week, it is handled in gnss_converters */
-    bit += 3;
+    swiftnav_bitstream_remove(buff, 3);
     /* for GLONASS, the epoch time is the time of day in ms */
-    header->tow_ms = rtcm_getbitu(buff, bit, 27);
-    bit += 27;
+    BITSTREAM_DECODE_U32(buff, header->tow_ms, 27);
   } else if (RTCM_CONSTELLATION_BDS == cons) {
     /* Beidou time can be negative (at least for some Septentrio base stations),
      * so normalize it first */
-    header->tow_ms = normalize_bds2_tow(rtcm_getbitu(buff, bit, 30));
-    bit += 30;
+    uint32_t bds2_tow;
+    BITSTREAM_DECODE_U32(buff, bds2_tow, 30);
+    header->tow_ms = normalize_bds2_tow(bds2_tow);
   } else {
     /* for other systems, epoch time is the time of week in ms */
-    header->tow_ms = rtcm_getbitu(buff, bit, 30);
-    bit += 30;
+    BITSTREAM_DECODE_U32(buff, header->tow_ms, 30);
   }
-  header->multiple = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
-  header->iods = rtcm_getbitu(buff, bit, 3);
-  bit += 3;
-  header->reserved = rtcm_getbitu(buff, bit, 7);
-  bit += 7;
-  header->steering = rtcm_getbitu(buff, bit, 2);
-  bit += 2;
-  header->ext_clock = rtcm_getbitu(buff, bit, 2);
-  bit += 2;
-  header->div_free = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
-  header->smooth = rtcm_getbitu(buff, bit, 3);
-  bit += 3;
+  BITSTREAM_DECODE_U8(buff, header->multiple, 1);
+  BITSTREAM_DECODE_U8(buff, header->iods, 3);
+  BITSTREAM_DECODE_U8(buff, header->reserved, 7);
+  BITSTREAM_DECODE_U8(buff, header->steering, 2);
+  BITSTREAM_DECODE_U8(buff, header->ext_clock, 2);
+  BITSTREAM_DECODE_U8(buff, header->div_free, 1);
+  BITSTREAM_DECODE_U8(buff, header->smooth, 3);
 
   for (uint8_t i = 0; i < MSM_SATELLITE_MASK_SIZE; i++) {
-    header->satellite_mask[i] = rtcm_getbitu(buff, bit, 1);
-    bit++;
+    BITSTREAM_DECODE_BOOL(buff, header->satellite_mask[i], 1);
   }
   for (uint8_t i = 0; i < MSM_SIGNAL_MASK_SIZE; i++) {
-    header->signal_mask[i] = rtcm_getbitu(buff, bit, 1);
-    bit++;
+    BITSTREAM_DECODE_BOOL(buff, header->signal_mask[i], 1);
   }
   uint8_t num_sats =
       count_mask_values(MSM_SATELLITE_MASK_SIZE, header->satellite_mask);
@@ -287,10 +251,9 @@ static uint16_t rtcm3_read_msm_header(const uint8_t buff[],
   uint8_t cell_mask_size = num_sats * num_sigs;
 
   for (uint8_t i = 0; i < cell_mask_size; i++) {
-    header->cell_mask[i] = rtcm_getbitu(buff, bit, 1);
-    bit++;
+    BITSTREAM_DECODE_BOOL(buff, header->cell_mask[i], 1);
   }
-  return bit;
+  return RC_OK;
 }
 
 static uint8_t construct_L1_code(rtcm_freq_data *l1_freq_data,
@@ -336,16 +299,16 @@ static uint8_t construct_L2_phase(rtcm_freq_data *l2_freq_data,
   return 0;
 }
 
-static uint8_t get_cnr(rtcm_freq_data *freq_data,
-                       const uint8_t buff[],
-                       uint16_t *bit) {
-  uint8_t cnr = rtcm_getbitu(buff, *bit, 8);
-  *bit += 8;
+static rtcm3_rc get_cnr(rtcm_freq_data *freq_data, swiftnav_bitstream_t *buff) {
+  uint32_t cnr;
+  BITSTREAM_DECODE_U32(buff, cnr, 8);
   if (cnr == 0) {
-    return 0;
+    freq_data->flags.valid_cnr = 0;
+    return RC_OK;
   }
   freq_data->cnr = 0.25 * cnr;
-  return 1;
+  freq_data->flags.valid_cnr = 1;
+  return RC_OK;
 }
 
 /** Decode an RTCMv3 message type 1001 (L1-Only GPS RTK Observables)
@@ -356,10 +319,13 @@ static uint8_t get_cnr(rtcm_freq_data *freq_data,
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
-rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001) {
+rtcm3_rc rtcm3_decode_1001_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_obs_message *msg_1001) {
   assert(msg_1001);
-  uint16_t bit = 0;
-  bit += rtcm3_read_header(buff, &msg_1001->header);
+  rtcm3_rc ret = rtcm3_read_header(buff, &msg_1001->header);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   if (msg_1001->header.msg_num != 1001) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
@@ -372,15 +338,17 @@ rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001) {
   for (uint8_t i = 0; i < msg_1001->header.n_sat; i++) {
     init_sat_data(&msg_1001->sats[i]);
 
-    msg_1001->sats[i].svId = rtcm_getbitu(buff, bit, 6);
-    bit += 6;
+    BITSTREAM_DECODE_U8(buff, msg_1001->sats[i].svId, 6);
 
     rtcm_freq_data *l1_freq_data = &msg_1001->sats[i].obs[L1_FREQ];
 
     uint32_t l1_pr;
     int32_t phr_pr_diff;
-    decode_basic_gps_l1_freq_data(
-        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff);
+    ret =
+        decode_basic_gps_l1_freq_data(buff, l1_freq_data, &l1_pr, &phr_pr_diff);
+    if (ret != RC_OK) {
+      return ret;
+    }
 
     l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, 0);
     l1_freq_data->flags.valid_cp =
@@ -399,10 +367,13 @@ rtcm3_rc rtcm3_decode_1001(const uint8_t buff[], rtcm_obs_message *msg_1001) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
-rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
+rtcm3_rc rtcm3_decode_1002_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_obs_message *msg_1002) {
   assert(msg_1002);
-  uint16_t bit = 0;
-  bit += rtcm3_read_header(buff, &msg_1002->header);
+  rtcm3_rc ret = rtcm3_read_header(buff, &msg_1002->header);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   if (msg_1002->header.msg_num != 1002) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
@@ -415,19 +386,24 @@ rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
   for (uint8_t i = 0; i < msg_1002->header.n_sat; i++) {
     init_sat_data(&msg_1002->sats[i]);
 
-    msg_1002->sats[i].svId = rtcm_getbitu(buff, bit, 6);
-    bit += 6;
+    BITSTREAM_DECODE_U8(buff, msg_1002->sats[i].svId, 6);
 
     rtcm_freq_data *l1_freq_data = &msg_1002->sats[i].obs[L1_FREQ];
 
     uint32_t l1_pr;
     int32_t phr_pr_diff;
-    decode_basic_gps_l1_freq_data(
-        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff);
+    ret =
+        decode_basic_gps_l1_freq_data(buff, l1_freq_data, &l1_pr, &phr_pr_diff);
+    if (ret != RC_OK) {
+      return ret;
+    }
 
-    uint8_t amb = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
-    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
+    uint8_t amb;
+    BITSTREAM_DECODE_U8(buff, amb, 8);
+    ret = get_cnr(l1_freq_data, buff);
+    if (ret != RC_OK) {
+      return ret;
+    }
     l1_freq_data->flags.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
     l1_freq_data->flags.valid_cp =
@@ -446,10 +422,13 @@ rtcm3_rc rtcm3_decode_1002(const uint8_t buff[], rtcm_obs_message *msg_1002) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
-rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
+rtcm3_rc rtcm3_decode_1003_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_obs_message *msg_1003) {
   assert(msg_1003);
-  uint16_t bit = 0;
-  bit += rtcm3_read_header(buff, &msg_1003->header);
+  rtcm3_rc ret = rtcm3_read_header(buff, &msg_1003->header);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   if (msg_1003->header.msg_num != 1003) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
@@ -462,16 +441,18 @@ rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
   for (uint8_t i = 0; i < msg_1003->header.n_sat; i++) {
     init_sat_data(&msg_1003->sats[i]);
 
-    msg_1003->sats[i].svId = rtcm_getbitu(buff, bit, 6);
-    bit += 6;
+    BITSTREAM_DECODE_U8(buff, msg_1003->sats[i].svId, 6);
 
     rtcm_freq_data *l1_freq_data = &msg_1003->sats[i].obs[L1_FREQ];
 
     uint32_t l1_pr;
     int32_t l2_pr;
     int32_t phr_pr_diff;
-    decode_basic_gps_l1_freq_data(
-        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff);
+    ret =
+        decode_basic_gps_l1_freq_data(buff, l1_freq_data, &l1_pr, &phr_pr_diff);
+    if (ret != RC_OK) {
+      return ret;
+    }
 
     l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, 0);
     l1_freq_data->flags.valid_cp =
@@ -480,7 +461,10 @@ rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
 
     rtcm_freq_data *l2_freq_data = &msg_1003->sats[i].obs[L2_FREQ];
 
-    decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr, &phr_pr_diff);
+    ret = decode_basic_l2_freq_data(buff, l2_freq_data, &l2_pr, &phr_pr_diff);
+    if (ret != RC_OK) {
+      return ret;
+    }
 
     l2_freq_data->flags.valid_pr =
         construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
@@ -500,10 +484,13 @@ rtcm3_rc rtcm3_decode_1003(const uint8_t buff[], rtcm_obs_message *msg_1003) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
-rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
+rtcm3_rc rtcm3_decode_1004_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_obs_message *msg_1004) {
   assert(msg_1004);
-  uint16_t bit = 0;
-  bit += rtcm3_read_header(buff, &msg_1004->header);
+  rtcm3_rc ret = rtcm3_read_header(buff, &msg_1004->header);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   if (msg_1004->header.msg_num != 1004) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
@@ -516,21 +503,26 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
   for (uint8_t i = 0; i < msg_1004->header.n_sat; i++) {
     init_sat_data(&msg_1004->sats[i]);
 
-    msg_1004->sats[i].svId = rtcm_getbitu(buff, bit, 6);
-    bit += 6;
+    BITSTREAM_DECODE_U8(buff, msg_1004->sats[i].svId, 6);
 
     rtcm_freq_data *l1_freq_data = &msg_1004->sats[i].obs[L1_FREQ];
 
     uint32_t l1_pr;
     int32_t l2_pr;
     int32_t phr_pr_diff;
-    decode_basic_gps_l1_freq_data(
-        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff);
+    ret =
+        decode_basic_gps_l1_freq_data(buff, l1_freq_data, &l1_pr, &phr_pr_diff);
+    if (ret != RC_OK) {
+      return ret;
+    }
 
-    uint8_t amb = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
+    uint32_t amb;
+    BITSTREAM_DECODE_U32(buff, amb, 8);
 
-    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
+    ret = get_cnr(l1_freq_data, buff);
+    if (ret != RC_OK) {
+      return ret;
+    }
     l1_freq_data->flags.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
     l1_freq_data->flags.valid_cp =
@@ -539,9 +531,15 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
 
     rtcm_freq_data *l2_freq_data = &msg_1004->sats[i].obs[L2_FREQ];
 
-    decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr, &phr_pr_diff);
+    ret = decode_basic_l2_freq_data(buff, l2_freq_data, &l2_pr, &phr_pr_diff);
+    if (ret != RC_OK) {
+      return ret;
+    }
 
-    l2_freq_data->flags.valid_cnr = get_cnr(l2_freq_data, buff, &bit);
+    ret = get_cnr(l2_freq_data, buff);
+    if (ret != RC_OK) {
+      return ret;
+    }
     l2_freq_data->flags.valid_pr =
         construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
     l2_freq_data->flags.valid_cp =
@@ -552,33 +550,24 @@ rtcm3_rc rtcm3_decode_1004(const uint8_t buff[], rtcm_obs_message *msg_1004) {
   return RC_OK;
 }
 
-static rtcm3_rc rtcm3_decode_1005_base(const uint8_t buff[],
-                                       rtcm_msg_1005 *msg_1005,
-                                       uint16_t *bit) {
-  msg_1005->stn_id = rtcm_getbitu(buff, *bit, 12);
-  *bit += 12;
-  msg_1005->ITRF = rtcm_getbitu(buff, *bit, 6);
-  *bit += 6;
-  msg_1005->GPS_ind = rtcm_getbitu(buff, *bit, 1);
-  *bit += 1;
-  msg_1005->GLO_ind = rtcm_getbitu(buff, *bit, 1);
-  *bit += 1;
-  msg_1005->GAL_ind = rtcm_getbitu(buff, *bit, 1);
-  *bit += 1;
-  msg_1005->ref_stn_ind = rtcm_getbitu(buff, *bit, 1);
-  *bit += 1;
-  msg_1005->arp_x = (double)(rtcm_getbitsl(buff, *bit, 38)) / 10000.0;
-  *bit += 38;
-  msg_1005->osc_ind = rtcm_getbitu(buff, *bit, 1);
-  *bit += 1;
-  rtcm_getbitu(buff, *bit, 1);
-  *bit += 1;
-  msg_1005->arp_y = (double)(rtcm_getbitsl(buff, *bit, 38)) / 10000.0;
-  *bit += 38;
-  msg_1005->quart_cycle_ind = rtcm_getbitu(buff, *bit, 2);
-  *bit += 2;
-  msg_1005->arp_z = (double)(rtcm_getbitsl(buff, *bit, 38)) / 10000.0;
-  *bit += 38;
+static rtcm3_rc rtcm3_decode_1005_base(swiftnav_bitstream_t *buff,
+                                       rtcm_msg_1005 *msg_1005) {
+  BITSTREAM_DECODE_U16(buff, msg_1005->stn_id, 12);
+  BITSTREAM_DECODE_U8(buff, msg_1005->ITRF, 6);
+  BITSTREAM_DECODE_U8(buff, msg_1005->GPS_ind, 1);
+  BITSTREAM_DECODE_U8(buff, msg_1005->GLO_ind, 1);
+  BITSTREAM_DECODE_U8(buff, msg_1005->GAL_ind, 1);
+  BITSTREAM_DECODE_U8(buff, msg_1005->ref_stn_ind, 1);
+  s64 tmp;
+  BITSTREAM_DECODE_S64(buff, tmp, 38);
+  msg_1005->arp_x = (double)(tmp) / 10000.0;
+  BITSTREAM_DECODE_U8(buff, msg_1005->osc_ind, 1);
+  swiftnav_bitstream_remove(buff, 1);
+  BITSTREAM_DECODE_S64(buff, tmp, 38);
+  msg_1005->arp_y = (double)(tmp) / 10000.0;
+  BITSTREAM_DECODE_U8(buff, msg_1005->quart_cycle_ind, 2);
+  BITSTREAM_DECODE_S64(buff, tmp, 38);
+  msg_1005->arp_z = (double)(tmp) / 10000.0;
 
   return RC_OK;
 }
@@ -590,17 +579,17 @@ static rtcm3_rc rtcm3_decode_1005_base(const uint8_t buff[],
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  */
-rtcm3_rc rtcm3_decode_1005(const uint8_t buff[], rtcm_msg_1005 *msg_1005) {
+rtcm3_rc rtcm3_decode_1005_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msg_1005 *msg_1005) {
   assert(msg_1005);
-  uint16_t bit = 0;
-  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  uint32_t msg_num;
+  BITSTREAM_DECODE_U32(buff, msg_num, 12);
 
   if (msg_num != 1005) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  return rtcm3_decode_1005_base(buff, msg_1005, &bit);
+  return rtcm3_decode_1005_base(buff, msg_1005);
 }
 
 /** Decode an RTCMv3 message type 1005 (Stationary RTK Reference Station ARP
@@ -611,32 +600,43 @@ rtcm3_rc rtcm3_decode_1005(const uint8_t buff[], rtcm_msg_1005 *msg_1005) {
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  */
-rtcm3_rc rtcm3_decode_1006(const uint8_t buff[], rtcm_msg_1006 *msg_1006) {
+rtcm3_rc rtcm3_decode_1006_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msg_1006 *msg_1006) {
   assert(msg_1006);
-  uint16_t bit = 0;
-  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  uint32_t msg_num;
+  BITSTREAM_DECODE_U32(buff, msg_num, 12);
 
   if (msg_num != 1006) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  rtcm3_decode_1005_base(buff, &msg_1006->msg_1005, &bit);
-  msg_1006->ant_height = (double)(rtcm_getbitu(buff, bit, 16)) / 10000.0;
-  bit += 16;
+  rtcm3_decode_1005_base(buff, &msg_1006->msg_1005);
+  uint32_t tmp;
+  BITSTREAM_DECODE_U32(buff, tmp, 16);
+  msg_1006->ant_height = (double)(tmp) / 10000.0;
   return RC_OK;
 }
 
-static rtcm3_rc rtcm3_decode_1007_base(const uint8_t buff[],
-                                       rtcm_msg_1007 *msg_1007,
-                                       uint16_t *bit) {
-  msg_1007->stn_id = rtcm_getbitu(buff, *bit, 12);
-  *bit += 12;
-  GET_STR_LEN(buff, *bit, msg_1007->ant_descriptor_counter);
-  GET_STR(
-      buff, *bit, msg_1007->ant_descriptor_counter, msg_1007->ant_descriptor);
-  msg_1007->ant_setup_id = rtcm_getbitu(buff, *bit, 8);
-  *bit += 8;
+static rtcm3_rc decode_string(swiftnav_bitstream_t *buff, u8 *len, char *str) {
+  BITSTREAM_DECODE_U8(buff, *len, 8);
+  if (*len > RTCM_MAX_STRING_LEN) {
+    return RC_INVALID_MESSAGE;
+  }
+  for (u32 i = 0; i < *len; i++) {
+    BITSTREAM_DECODE_U8(buff, str[i], 8);
+  }
+  return RC_OK;
+}
+
+static rtcm3_rc rtcm3_decode_1007_base(swiftnav_bitstream_t *buff,
+                                       rtcm_msg_1007 *msg_1007) {
+  BITSTREAM_DECODE_U16(buff, msg_1007->stn_id, 12);
+  if (decode_string(buff,
+                    &msg_1007->ant_descriptor_counter,
+                    msg_1007->ant_descriptor) != RC_OK) {
+    return RC_INVALID_MESSAGE;
+  }
+  BITSTREAM_DECODE_U8(buff, msg_1007->ant_setup_id, 8);
 
   return RC_OK;
 }
@@ -650,17 +650,17 @@ static rtcm3_rc rtcm3_decode_1007_base(const uint8_t buff[],
  *          - RC_INVALID_MESSAGE : String length too large
  *
  */
-rtcm3_rc rtcm3_decode_1007(const uint8_t buff[], rtcm_msg_1007 *msg_1007) {
+rtcm3_rc rtcm3_decode_1007_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msg_1007 *msg_1007) {
   assert(msg_1007);
-  uint16_t bit = 0;
-  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  uint32_t msg_num;
+  BITSTREAM_DECODE_U32(buff, msg_num, 12);
 
   if (msg_num != 1007) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  return rtcm3_decode_1007_base(buff, msg_1007, &bit);
+  return rtcm3_decode_1007_base(buff, msg_1007);
 }
 
 /** Decode an RTCMv3 message type 1008 (Antenna Descriptor & Serial Number)
@@ -671,26 +671,23 @@ rtcm3_rc rtcm3_decode_1007(const uint8_t buff[], rtcm_msg_1007 *msg_1007) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : String length too large
  */
-rtcm3_rc rtcm3_decode_1008(const uint8_t buff[], rtcm_msg_1008 *msg_1008) {
+rtcm3_rc rtcm3_decode_1008_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msg_1008 *msg_1008) {
   assert(msg_1008);
-  uint16_t bit = 0;
-  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  uint32_t msg_num;
+  BITSTREAM_DECODE_U32(buff, msg_num, 12);
 
   if (msg_num != 1008) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  rtcm3_rc ret = rtcm3_decode_1007_base(buff, &msg_1008->msg_1007, &bit);
+  rtcm3_rc ret = rtcm3_decode_1007_base(buff, &msg_1008->msg_1007);
   if (RC_OK != ret) {
     return ret;
   }
 
-  GET_STR_LEN(buff, bit, msg_1008->ant_serial_num_counter);
-  GET_STR(
-      buff, bit, msg_1008->ant_serial_num_counter, msg_1008->ant_serial_num);
-
-  return RC_OK;
+  return decode_string(
+      buff, &msg_1008->ant_serial_num_counter, msg_1008->ant_serial_num);
 }
 
 /** Decode an RTCMv3 message type 1010 (Extended L1-Only GLO RTK Observables)
@@ -701,10 +698,13 @@ rtcm3_rc rtcm3_decode_1008(const uint8_t buff[], rtcm_msg_1008 *msg_1008) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
-rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
+rtcm3_rc rtcm3_decode_1010_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_obs_message *msg_1010) {
   assert(msg_1010);
-  uint16_t bit = 0;
-  bit += rtcm3_read_glo_header(buff, &msg_1010->header);
+  rtcm3_rc ret = rtcm3_read_glo_header(buff, &msg_1010->header);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   if (msg_1010->header.msg_num != 1010) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
@@ -717,20 +717,25 @@ rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
   for (uint8_t i = 0; i < msg_1010->header.n_sat; i++) {
     init_sat_data(&msg_1010->sats[i]);
 
-    msg_1010->sats[i].svId = rtcm_getbitu(buff, bit, 6);
-    bit += 6;
+    BITSTREAM_DECODE_U8(buff, msg_1010->sats[i].svId, 6);
 
     rtcm_freq_data *l1_freq_data = &msg_1010->sats[i].obs[L1_FREQ];
 
     uint32_t l1_pr;
     int32_t phr_pr_diff;
-    decode_basic_glo_l1_freq_data(
-        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff, &msg_1010->sats[i].fcn);
+    ret = decode_basic_glo_l1_freq_data(
+        buff, l1_freq_data, &l1_pr, &phr_pr_diff, &msg_1010->sats[i].fcn);
+    if (ret != RC_OK) {
+      return ret;
+    }
 
-    uint8_t amb = rtcm_getbitu(buff, bit, 7);
-    bit += 7;
+    uint8_t amb;
+    BITSTREAM_DECODE_U8(buff, amb, 7);
 
-    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
+    ret = get_cnr(l1_freq_data, buff);
+    if (ret != RC_OK) {
+      return ret;
+    }
 
     int8_t glo_fcn = msg_1010->sats[i].fcn - MT1012_GLO_FCN_OFFSET;
     l1_freq_data->flags.valid_pr =
@@ -753,10 +758,13 @@ rtcm3_rc rtcm3_decode_1010(const uint8_t buff[], rtcm_obs_message *msg_1010) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : TOW sanity check fail
  */
-rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
+rtcm3_rc rtcm3_decode_1012_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_obs_message *msg_1012) {
   assert(msg_1012);
-  uint16_t bit = 0;
-  bit += rtcm3_read_glo_header(buff, &msg_1012->header);
+  rtcm3_rc ret = rtcm3_read_glo_header(buff, &msg_1012->header);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   if (msg_1012->header.msg_num != 1012) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
@@ -769,22 +777,27 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
   for (uint8_t i = 0; i < msg_1012->header.n_sat; i++) {
     init_sat_data(&msg_1012->sats[i]);
 
-    msg_1012->sats[i].svId = rtcm_getbitu(buff, bit, 6);
-    bit += 6;
+    BITSTREAM_DECODE_U8(buff, msg_1012->sats[i].svId, 6);
 
     rtcm_freq_data *l1_freq_data = &msg_1012->sats[i].obs[L1_FREQ];
 
     uint32_t l1_pr;
     int32_t l2_pr;
     int32_t phr_pr_diff;
-    decode_basic_glo_l1_freq_data(
-        buff, &bit, l1_freq_data, &l1_pr, &phr_pr_diff, &msg_1012->sats[i].fcn);
+    ret = decode_basic_glo_l1_freq_data(
+        buff, l1_freq_data, &l1_pr, &phr_pr_diff, &msg_1012->sats[i].fcn);
+    if (ret != RC_OK) {
+      return ret;
+    }
 
-    uint8_t amb = rtcm_getbitu(buff, bit, 7);
-    bit += 7;
+    uint32_t amb;
+    BITSTREAM_DECODE_U32(buff, amb, 7);
 
     int8_t glo_fcn = msg_1012->sats[i].fcn - MT1012_GLO_FCN_OFFSET;
-    l1_freq_data->flags.valid_cnr = get_cnr(l1_freq_data, buff, &bit);
+    ret = get_cnr(l1_freq_data, buff);
+    if (ret != RC_OK) {
+      return ret;
+    }
     l1_freq_data->flags.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GLO);
     l1_freq_data->flags.valid_cp =
@@ -795,9 +808,15 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
 
     rtcm_freq_data *l2_freq_data = &msg_1012->sats[i].obs[L2_FREQ];
 
-    decode_basic_l2_freq_data(buff, &bit, l2_freq_data, &l2_pr, &phr_pr_diff);
+    ret = decode_basic_l2_freq_data(buff, l2_freq_data, &l2_pr, &phr_pr_diff);
+    if (ret != RC_OK) {
+      return ret;
+    }
 
-    l2_freq_data->flags.valid_cnr = get_cnr(l2_freq_data, buff, &bit);
+    ret = get_cnr(l2_freq_data, buff);
+    if (ret != RC_OK) {
+      return ret;
+    }
     l2_freq_data->flags.valid_pr =
         construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
     l2_freq_data->flags.valid_cp =
@@ -818,33 +837,27 @@ rtcm3_rc rtcm3_decode_1012(const uint8_t buff[], rtcm_obs_message *msg_1012) {
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  */
-rtcm3_rc rtcm3_decode_1029(const uint8_t buff[], rtcm_msg_1029 *msg_1029) {
+rtcm3_rc rtcm3_decode_1029_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msg_1029 *msg_1029) {
   assert(msg_1029);
-  uint16_t bit = 0;
-  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  uint32_t msg_num;
+  BITSTREAM_DECODE_U32(buff, msg_num, 12);
 
   if (msg_num != 1029) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  msg_1029->stn_id = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  BITSTREAM_DECODE_U16(buff, msg_1029->stn_id, 12);
 
-  msg_1029->mjd_num = rtcm_getbitu(buff, bit, 16);
-  bit += 16;
+  BITSTREAM_DECODE_U16(buff, msg_1029->mjd_num, 16);
 
-  msg_1029->utc_sec_of_day = rtcm_getbitu(buff, bit, 17);
-  bit += 17;
+  BITSTREAM_DECODE_U32(buff, msg_1029->utc_sec_of_day, 17);
 
-  msg_1029->unicode_chars = rtcm_getbitu(buff, bit, 7);
-  bit += 7;
+  BITSTREAM_DECODE_U8(buff, msg_1029->unicode_chars, 7);
 
-  msg_1029->utf8_code_units_n = rtcm_getbitu(buff, bit, 8);
-  bit += 8;
+  BITSTREAM_DECODE_U8(buff, msg_1029->utf8_code_units_n, 8);
   for (uint8_t i = 0; i < msg_1029->utf8_code_units_n; ++i) {
-    msg_1029->utf8_code_units[i] = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
+    BITSTREAM_DECODE_U8(buff, msg_1029->utf8_code_units[i], 8);
   }
 
   return RC_OK;
@@ -858,11 +871,11 @@ rtcm3_rc rtcm3_decode_1029(const uint8_t buff[], rtcm_msg_1029 *msg_1029) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : String length too large
  */
-rtcm3_rc rtcm3_decode_1033(const uint8_t buff[], rtcm_msg_1033 *msg_1033) {
+rtcm3_rc rtcm3_decode_1033_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msg_1033 *msg_1033) {
   assert(msg_1033);
-  uint16_t bit = 0;
-  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  uint32_t msg_num;
+  BITSTREAM_DECODE_U32(buff, msg_num, 12);
 
   if (msg_num != 1033) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
@@ -871,31 +884,39 @@ rtcm3_rc rtcm3_decode_1033(const uint8_t buff[], rtcm_msg_1033 *msg_1033) {
   /* make sure all the strings gets initialized */
   memset(msg_1033, 0, sizeof(*msg_1033));
 
-  msg_1033->stn_id = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  BITSTREAM_DECODE_U16(buff, msg_1033->stn_id, 12);
 
-  GET_STR_LEN(buff, bit, msg_1033->ant_descriptor_counter);
-  GET_STR(
-      buff, bit, msg_1033->ant_descriptor_counter, msg_1033->ant_descriptor);
+  rtcm3_rc ret = decode_string(
+      buff, &msg_1033->ant_descriptor_counter, msg_1033->ant_descriptor);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
-  msg_1033->ant_setup_id = rtcm_getbitu(buff, bit, 8);
-  bit += 8;
+  BITSTREAM_DECODE_U8(buff, msg_1033->ant_setup_id, 8);
 
-  GET_STR_LEN(buff, bit, msg_1033->ant_serial_num_counter);
-  GET_STR(
-      buff, bit, msg_1033->ant_serial_num_counter, msg_1033->ant_serial_num);
+  ret = decode_string(
+      buff, &msg_1033->ant_serial_num_counter, msg_1033->ant_serial_num);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
-  GET_STR_LEN(buff, bit, msg_1033->rcv_descriptor_counter);
-  GET_STR(
-      buff, bit, msg_1033->rcv_descriptor_counter, msg_1033->rcv_descriptor);
+  ret = decode_string(
+      buff, &msg_1033->rcv_descriptor_counter, msg_1033->rcv_descriptor);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
-  GET_STR_LEN(buff, bit, msg_1033->rcv_fw_version_counter);
-  GET_STR(
-      buff, bit, msg_1033->rcv_fw_version_counter, msg_1033->rcv_fw_version);
+  ret = decode_string(
+      buff, &msg_1033->rcv_fw_version_counter, msg_1033->rcv_fw_version);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
-  GET_STR_LEN(buff, bit, msg_1033->rcv_serial_num_counter);
-  GET_STR(
-      buff, bit, msg_1033->rcv_serial_num_counter, msg_1033->rcv_serial_num);
+  ret = decode_string(
+      buff, &msg_1033->rcv_serial_num_counter, msg_1033->rcv_serial_num);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   return RC_OK;
 }
@@ -907,45 +928,46 @@ rtcm3_rc rtcm3_decode_1033(const uint8_t buff[], rtcm_msg_1033 *msg_1033) {
  * \return  - RC_OK : Success
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  */
-rtcm3_rc rtcm3_decode_1230(const uint8_t buff[], rtcm_msg_1230 *msg_1230) {
+rtcm3_rc rtcm3_decode_1230_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msg_1230 *msg_1230) {
   assert(msg_1230);
-  uint16_t bit = 0;
-  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  uint32_t msg_num;
+  BITSTREAM_DECODE_U32(buff, msg_num, 12);
 
   if (msg_num != 1230) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  msg_1230->stn_id = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
-  msg_1230->bias_indicator = rtcm_getbitu(buff, bit, 1);
-  bit += 1;
+  BITSTREAM_DECODE_U16(buff, msg_1230->stn_id, 12);
+  BITSTREAM_DECODE_U8(buff, msg_1230->bias_indicator, 1);
   /* 3 Reserved bits */
-  bit += 3;
-  msg_1230->fdma_signal_mask = rtcm_getbitu(buff, bit, 4);
-  bit += 4;
+  swiftnav_bitstream_remove(buff, 3);
+  BITSTREAM_DECODE_U8(buff, msg_1230->fdma_signal_mask, 4);
   if (msg_1230->fdma_signal_mask & 0x08) {
-    msg_1230->L1_CA_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
-    bit += 16;
+    s32 tmp;
+    BITSTREAM_DECODE_S32(buff, tmp, 16);
+    msg_1230->L1_CA_cpb_meter = tmp * 0.02;
   } else {
     msg_1230->L1_CA_cpb_meter = 0.0;
   }
   if (msg_1230->fdma_signal_mask & 0x04) {
-    msg_1230->L1_P_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
-    bit += 16;
+    s32 tmp;
+    BITSTREAM_DECODE_S32(buff, tmp, 16);
+    msg_1230->L1_P_cpb_meter = tmp * 0.02;
   } else {
     msg_1230->L1_P_cpb_meter = 0.0;
   }
   if (msg_1230->fdma_signal_mask & 0x02) {
-    msg_1230->L2_CA_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
-    bit += 16;
+    s32 tmp;
+    BITSTREAM_DECODE_S32(buff, tmp, 16);
+    msg_1230->L2_CA_cpb_meter = tmp * 0.02;
   } else {
     msg_1230->L2_CA_cpb_meter = 0.0;
   }
   if (msg_1230->fdma_signal_mask & 0x01) {
-    msg_1230->L2_P_cpb_meter = rtcm_getbits(buff, bit, 16) * 0.02;
-    bit += 16;  // NOLINT
+    s32 tmp;
+    BITSTREAM_DECODE_S32(buff, tmp, 16);
+    msg_1230->L2_P_cpb_meter = tmp * 0.02;
   } else {
     msg_1230->L2_P_cpb_meter = 0.0;
   }
@@ -953,20 +975,19 @@ rtcm3_rc rtcm3_decode_1230(const uint8_t buff[], rtcm_msg_1230 *msg_1230) {
   return RC_OK;
 }
 
-static void decode_msm_sat_data(const uint8_t buff[],
-                                const uint8_t num_sats,
-                                const msm_enum msm_type,
-                                double rough_range_ms[],
-                                bool rough_range_valid[],
-                                uint8_t sat_info[],
-                                bool sat_info_valid[],
-                                double rough_rate_m_s[],
-                                bool rough_rate_valid[],
-                                uint16_t *bit) {
+static rtcm3_rc decode_msm_sat_data(swiftnav_bitstream_t *buff,
+                                    const uint8_t num_sats,
+                                    const msm_enum msm_type,
+                                    double rough_range_ms[],
+                                    bool rough_range_valid[],
+                                    uint8_t sat_info[],
+                                    bool sat_info_valid[],
+                                    double rough_rate_m_s[],
+                                    bool rough_rate_valid[]) {
   /* number of integer milliseconds, DF397 */
   for (uint8_t i = 0; i < num_sats; i++) {
-    uint32_t range_ms = rtcm_getbitu(buff, *bit, 8);
-    *bit += 8;
+    uint32_t range_ms;
+    BITSTREAM_DECODE_U32(buff, range_ms, 8);
     rough_range_ms[i] = range_ms;
     rough_range_valid[i] = (MSM_ROUGH_RANGE_INVALID != range_ms);
   }
@@ -975,8 +996,7 @@ static void decode_msm_sat_data(const uint8_t buff[],
    * deliver FCN) */
   for (uint8_t i = 0; i < num_sats; i++) {
     if (MSM5 == msm_type || MSM7 == msm_type) {
-      sat_info[i] = rtcm_getbitu(buff, *bit, 4);
-      *bit += 4;
+      BITSTREAM_DECODE_U8(buff, sat_info[i], 4);
       sat_info_valid[i] = true;
     } else {
       sat_info[i] = 0;
@@ -986,8 +1006,8 @@ static void decode_msm_sat_data(const uint8_t buff[],
 
   /* rough range modulo 1 ms, DF398 */
   for (uint8_t i = 0; i < num_sats; i++) {
-    uint32_t rough_pr = rtcm_getbitu(buff, *bit, 10);
-    *bit += 10;
+    uint32_t rough_pr;
+    BITSTREAM_DECODE_U32(buff, rough_pr, 10);
     if (rough_range_valid[i]) {
       rough_range_ms[i] += (double)rough_pr / 1024;
     }
@@ -996,8 +1016,8 @@ static void decode_msm_sat_data(const uint8_t buff[],
   /* range rate, m/s, DF399*/
   for (uint8_t i = 0; i < num_sats; i++) {
     if (MSM5 == msm_type || MSM7 == msm_type) {
-      int16_t rate = rtcm_getbits(buff, *bit, 14);
-      *bit += 14;
+      int16_t rate;
+      BITSTREAM_DECODE_S16(buff, rate, 14);
       rough_rate_m_s[i] = (double)rate;
       rough_rate_valid[i] = (MSM_ROUGH_RATE_INVALID != rate);
     } else {
@@ -1005,143 +1025,144 @@ static void decode_msm_sat_data(const uint8_t buff[],
       rough_rate_valid[i] = false;
     }
   }
+  return RC_OK;
 }
 
-static void decode_msm_fine_pseudoranges(const uint8_t buff[],
-                                         const uint8_t num_cells,
-                                         double fine_pr_ms[],
-                                         flag_bf flags[],
-                                         uint16_t *bit) {
+static rtcm3_rc decode_msm_fine_pseudoranges(swiftnav_bitstream_t *buff,
+                                             const uint8_t num_cells,
+                                             double fine_pr_ms[],
+                                             flag_bf flags[]) {
   /* DF400 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    int16_t decoded = (int16_t)rtcm_getbits(buff, *bit, 15);
-    *bit += 15;
+    int16_t decoded;
+    BITSTREAM_DECODE_S16(buff, decoded, 15);
     flags[i].valid_pr = (decoded != MSM_PR_INVALID);
     fine_pr_ms[i] = (double)decoded * C_1_2P24;
   }
+  return RC_OK;
 }
 
-static void decode_msm_fine_pseudoranges_extended(const uint8_t buff[],
-                                                  const uint8_t num_cells,
-                                                  double fine_pr_ms[],
-                                                  flag_bf flags[],
-                                                  uint16_t *bit) {
+static rtcm3_rc decode_msm_fine_pseudoranges_extended(
+    swiftnav_bitstream_t *buff,
+    const uint8_t num_cells,
+    double fine_pr_ms[],
+    flag_bf flags[]) {
   /* DF405 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    int32_t decoded = (int32_t)rtcm_getbitsl(buff, *bit, 20);
-    *bit += 20;
+    int32_t decoded;
+    BITSTREAM_DECODE_S32(buff, decoded, 20);
     flags[i].valid_pr = (decoded != MSM_PR_EXT_INVALID);
     fine_pr_ms[i] = (double)decoded * C_1_2P29;
   }
+  return RC_OK;
 }
 
-static void decode_msm_fine_phaseranges(const uint8_t buff[],
-                                        const uint8_t num_cells,
-                                        double fine_cp_ms[],
-                                        flag_bf flags[],
-                                        uint16_t *bit) {
+static rtcm3_rc decode_msm_fine_phaseranges(swiftnav_bitstream_t *buff,
+                                            const uint8_t num_cells,
+                                            double fine_cp_ms[],
+                                            flag_bf flags[]) {
   /* DF401 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    int32_t decoded = rtcm_getbits(buff, *bit, 22);
-    *bit += 22;
+    int32_t decoded;
+    BITSTREAM_DECODE_S32(buff, decoded, 22);
     flags[i].valid_cp = (decoded != MSM_CP_INVALID);
     fine_cp_ms[i] = (double)decoded * C_1_2P29;
   }
+  return RC_OK;
 }
 
-static void decode_msm_fine_phaseranges_extended(const uint8_t buff[],
-                                                 const uint8_t num_cells,
-                                                 double fine_cp_ms[],
-                                                 flag_bf flags[],
-                                                 uint16_t *bit) {
+static rtcm3_rc decode_msm_fine_phaseranges_extended(swiftnav_bitstream_t *buff,
+                                                     const uint8_t num_cells,
+                                                     double fine_cp_ms[],
+                                                     flag_bf flags[]) {
   /* DF406 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    int32_t decoded = rtcm_getbits(buff, *bit, 24);
-    *bit += 24;
+    int32_t decoded;
+    BITSTREAM_DECODE_S32(buff, decoded, 24);
     flags[i].valid_cp = (decoded != MSM_CP_EXT_INVALID);
     fine_cp_ms[i] = (double)decoded * C_1_2P31;
   }
+  return RC_OK;
 }
 
-static void decode_msm_lock_times(const uint8_t buff[],
-                                  const uint8_t num_cells,
-                                  double lock_time[],
-                                  flag_bf flags[],
-                                  uint16_t *bit) {
+static rtcm3_rc decode_msm_lock_times(swiftnav_bitstream_t *buff,
+                                      const uint8_t num_cells,
+                                      double lock_time[],
+                                      flag_bf flags[]) {
   /* DF402 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    uint32_t lock_ind = rtcm_getbitu(buff, *bit, 4);
-    *bit += 4;
+    uint32_t lock_ind;
+    BITSTREAM_DECODE_U32(buff, lock_ind, 4);
     lock_time[i] = rtcm3_decode_lock_time(lock_ind);
     flags[i].valid_lock = 1;
   }
+  return RC_OK;
 }
 
-static void decode_msm_lock_times_extended(const uint8_t buff[],
-                                           const uint8_t num_cells,
-                                           double lock_time[],
-                                           flag_bf flags[],
-                                           uint16_t *bit) {
+static rtcm3_rc decode_msm_lock_times_extended(swiftnav_bitstream_t *buff,
+                                               const uint8_t num_cells,
+                                               double lock_time[],
+                                               flag_bf flags[]) {
   /* DF407 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    uint16_t lock_ind = rtcm_getbitu(buff, *bit, 10);
-    *bit += 10;
+    uint16_t lock_ind;
+    BITSTREAM_DECODE_U16(buff, lock_ind, 10);
     lock_time[i] = (double)from_msm_lock_ind_ext(lock_ind) / 1000;
     flags[i].valid_lock = 1;
   }
+  return RC_OK;
 }
 
-static void decode_msm_hca_indicators(const uint8_t buff[],
-                                      const uint8_t num_cells,
-                                      bool hca_indicator[],
-                                      uint16_t *bit) {
+static rtcm3_rc decode_msm_hca_indicators(swiftnav_bitstream_t *buff,
+                                          const uint8_t num_cells,
+                                          bool hca_indicator[]) {
   /* DF420 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    hca_indicator[i] = (bool)rtcm_getbitu(buff, *bit, 1);
-    *bit += 1;
+    BITSTREAM_DECODE_BOOL(buff, hca_indicator[i], 1);
   }
+  return RC_OK;
 }
 
-static void decode_msm_cnrs(const uint8_t buff[],
-                            const uint8_t num_cells,
-                            double cnr[],
-                            flag_bf flags[],
-                            uint16_t *bit) {
+static rtcm3_rc decode_msm_cnrs(swiftnav_bitstream_t *buff,
+                                const uint8_t num_cells,
+                                double cnr[],
+                                flag_bf flags[]) {
   /* DF403 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    uint32_t decoded = rtcm_getbitu(buff, *bit, 6);
-    *bit += 6;
+    uint32_t decoded;
+    BITSTREAM_DECODE_U32(buff, decoded, 6);
     flags[i].valid_cnr = (decoded != 0);
     cnr[i] = (double)decoded;
   }
+  return RC_OK;
 }
 
-static void decode_msm_cnrs_extended(const uint8_t buff[],
-                                     const uint8_t num_cells,
-                                     double cnr[],
-                                     flag_bf flags[],
-                                     uint16_t *bit) {
+static rtcm3_rc decode_msm_cnrs_extended(swiftnav_bitstream_t *buff,
+                                         const uint8_t num_cells,
+                                         double cnr[],
+                                         flag_bf flags[]) {
   /* DF408 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    uint32_t decoded = rtcm_getbitu(buff, *bit, 10);
-    *bit += 10;
+    uint32_t decoded;
+    BITSTREAM_DECODE_U32(buff, decoded, 10);
     flags[i].valid_cnr = (decoded != 0);
     cnr[i] = (double)decoded * C_1_2P4;
   }
+  return RC_OK;
 }
 
-static void decode_msm_fine_phaserangerates(const uint8_t buff[],
-                                            const uint8_t num_cells,
-                                            double *fine_range_rate_m_s,
-                                            flag_bf *flags,
-                                            uint16_t *bit) {
+static rtcm3_rc decode_msm_fine_phaserangerates(swiftnav_bitstream_t *buff,
+                                                const uint8_t num_cells,
+                                                double *fine_range_rate_m_s,
+                                                flag_bf *flags) {
   /* DF404 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    int32_t decoded = rtcm_getbits(buff, *bit, 15);
-    *bit += 15;
+    int32_t decoded;
+    BITSTREAM_DECODE_S32(buff, decoded, 15);
     fine_range_rate_m_s[i] = (double)decoded * 0.0001;
     flags[i].valid_dop = (decoded != MSM_DOP_INVALID);
   }
+  return RC_OK;
 }
 
 /** Decode an RTCMv3 Multi System Messages 4-7
@@ -1153,7 +1174,7 @@ static void decode_msm_fine_phaserangerates(const uint8_t buff[],
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
-static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
+static rtcm3_rc rtcm3_decode_msm_internal(swiftnav_bitstream_t *buff,
                                           const uint16_t msm_type,
                                           rtcm_msm_message *msg) {
   if (MSM4 != msm_type && MSM5 != msm_type && MSM6 != msm_type &&
@@ -1162,8 +1183,7 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  msg->header.msg_num = rtcm_getbitu(buff, 0, 12);
-
+  BITSTREAM_DECODE_U16(buff, msg->header.msg_num, 12);
   if (msm_type != to_msm_type(msg->header.msg_num)) {
     /* Message number does not match the requested message type */
     return RC_MESSAGE_TYPE_MISMATCH;
@@ -1175,8 +1195,10 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  uint16_t bit = 0;
-  bit += rtcm3_read_msm_header(buff, cons, &msg->header);
+  rtcm3_rc ret = rtcm3_read_msm_header(buff, cons, &msg->header);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   if (RTCM_CONSTELLATION_GLO != cons) {
     if (msg->header.tow_ms > RTCM_MAX_TOW_MS) {
@@ -1208,16 +1230,18 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
   bool rough_rate_valid[num_sats];
   bool sat_info_valid[num_sats];
 
-  decode_msm_sat_data(buff,
-                      num_sats,
-                      msm_type,
-                      rough_range_ms,
-                      rough_range_valid,
-                      sat_info,
-                      sat_info_valid,
-                      rough_rate_m_s,
-                      rough_rate_valid,
-                      &bit);
+  ret = decode_msm_sat_data(buff,
+                            num_sats,
+                            msm_type,
+                            rough_range_ms,
+                            rough_range_valid,
+                            sat_info,
+                            sat_info_valid,
+                            rough_rate_m_s,
+                            rough_rate_valid);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   /* Signal Data */
 
@@ -1238,36 +1262,72 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
   memset(flags, 0, sizeof(flags));
 
   for (uint8_t i = 0; i < num_cells; i++) {
+    fine_pr_ms[i] = 0;
+    fine_cp_ms[i] = 0;
+    lock_time[i] = 0;
+    hca_indicator[i] = false;
+    cnr[i] = 0;
+    fine_range_rate_m_s[i] = 0;
     flags[i].data = 0;
   }
 
   if (MSM4 == msm_type || MSM5 == msm_type) {
-    decode_msm_fine_pseudoranges(buff, num_cells, fine_pr_ms, flags, &bit);
-    decode_msm_fine_phaseranges(buff, num_cells, fine_cp_ms, flags, &bit);
-    decode_msm_lock_times(buff, num_cells, lock_time, flags, &bit);
+    ret = decode_msm_fine_pseudoranges(buff, num_cells, fine_pr_ms, flags);
+    if (ret != RC_OK) {
+      return ret;
+    }
+    ret = decode_msm_fine_phaseranges(buff, num_cells, fine_cp_ms, flags);
+    if (ret != RC_OK) {
+      return ret;
+    }
+    ret = decode_msm_lock_times(buff, num_cells, lock_time, flags);
+    if (ret != RC_OK) {
+      return ret;
+    }
   } else if (MSM6 == msm_type || MSM7 == msm_type) {
-    decode_msm_fine_pseudoranges_extended(
-        buff, num_cells, fine_pr_ms, flags, &bit);
-    decode_msm_fine_phaseranges_extended(
-        buff, num_cells, fine_cp_ms, flags, &bit);
-    decode_msm_lock_times_extended(buff, num_cells, lock_time, flags, &bit);
+    ret = decode_msm_fine_pseudoranges_extended(
+        buff, num_cells, fine_pr_ms, flags);
+    if (ret != RC_OK) {
+      return ret;
+    }
+    ret = decode_msm_fine_phaseranges_extended(
+        buff, num_cells, fine_cp_ms, flags);
+    if (ret != RC_OK) {
+      return ret;
+    }
+    ret = decode_msm_lock_times_extended(buff, num_cells, lock_time, flags);
+    if (ret != RC_OK) {
+      return ret;
+    }
   } else {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  decode_msm_hca_indicators(buff, num_cells, hca_indicator, &bit);
+  ret = decode_msm_hca_indicators(buff, num_cells, hca_indicator);
+  if (ret != RC_OK) {
+    return ret;
+  }
 
   if (MSM4 == msm_type || MSM5 == msm_type) {
-    decode_msm_cnrs(buff, num_cells, cnr, flags, &bit);
+    ret = decode_msm_cnrs(buff, num_cells, cnr, flags);
+    if (ret != RC_OK) {
+      return ret;
+    }
   } else if (MSM6 == msm_type || MSM7 == msm_type) {
-    decode_msm_cnrs_extended(buff, num_cells, cnr, flags, &bit);
+    ret = decode_msm_cnrs_extended(buff, num_cells, cnr, flags);
+    if (ret != RC_OK) {
+      return ret;
+    }
   } else {
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
   if (MSM5 == msm_type || MSM7 == msm_type) {
-    decode_msm_fine_phaserangerates(
-        buff, num_cells, fine_range_rate_m_s, flags, &bit);
+    ret = decode_msm_fine_phaserangerates(
+        buff, num_cells, fine_range_rate_m_s, flags);
+    if (ret != RC_OK) {
+      return ret;
+    }
   }
 
   uint8_t i = 0;
@@ -1327,7 +1387,8 @@ static rtcm3_rc rtcm3_decode_msm_internal(const uint8_t buff[],
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
-rtcm3_rc rtcm3_decode_msm4(const uint8_t buff[], rtcm_msm_message *msg) {
+rtcm3_rc rtcm3_decode_msm4_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msm_message *msg) {
   assert(msg);
   return rtcm3_decode_msm_internal(buff, MSM4, msg);
 }
@@ -1340,7 +1401,8 @@ rtcm3_rc rtcm3_decode_msm4(const uint8_t buff[], rtcm_msm_message *msg) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
-rtcm3_rc rtcm3_decode_msm5(const uint8_t buff[], rtcm_msm_message *msg) {
+rtcm3_rc rtcm3_decode_msm5_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msm_message *msg) {
   assert(msg);
   return rtcm3_decode_msm_internal(buff, MSM5, msg);
 }
@@ -1353,7 +1415,8 @@ rtcm3_rc rtcm3_decode_msm5(const uint8_t buff[], rtcm_msm_message *msg) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
-rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[], rtcm_msm_message *msg) {
+rtcm3_rc rtcm3_decode_msm6_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msm_message *msg) {
   assert(msg);
   return rtcm3_decode_msm_internal(buff, MSM6, msg);
 }
@@ -1366,7 +1429,8 @@ rtcm3_rc rtcm3_decode_msm6(const uint8_t buff[], rtcm_msm_message *msg) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Cell mask too large or invalid TOW
  */
-rtcm3_rc rtcm3_decode_msm7(const uint8_t buff[], rtcm_msm_message *msg) {
+rtcm3_rc rtcm3_decode_msm7_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msm_message *msg) {
   assert(msg);
   return rtcm3_decode_msm_internal(buff, MSM7, msg);
 }
@@ -1379,19 +1443,18 @@ rtcm3_rc rtcm3_decode_msm7(const uint8_t buff[], rtcm_msm_message *msg) {
  *          - RC_MESSAGE_TYPE_MISMATCH : Message type mismatch
  *          - RC_INVALID_MESSAGE : Nonzero reserved bits (invalid format)
  */
-rtcm3_rc rtcm3_decode_4062(const uint8_t buff[],
-                           rtcm_msg_swift_proprietary *msg) {
+rtcm3_rc rtcm3_decode_4062_bitstream(swiftnav_bitstream_t *buff,
+                                     rtcm_msg_swift_proprietary *msg) {
   assert(msg);
-  uint16_t bit = 0;
-  uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
-  bit += 12;
+  uint32_t msg_num;
+  BITSTREAM_DECODE_U32(buff, msg_num, 12);
 
   if (msg_num != 4062) { /* Unexpected message type. */
     return RC_MESSAGE_TYPE_MISMATCH;
   }
 
-  uint8_t reserved_bits = rtcm_getbitu(buff, bit, 4);
-  bit += 4;
+  uint32_t reserved_bits;
+  BITSTREAM_DECODE_U32(buff, reserved_bits, 4);
 
   /* These bits are reserved for future use, if they aren't 0 it must be a
      new format we don't know how to handle. */
@@ -1399,16 +1462,12 @@ rtcm3_rc rtcm3_decode_4062(const uint8_t buff[],
     return RC_INVALID_MESSAGE;
   }
 
-  msg->msg_type = rtcm_getbitu(buff, bit, 16);
-  bit += 16;
-  msg->sender_id = rtcm_getbitu(buff, bit, 16);
-  bit += 16;
-  msg->len = rtcm_getbitu(buff, bit, 8);
-  bit += 8;
+  BITSTREAM_DECODE_U16(buff, msg->msg_type, 16);
+  BITSTREAM_DECODE_U16(buff, msg->sender_id, 16);
+  BITSTREAM_DECODE_U8(buff, msg->len, 8);
 
   for (uint8_t i = 0; i < msg->len; ++i) {
-    msg->data[i] = rtcm_getbitu(buff, bit, 8);
-    bit += 8;
+    BITSTREAM_DECODE_U8(buff, msg->data[i], 8);
   }
 
   return RC_OK;

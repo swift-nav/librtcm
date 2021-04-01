@@ -22,13 +22,13 @@
 #define MSM_MAX_CELLS 64           /* Maximum number of cells in MSM message */
 #define MSM_SATELLITE_MASK_SIZE 64 /* Maximum size of MSM satellite mask */
 #define MSM_SIGNAL_MASK_SIZE 32    /* Maximum size of MSM signal mask */
-#define MSM_ROUGH_RANGE_INVALID 0xFF  /* Unsigned bit pattern 0xFF */
-#define MSM_ROUGH_RATE_INVALID 0x2000 /* Unsigned bit pattern 0x2000 */
-#define MSM_PR_INVALID (-16384)       /* Signed bit pattern 0x4000 */
-#define MSM_PR_EXT_INVALID (-8388608) /* Signed bit pattern 0x800000 */
-#define MSM_CP_INVALID (-2097152)     /* Signed bit pattern 0x200000 */
-#define MSM_CP_EXT_INVALID (-8388608) /* Signed bit pattern 0x800000 */
-#define MSM_DOP_INVALID (-16384)      /* Signed bit pattern 0x4000 */
+#define MSM_ROUGH_RANGE_INVALID 0xFF   /* Unsigned bit pattern 0xFF */
+#define MSM_ROUGH_RATE_INVALID (-8192) /* Signed bit pattern 0x2000 */
+#define MSM_PR_INVALID (-16384)        /* Signed bit pattern 0x4000 */
+#define MSM_PR_EXT_INVALID (-524288)   /* Signed bit pattern 0x80000 */
+#define MSM_CP_INVALID (-2097152)      /* Signed bit pattern 0x200000 */
+#define MSM_CP_EXT_INVALID (-8388608)  /* Signed bit pattern 0x800000 */
+#define MSM_DOP_INVALID (-16384)       /* Signed bit pattern 0x4000 */
 
 #define RTCM_MAX_STRING_LEN 32 /* Max length of strings in 1008, 1033, etc */
 

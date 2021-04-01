@@ -10,7 +10,6 @@
  * WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +26,8 @@
 #define DEBUG 0
 #define LIBRTCM_LOG_INTERNAL
 #include "rtcm3/logging.h"
+
+#include "test_assert.h"
 
 static uint8_t fw_ver_array[] = {
     0xD3, 0x00, 0x1A, 0x3E, 0x71, 0x91, 0x64, 0x74, 0xE5, 0x35, 0x34,

@@ -159,8 +159,12 @@ uint16_t rtcm3_encode_glo_eph(const rtcm_msg_eph *msg_1020, uint8_t buff[]) {
   rtcm_setbitu(buff, bit, 2, 0);
   bit += 2;
   // Additional data
-  rtcm_setbitu(buff, bit, 79, 0);
-  bit += 79;
+  rtcm_setbitu(buff, bit, 32, 0);
+  bit += 32;
+  rtcm_setbitu(buff, bit, 32, 0);
+  bit += 32;
+  rtcm_setbitu(buff, bit, 15, 0);
+  bit += 15;
 
   /* Round number of bits up to nearest whole byte. */
   return (bit + 7) / 8;

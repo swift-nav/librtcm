@@ -14,13 +14,62 @@
 #define SWIFTNAV_RTCM3_EPH_DECODE_H
 
 #include <rtcm3/messages.h>
+#include <swiftnav/bitstream.h>
 #define BEIDOU_GEOS_MAX_PRN 5
 
-rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);
-rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);
-rtcm3_rc rtcm3_decode_gal_eph_inav(const uint8_t buff[], rtcm_msg_eph *msg_eph);
-rtcm3_rc rtcm3_decode_gal_eph_fnav(const uint8_t buff[], rtcm_msg_eph *msg_eph);
-rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);
-rtcm3_rc rtcm3_decode_qzss_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);
+rtcm3_rc rtcm3_decode_gps_eph_bitstream(swiftnav_bitstream_t *buff,
+                                        rtcm_msg_eph *msg_eph);
+rtcm3_rc rtcm3_decode_glo_eph_bitstream(swiftnav_bitstream_t *buff,
+                                        rtcm_msg_eph *msg_eph);
+rtcm3_rc rtcm3_decode_gal_eph_inav_bitstream(swiftnav_bitstream_t *buff,
+                                             rtcm_msg_eph *msg_eph);
+rtcm3_rc rtcm3_decode_gal_eph_fnav_bitstream(swiftnav_bitstream_t *buff,
+                                             rtcm_msg_eph *msg_eph);
+rtcm3_rc rtcm3_decode_bds_eph_bitstream(swiftnav_bitstream_t *buff,
+                                        rtcm_msg_eph *msg_eph);
+rtcm3_rc rtcm3_decode_qzss_eph_bitstream(swiftnav_bitstream_t *buff,
+                                         rtcm_msg_eph *msg_eph);
+
+static inline rtcm3_rc rtcm3_decode_gps_eph(const uint8_t buff[],
+                                            rtcm_msg_eph *msg_eph) {
+  swiftnav_bitstream_t bitstream;
+  swiftnav_bitstream_init(&bitstream, buff, UINT32_MAX);
+  return rtcm3_decode_gps_eph_bitstream(&bitstream, msg_eph);
+}
+
+static inline rtcm3_rc rtcm3_decode_glo_eph(const uint8_t buff[],
+                                            rtcm_msg_eph *msg_eph) {
+  swiftnav_bitstream_t bitstream;
+  swiftnav_bitstream_init(&bitstream, buff, UINT32_MAX);
+  return rtcm3_decode_glo_eph_bitstream(&bitstream, msg_eph);
+}
+
+static inline rtcm3_rc rtcm3_decode_gal_eph_inav(const uint8_t buff[],
+                                                 rtcm_msg_eph *msg_eph) {
+  swiftnav_bitstream_t bitstream;
+  swiftnav_bitstream_init(&bitstream, buff, UINT32_MAX);
+  return rtcm3_decode_gal_eph_inav_bitstream(&bitstream, msg_eph);
+}
+
+static inline rtcm3_rc rtcm3_decode_gal_eph_fnav(const uint8_t buff[],
+                                                 rtcm_msg_eph *msg_eph) {
+  swiftnav_bitstream_t bitstream;
+  swiftnav_bitstream_init(&bitstream, buff, UINT32_MAX);
+  return rtcm3_decode_gal_eph_fnav_bitstream(&bitstream, msg_eph);
+}
+
+static inline rtcm3_rc rtcm3_decode_bds_eph(const uint8_t buff[],
+                                            rtcm_msg_eph *msg_eph) {
+  swiftnav_bitstream_t bitstream;
+  swiftnav_bitstream_init(&bitstream, buff, UINT32_MAX);
+  return rtcm3_decode_bds_eph_bitstream(&bitstream, msg_eph);
+}
+
+static inline rtcm3_rc rtcm3_decode_qzss_eph(const uint8_t buff[],
+                                             rtcm_msg_eph *msg_eph) {
+  swiftnav_bitstream_t bitstream;
+  swiftnav_bitstream_init(&bitstream, buff, UINT32_MAX);
+  return rtcm3_decode_qzss_eph_bitstream(&bitstream, msg_eph);
+}
 
 #endif /* SWIFTNAV_RTCM3_EPH_DECODE_H */

@@ -155,16 +155,16 @@ typedef struct {
 typedef struct {
   uint16_t stn_id;                /* Reference Station ID DF003 uint12 12 */
   uint8_t ant_descriptor_counter; /* Descriptor Counter N DF029 uint8 8 */
-  char ant_descriptor[RTCM_MAX_STRING_LEN]; /* Antenna Descriptor DF030 char8(N)
-                                               8*N N <= 31 */
-  uint8_t ant_setup_id;                     /* Antenna Setup ID DF031 uint8 8 */
+  char ant_descriptor[RTCM_MAX_STRING_LEN + 1]; /* Antenna Descriptor DF030
+                                                 char8(N) 8*N N <= 31 */
+  uint8_t ant_setup_id; /* Antenna Setup ID DF031 uint8 8 */
 } rtcm_msg_1007;
 
 typedef struct {
   rtcm_msg_1007 msg_1007;
   uint8_t ant_serial_num_counter; /* Serial Number Counter M DF032 uint8 8 */
-  char ant_serial_num[RTCM_MAX_STRING_LEN]; /* Antenna Serial Number DF033
-                                               char8(M) 8*M M <= 31*/
+  char ant_serial_num[RTCM_MAX_STRING_LEN + 1]; /* Antenna Serial Number DF033
+                                                 char8(M) 8*M M <= 31*/
 } rtcm_msg_1008;
 
 #define RTCM_1029_MAX_CODE_UNITS (255u)
@@ -180,16 +180,20 @@ typedef struct {
 typedef struct {
   uint16_t stn_id;                /* Reference Station ID DF003 uint12 12 */
   uint8_t ant_descriptor_counter; /* Antenna Descriptor Counter N DF029 */
-  char ant_descriptor[RTCM_MAX_STRING_LEN]; /* Antenna Descriptor DF030 */
-  uint8_t ant_setup_id;                     /* Antenna Setup ID DF031 */
+  char ant_descriptor[RTCM_MAX_STRING_LEN + 1]; /* Antenna Descriptor DF030 */
+  uint8_t ant_setup_id;                         /* Antenna Setup ID DF031 */
   uint8_t ant_serial_num_counter; /* Antenna Serial Number Counter M DF032 */
-  char ant_serial_num[RTCM_MAX_STRING_LEN]; /* Antenna Serial Number DF033 */
+  char
+      ant_serial_num[RTCM_MAX_STRING_LEN + 1]; /* Antenna Serial Number DF033 */
   uint8_t rcv_descriptor_counter; /* Receiver Type Descriptor Counter I DF227 */
-  char rcv_descriptor[RTCM_MAX_STRING_LEN]; /* Receiver Type Descriptor DF228 */
+  char rcv_descriptor[RTCM_MAX_STRING_LEN +
+                      1];         /* Receiver Type Descriptor DF228 */
   uint8_t rcv_fw_version_counter; /* Receiver Firmware Version Counter DF229 */
-  char rcv_fw_version[RTCM_MAX_STRING_LEN]; /* Receiver Firmware Version DF230*/
+  char rcv_fw_version[RTCM_MAX_STRING_LEN +
+                      1];         /* Receiver Firmware Version DF230*/
   uint8_t rcv_serial_num_counter; /* Receiver Serial Number Counter K DF231 */
-  char rcv_serial_num[RTCM_MAX_STRING_LEN]; /* Receiver Serial Number DF232 */
+  char rcv_serial_num[RTCM_MAX_STRING_LEN +
+                      1]; /* Receiver Serial Number DF232 */
 } rtcm_msg_1033;
 
 typedef struct {

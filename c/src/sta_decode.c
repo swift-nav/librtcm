@@ -17,8 +17,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "decode_helpers.h"
 #include "rtcm3/bits.h"
-#include "rtcm3/decode_macros.h"
 
 #define RCC_FW_CONFIG_START_BIT 58
 rtcm3_rc sta_decode_rcc_config(const uint8_t buff[],
@@ -28,7 +28,7 @@ rtcm3_rc sta_decode_rcc_config(const uint8_t buff[],
   uint16_t msg_num = rtcm_getbitu(buff, bit, 12);
   bit += 12;
   uint8_t subtype_id = rtcm_getbitu(buff, bit, 8);
-  bit += 8;
+  bit += 8;  // NOLINT
   /* this should never be called on anything other than msg 999:2 */
   assert(msg_num == 999 && subtype_id == 2);
   (void)msg_num;
@@ -65,8 +65,14 @@ rtcm3_rc sta_decode_fwver(const uint8_t buff[], char *fw_ver, uint8_t len) {
   (void)msg_num;
   (void)subtype_id;
   assert(msg_num == 999 && subtype_id == 25);
-  GET_STR_LEN(buff, bit, fw_ver_strlen);
-  GET_STR(buff, bit, len, fw_ver);
+  fw_ver_strlen = rtcm_getbitu(buff, bit, 8);
+  bit += 8;
+  /* if fw_ver_strlen is bigger then our len, use the smaller
+   * of the two*/
+  if (fw_ver_strlen > len) {
+    fw_ver_strlen = len;
+  }
+  GET_STR(buff, bit, fw_ver_strlen, fw_ver);
   fw_ver[fw_ver_strlen] = '\0';
   return RC_OK;
 }
