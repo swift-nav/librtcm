@@ -16,11 +16,19 @@
 #include <rtcm3/messages.h>
 #define BEIDOU_GEOS_MAX_PRN 5
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 uint16_t rtcm3_encode_gps_eph(const rtcm_msg_eph *msg_1019, uint8_t buff[]);
 uint16_t rtcm3_encode_glo_eph(const rtcm_msg_eph *msg_1020, uint8_t buff[]);
 uint16_t rtcm3_encode_bds_eph(const rtcm_msg_eph *msg_1042, uint8_t buff[]);
 uint16_t rtcm3_encode_gal_eph_inav(const rtcm_msg_eph *msg_eph, uint8_t buff[]);
 uint16_t rtcm3_encode_gal_eph_fnav(const rtcm_msg_eph *msg_eph, uint8_t buff[]);
 // uint16_t rtcm3_encode_qzss_eph(const uint8_t buff[], rtcm_msg_eph *msg_eph);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SWIFTNAV_RTCM3_EPH_ENCODE_H */

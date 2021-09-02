@@ -37,34 +37,34 @@ rtcm3_rc rtcm3_decode_gps_eph_bitstream(swiftnav_bitstream_t *buff,
   BITSTREAM_DECODE_U8(buff, msg_eph->sat_id, 6);
   BITSTREAM_DECODE_U16(buff, msg_eph->wn, 10);
   BITSTREAM_DECODE_U16(buff, msg_eph->ura, 4);
-  BITSTREAM_DECODE_U8(buff, msg_eph->kepler.codeL2, 2);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.inc_dot, 14);
-  BITSTREAM_DECODE_U16(buff, msg_eph->kepler.iode, 8);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.toc, 16);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.af2, 8);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.af1, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.af0, 22);
-  BITSTREAM_DECODE_U16(buff, msg_eph->kepler.iodc, 10);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.crs, 16);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.dn, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.m0, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cuc, 16);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.ecc, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cus, 16);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.sqrta, 32);
+  BITSTREAM_DECODE_U8(buff, msg_eph->data.kepler.codeL2, 2);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.inc_dot, 14);
+  BITSTREAM_DECODE_U16(buff, msg_eph->data.kepler.iode, 8);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.toc, 16);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.af2, 8);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.af1, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.af0, 22);
+  BITSTREAM_DECODE_U16(buff, msg_eph->data.kepler.iodc, 10);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.crs, 16);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.dn, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.m0, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cuc, 16);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.ecc, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cus, 16);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.sqrta, 32);
   BITSTREAM_DECODE_U32(buff, msg_eph->toe, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cic, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.omega0, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cis, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.inc, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.crc, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.w, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.omegadot, 24);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.tgd_gps_s, 8);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cic, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.omega0, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cis, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.inc, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.crc, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.w, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.omegadot, 24);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.tgd.gps_s, 8);
   BITSTREAM_DECODE_U8(buff, msg_eph->health_bits, 6);
   uint8_t L2_data_bit;
   BITSTREAM_DECODE_U8(buff, L2_data_bit, 1);
-  msg_eph->kepler.L2_data_bit = (bool)L2_data_bit;
+  msg_eph->data.kepler.L2_data_bit = (bool)L2_data_bit;
   BITSTREAM_DECODE_U32(buff, msg_eph->fit_interval, 1);
 
   return RC_OK;
@@ -88,34 +88,34 @@ rtcm3_rc rtcm3_decode_qzss_eph_bitstream(swiftnav_bitstream_t *buff,
     return RC_MESSAGE_TYPE_MISMATCH;
   }
   BITSTREAM_DECODE_U8(buff, msg_eph->sat_id, 4);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.toc, 16);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.af2, 8);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.af1, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.af0, 22);
-  BITSTREAM_DECODE_U16(buff, msg_eph->kepler.iode, 8);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.crs, 16);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.dn, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.m0, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cuc, 16);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.ecc, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cus, 16);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.sqrta, 32);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.toc, 16);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.af2, 8);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.af1, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.af0, 22);
+  BITSTREAM_DECODE_U16(buff, msg_eph->data.kepler.iode, 8);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.crs, 16);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.dn, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.m0, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cuc, 16);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.ecc, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cus, 16);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.sqrta, 32);
   BITSTREAM_DECODE_U32(buff, msg_eph->toe, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cic, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.omega0, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cis, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.inc, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.crc, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.w, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.omegadot, 24);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.inc_dot, 14);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cic, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.omega0, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cis, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.inc, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.crc, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.w, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.omegadot, 24);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.inc_dot, 14);
   /* L2 data bit */
   swiftnav_bitstream_remove(buff, 2);
   BITSTREAM_DECODE_U16(buff, msg_eph->wn, 10);
   BITSTREAM_DECODE_U16(buff, msg_eph->ura, 4);
   BITSTREAM_DECODE_U8(buff, msg_eph->health_bits, 6);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.tgd_gps_s, 8);
-  BITSTREAM_DECODE_U16(buff, msg_eph->kepler.iodc, 10);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.tgd.gps_s, 8);
+  BITSTREAM_DECODE_U16(buff, msg_eph->data.kepler.iodc, 10);
   BITSTREAM_DECODE_U32(buff, msg_eph->fit_interval, 1);
   return RC_OK;
 }
@@ -138,7 +138,7 @@ rtcm3_rc rtcm3_decode_glo_eph_bitstream(swiftnav_bitstream_t *buff,
     return RC_MESSAGE_TYPE_MISMATCH;
   }
   BITSTREAM_DECODE_U8(buff, msg_eph->sat_id, 6);
-  BITSTREAM_DECODE_U8(buff, msg_eph->glo.fcn, 5);
+  BITSTREAM_DECODE_U8(buff, msg_eph->data.glo.fcn, 5);
   /*alm health ind = */
   swiftnav_bitstream_remove(buff, 1);
   /*alm health ind valid = */
@@ -151,41 +151,41 @@ rtcm3_rc rtcm3_decode_glo_eph_bitstream(swiftnav_bitstream_t *buff,
   BITSTREAM_DECODE_U8(buff, bn_msb, 1);
   /* P2 */
   swiftnav_bitstream_remove(buff, 1);
-  BITSTREAM_DECODE_U8(buff, msg_eph->glo.t_b, 7);
+  BITSTREAM_DECODE_U8(buff, msg_eph->data.glo.t_b, 7);
   rtcm3_rc ret =
-      rtcm_get_sign_magnitude_bitstream(buff, 24, &msg_eph->glo.vel[0]);
+      rtcm_get_sign_magnitude_bitstream(buff, 24, &msg_eph->data.glo.vel[0]);
   if (ret != RC_OK) {
     return ret;
   }
-  ret = rtcm_get_sign_magnitude_bitstream(buff, 27, &msg_eph->glo.pos[0]);
+  ret = rtcm_get_sign_magnitude_bitstream(buff, 27, &msg_eph->data.glo.pos[0]);
   if (ret != RC_OK) {
     return ret;
   }
-  ret = rtcm_get_sign_magnitude_bitstream(buff, 5, &msg_eph->glo.acc[0]);
+  ret = rtcm_get_sign_magnitude_bitstream(buff, 5, &msg_eph->data.glo.acc[0]);
   if (ret != RC_OK) {
     return ret;
   }
-  ret = rtcm_get_sign_magnitude_bitstream(buff, 24, &msg_eph->glo.vel[1]);
+  ret = rtcm_get_sign_magnitude_bitstream(buff, 24, &msg_eph->data.glo.vel[1]);
   if (ret != RC_OK) {
     return ret;
   }
-  ret = rtcm_get_sign_magnitude_bitstream(buff, 27, &msg_eph->glo.pos[1]);
+  ret = rtcm_get_sign_magnitude_bitstream(buff, 27, &msg_eph->data.glo.pos[1]);
   if (ret != RC_OK) {
     return ret;
   }
-  ret = rtcm_get_sign_magnitude_bitstream(buff, 5, &msg_eph->glo.acc[1]);
+  ret = rtcm_get_sign_magnitude_bitstream(buff, 5, &msg_eph->data.glo.acc[1]);
   if (ret != RC_OK) {
     return ret;
   }
-  ret = rtcm_get_sign_magnitude_bitstream(buff, 24, &msg_eph->glo.vel[2]);
+  ret = rtcm_get_sign_magnitude_bitstream(buff, 24, &msg_eph->data.glo.vel[2]);
   if (ret != RC_OK) {
     return ret;
   }
-  ret = rtcm_get_sign_magnitude_bitstream(buff, 27, &msg_eph->glo.pos[2]);
+  ret = rtcm_get_sign_magnitude_bitstream(buff, 27, &msg_eph->data.glo.pos[2]);
   if (ret != RC_OK) {
     return ret;
   }
-  ret = rtcm_get_sign_magnitude_bitstream(buff, 5, &msg_eph->glo.acc[2]);
+  ret = rtcm_get_sign_magnitude_bitstream(buff, 5, &msg_eph->data.glo.acc[2]);
   if (ret != RC_OK) {
     return ret;
   }
@@ -196,13 +196,13 @@ rtcm3_rc rtcm3_decode_glo_eph_bitstream(swiftnav_bitstream_t *buff,
   if (ret != RC_OK) {
     return ret;
   }
-  msg_eph->glo.gamma = (s16)gamma;
+  msg_eph->data.glo.gamma = (s16)gamma;
   /* P */
   swiftnav_bitstream_remove(buff, 2);
   /* health flag in string 3 */
   uint8_t mln3;
   BITSTREAM_DECODE_U8(buff, mln3, 1);
-  ret = rtcm_get_sign_magnitude_bitstream(buff, 22, &msg_eph->glo.tau);
+  ret = rtcm_get_sign_magnitude_bitstream(buff, 22, &msg_eph->data.glo.tau);
   if (ret != RC_OK) {
     return ret;
   }
@@ -211,7 +211,7 @@ rtcm3_rc rtcm3_decode_glo_eph_bitstream(swiftnav_bitstream_t *buff,
   if (ret != RC_OK) {
     return ret;
   }
-  msg_eph->glo.d_tau = (uint8_t)d_tau;
+  msg_eph->data.glo.d_tau = (uint8_t)d_tau;
   /* EN */
   swiftnav_bitstream_remove(buff, 5);
   /* P4 */
@@ -267,30 +267,30 @@ rtcm3_rc rtcm3_decode_bds_eph_bitstream(swiftnav_bitstream_t *buff,
   }
   BITSTREAM_DECODE_U16(buff, msg_eph->wn, 13);
   BITSTREAM_DECODE_U16(buff, msg_eph->ura, 4);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.inc_dot, 14);
-  BITSTREAM_DECODE_U16(buff, msg_eph->kepler.iode, 5);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.toc, 17);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.af2, 11);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.af1, 22);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.af0, 24);
-  BITSTREAM_DECODE_U16(buff, msg_eph->kepler.iodc, 5);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.crs, 18);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.dn, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.m0, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cuc, 18);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.ecc, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cus, 18);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.sqrta, 32);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.inc_dot, 14);
+  BITSTREAM_DECODE_U16(buff, msg_eph->data.kepler.iode, 5);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.toc, 17);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.af2, 11);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.af1, 22);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.af0, 24);
+  BITSTREAM_DECODE_U16(buff, msg_eph->data.kepler.iodc, 5);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.crs, 18);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.dn, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.m0, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cuc, 18);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.ecc, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cus, 18);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.sqrta, 32);
   BITSTREAM_DECODE_U32(buff, msg_eph->toe, 17);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cic, 18);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.omega0, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cis, 18);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.inc, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.crc, 18);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.w, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.omegadot, 24);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.tgd_bds_s[0], 10);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.tgd_bds_s[1], 10);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cic, 18);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.omega0, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cis, 18);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.inc, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.crc, 18);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.w, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.omegadot, 24);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.tgd.bds_s[0], 10);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.tgd.bds_s[1], 10);
   BITSTREAM_DECODE_U8(buff, msg_eph->health_bits, 1);
   return RC_OK;
 }
@@ -306,28 +306,28 @@ static uint16_t rtcm3_decode_gal_eph_common(swiftnav_bitstream_t *buff,
   assert(msg_eph);
   BITSTREAM_DECODE_U8(buff, msg_eph->sat_id, 6);
   BITSTREAM_DECODE_U16(buff, msg_eph->wn, 12);
-  BITSTREAM_DECODE_U16(buff, msg_eph->kepler.iode, 10);
+  BITSTREAM_DECODE_U16(buff, msg_eph->data.kepler.iode, 10);
   BITSTREAM_DECODE_U16(buff, msg_eph->ura, 8);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.inc_dot, 14);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.toc, 14);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.af2, 6);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.af1, 21);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.af0, 31);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.crs, 16);
-  BITSTREAM_DECODE_S16(buff, msg_eph->kepler.dn, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.m0, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cuc, 16);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.ecc, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cus, 16);
-  BITSTREAM_DECODE_U32(buff, msg_eph->kepler.sqrta, 32);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.inc_dot, 14);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.toc, 14);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.af2, 6);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.af1, 21);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.af0, 31);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.crs, 16);
+  BITSTREAM_DECODE_S16(buff, msg_eph->data.kepler.dn, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.m0, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cuc, 16);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.ecc, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cus, 16);
+  BITSTREAM_DECODE_U32(buff, msg_eph->data.kepler.sqrta, 32);
   BITSTREAM_DECODE_U32(buff, msg_eph->toe, 14);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cic, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.omega0, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.cis, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.inc, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.crc, 16);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.w, 32);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.omegadot, 24);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cic, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.omega0, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.cis, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.inc, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.crc, 16);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.w, 32);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.omegadot, 24);
   return RC_OK;
 }
 
@@ -355,8 +355,8 @@ rtcm3_rc rtcm3_decode_gal_eph_inav_bitstream(swiftnav_bitstream_t *buff,
     return ret;
   }
 
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.tgd_gal_s[0], 10);
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.tgd_gal_s[1], 10);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.tgd.gal_s[0], 10);
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.tgd.gal_s[1], 10);
   BITSTREAM_DECODE_S8(buff, msg_eph->health_bits, 6);
   /* reserved */
   swiftnav_bitstream_remove(buff, 2);
@@ -388,8 +388,8 @@ rtcm3_rc rtcm3_decode_gal_eph_fnav_bitstream(swiftnav_bitstream_t *buff,
     return ret;
   }
 
-  BITSTREAM_DECODE_S32(buff, msg_eph->kepler.tgd_gal_s[0], 10);
-  msg_eph->kepler.tgd_gal_s[1] = 0;
+  BITSTREAM_DECODE_S32(buff, msg_eph->data.kepler.tgd.gal_s[0], 10);
+  msg_eph->data.kepler.tgd.gal_s[1] = 0;
   BITSTREAM_DECODE_S8(buff, msg_eph->health_bits, 3);
   /* reserved */
   swiftnav_bitstream_remove(buff, 7);

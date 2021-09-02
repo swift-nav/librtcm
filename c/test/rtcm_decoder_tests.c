@@ -77,27 +77,27 @@ void test_rtcm_1001(void) {
   msg1001.sats[0].obs[0].pseudorange = 20000004.4;
   msg1001.sats[0].obs[0].carrier_phase = 105100794.4;
   msg1001.sats[0].obs[0].lock = 900;
-  msg1001.sats[0].obs[0].flags.valid_pr = 1;
-  msg1001.sats[0].obs[0].flags.valid_cp = 1;
-  msg1001.sats[0].obs[0].flags.valid_lock = 1;
+  msg1001.sats[0].obs[0].flags.fields.valid_pr = 1;
+  msg1001.sats[0].obs[0].flags.fields.valid_cp = 1;
+  msg1001.sats[0].obs[0].flags.fields.valid_lock = 1;
 
   msg1001.sats[1].svId = 6;
   msg1001.sats[1].obs[0].code = 0;
   msg1001.sats[1].obs[0].pseudorange = 22000004.4;
   msg1001.sats[1].obs[0].carrier_phase = 115610703.4;
   msg1001.sats[1].obs[0].lock = 254;
-  msg1001.sats[1].obs[0].flags.valid_pr = 1;
-  msg1001.sats[1].obs[0].flags.valid_cp = 1;
-  msg1001.sats[1].obs[0].flags.valid_lock = 1;
+  msg1001.sats[1].obs[0].flags.fields.valid_pr = 1;
+  msg1001.sats[1].obs[0].flags.fields.valid_cp = 1;
+  msg1001.sats[1].obs[0].flags.fields.valid_lock = 1;
 
   msg1001.sats[2].svId = 6;
   msg1001.sats[2].obs[0].code = 0;
   msg1001.sats[2].obs[0].pseudorange = 22000004.4;
   msg1001.sats[2].obs[0].carrier_phase = 115610553.4;
   msg1001.sats[2].obs[0].lock = 254;
-  msg1001.sats[2].obs[0].flags.valid_pr = 1;
-  msg1001.sats[2].obs[0].flags.valid_cp = 0;
-  msg1001.sats[2].obs[0].flags.valid_lock = 0;
+  msg1001.sats[2].obs[0].flags.fields.valid_pr = 1;
+  msg1001.sats[2].obs[0].flags.fields.valid_cp = 0;
+  msg1001.sats[2].obs[0].flags.fields.valid_lock = 0;
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -127,33 +127,33 @@ void test_rtcm_1002(void) {
   msg1002.sats[0].obs[0].pseudorange = 20000004.4;
   msg1002.sats[0].obs[0].carrier_phase = 105100794.4;
   msg1002.sats[0].obs[0].lock = 900;
-  msg1002.sats[0].obs[0].flags.valid_pr = 1;
-  msg1002.sats[0].obs[0].flags.valid_cp = 1;
-  msg1002.sats[0].obs[0].flags.valid_lock = 1;
+  msg1002.sats[0].obs[0].flags.fields.valid_pr = 1;
+  msg1002.sats[0].obs[0].flags.fields.valid_cp = 1;
+  msg1002.sats[0].obs[0].flags.fields.valid_lock = 1;
   msg1002.sats[0].obs[0].cnr = 3.4;
-  msg1002.sats[0].obs[0].flags.valid_cnr = 1;
+  msg1002.sats[0].obs[0].flags.fields.valid_cnr = 1;
 
   msg1002.sats[1].svId = 6;
   msg1002.sats[1].obs[0].code = 0;
   msg1002.sats[1].obs[0].pseudorange = 22000004.4;
   msg1002.sats[1].obs[0].carrier_phase = 115610703.4;
   msg1002.sats[1].obs[0].lock = 254;
-  msg1002.sats[1].obs[0].flags.valid_pr = 1;
-  msg1002.sats[1].obs[0].flags.valid_cp = 1;
-  msg1002.sats[1].obs[0].flags.valid_lock = 1;
+  msg1002.sats[1].obs[0].flags.fields.valid_pr = 1;
+  msg1002.sats[1].obs[0].flags.fields.valid_cp = 1;
+  msg1002.sats[1].obs[0].flags.fields.valid_lock = 1;
   msg1002.sats[1].obs[0].cnr = 50.2;
-  msg1002.sats[1].obs[0].flags.valid_cnr = 1;
+  msg1002.sats[1].obs[0].flags.fields.valid_cnr = 1;
 
   msg1002.sats[2].svId = 6;
   msg1002.sats[2].obs[0].code = 0;
   msg1002.sats[2].obs[0].pseudorange = 22000004.4;
   msg1002.sats[2].obs[0].carrier_phase = 115610553.4;
   msg1002.sats[2].obs[0].lock = 254;
-  msg1002.sats[2].obs[0].flags.valid_pr = 1;
-  msg1002.sats[2].obs[0].flags.valid_cp = 0;
-  msg1002.sats[2].obs[0].flags.valid_lock = 0;
+  msg1002.sats[2].obs[0].flags.fields.valid_pr = 1;
+  msg1002.sats[2].obs[0].flags.fields.valid_cp = 0;
+  msg1002.sats[2].obs[0].flags.fields.valid_lock = 0;
   msg1002.sats[2].obs[0].cnr = 50.2;
-  msg1002.sats[2].obs[0].flags.valid_cnr = 0;
+  msg1002.sats[2].obs[0].flags.fields.valid_cnr = 0;
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -183,10 +183,10 @@ void test_rtcm_1003(void) {
   msg1003.sats[0].obs[0].pseudorange = 20000004.4;
   msg1003.sats[0].obs[0].carrier_phase = 105100794.4;
   msg1003.sats[0].obs[0].lock = 900;
-  msg1003.sats[0].obs[0].flags.valid_pr = 1;
-  msg1003.sats[0].obs[0].flags.valid_cp = 1;
-  msg1003.sats[0].obs[0].flags.valid_lock = 1;
-  msg1003.sats[0].obs[0].flags.valid_cnr = 0;
+  msg1003.sats[0].obs[0].flags.fields.valid_pr = 1;
+  msg1003.sats[0].obs[0].flags.fields.valid_cp = 1;
+  msg1003.sats[0].obs[0].flags.fields.valid_lock = 1;
+  msg1003.sats[0].obs[0].flags.fields.valid_cnr = 0;
   msg1003.sats[0].obs[1] = msg1003.sats[0].obs[0];
   msg1003.sats[0].obs[1].pseudorange = 20000124.4;
   msg1003.sats[0].obs[1].carrier_phase = 81897184.4;
@@ -196,10 +196,10 @@ void test_rtcm_1003(void) {
   msg1003.sats[1].obs[0].pseudorange = 22000004.4;
   msg1003.sats[1].obs[0].carrier_phase = 115610703.4;
   msg1003.sats[1].obs[0].lock = 254;
-  msg1003.sats[1].obs[0].flags.valid_pr = 1;
-  msg1003.sats[1].obs[0].flags.valid_cp = 1;
-  msg1003.sats[1].obs[0].flags.valid_lock = 1;
-  msg1003.sats[1].obs[0].flags.valid_cnr = 0;
+  msg1003.sats[1].obs[0].flags.fields.valid_pr = 1;
+  msg1003.sats[1].obs[0].flags.fields.valid_cp = 1;
+  msg1003.sats[1].obs[0].flags.fields.valid_lock = 1;
+  msg1003.sats[1].obs[0].flags.fields.valid_cnr = 0;
   msg1003.sats[1].obs[1] = msg1003.sats[1].obs[0];
   msg1003.sats[1].obs[1].pseudorange = 22000024.4;
   msg1003.sats[1].obs[1].carrier_phase = 90086422.236;
@@ -209,11 +209,11 @@ void test_rtcm_1003(void) {
   msg1003.sats[2].obs[0].pseudorange = 22000004.4;
   msg1003.sats[2].obs[0].carrier_phase = 115610553.4;
   msg1003.sats[2].obs[0].lock = 254;
-  msg1003.sats[2].obs[0].flags.valid_pr = 1;
-  msg1003.sats[2].obs[0].flags.valid_cp = 0;
-  msg1003.sats[2].obs[0].flags.valid_lock = 0;
+  msg1003.sats[2].obs[0].flags.fields.valid_pr = 1;
+  msg1003.sats[2].obs[0].flags.fields.valid_cp = 0;
+  msg1003.sats[2].obs[0].flags.fields.valid_lock = 0;
   msg1003.sats[2].obs[0].cnr = 50.2;
-  msg1003.sats[2].obs[0].flags.valid_cnr = 0;
+  msg1003.sats[2].obs[0].flags.fields.valid_cnr = 0;
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -243,11 +243,11 @@ void test_rtcm_1004(void) {
   msg1004.sats[0].obs[0].pseudorange = 20000004.4;
   msg1004.sats[0].obs[0].carrier_phase = 105100794.4;
   msg1004.sats[0].obs[0].lock = 900;
-  msg1004.sats[0].obs[0].flags.valid_pr = 1;
-  msg1004.sats[0].obs[0].flags.valid_cp = 1;
-  msg1004.sats[0].obs[0].flags.valid_lock = 1;
+  msg1004.sats[0].obs[0].flags.fields.valid_pr = 1;
+  msg1004.sats[0].obs[0].flags.fields.valid_cp = 1;
+  msg1004.sats[0].obs[0].flags.fields.valid_lock = 1;
   msg1004.sats[0].obs[0].cnr = 3.4;
-  msg1004.sats[0].obs[0].flags.valid_cnr = 1;
+  msg1004.sats[0].obs[0].flags.fields.valid_cnr = 1;
   msg1004.sats[0].obs[1] = msg1004.sats[0].obs[0];
   msg1004.sats[0].obs[1].pseudorange = 20000124.4;
   msg1004.sats[0].obs[1].carrier_phase = 81897184.4;
@@ -259,13 +259,13 @@ void test_rtcm_1004(void) {
   msg1004.sats[1].obs[0].pseudorange = 22000004.4;
   msg1004.sats[1].obs[0].carrier_phase = 115610703.4;
   msg1004.sats[1].obs[0].lock = 254;
-  msg1004.sats[1].obs[0].flags.valid_pr = 1;
-  msg1004.sats[1].obs[0].flags.valid_cp = 1;
-  msg1004.sats[1].obs[0].flags.valid_lock = 1;
+  msg1004.sats[1].obs[0].flags.fields.valid_pr = 1;
+  msg1004.sats[1].obs[0].flags.fields.valid_cp = 1;
+  msg1004.sats[1].obs[0].flags.fields.valid_lock = 1;
   msg1004.sats[1].obs[0].cnr = 50.2;
-  msg1004.sats[1].obs[0].flags.valid_cnr = 1;
+  msg1004.sats[1].obs[0].flags.fields.valid_cnr = 1;
   msg1004.sats[1].obs[0].cnr = 50.2;
-  msg1004.sats[1].obs[0].flags.valid_cnr = 1;
+  msg1004.sats[1].obs[0].flags.fields.valid_cnr = 1;
   msg1004.sats[1].obs[1] = msg1004.sats[1].obs[0];
   msg1004.sats[1].obs[1].pseudorange = 22000024.4;
   msg1004.sats[1].obs[1].carrier_phase = 90086422.236;
@@ -275,29 +275,29 @@ void test_rtcm_1004(void) {
   msg1004.sats[2].obs[0].pseudorange = 22000004.4;
   msg1004.sats[2].obs[0].carrier_phase = 115610553.4;
   msg1004.sats[2].obs[0].lock = 254;
-  msg1004.sats[2].obs[0].flags.valid_pr = 1;
-  msg1004.sats[2].obs[0].flags.valid_cp = 0;
-  msg1004.sats[2].obs[0].flags.valid_lock = 0;
+  msg1004.sats[2].obs[0].flags.fields.valid_pr = 1;
+  msg1004.sats[2].obs[0].flags.fields.valid_cp = 0;
+  msg1004.sats[2].obs[0].flags.fields.valid_lock = 0;
   msg1004.sats[2].obs[0].cnr = 50.2;
-  msg1004.sats[2].obs[0].flags.valid_cnr = 0;
+  msg1004.sats[2].obs[0].flags.fields.valid_cnr = 0;
   msg1004.sats[2].obs[0].cnr = 50.2;
-  msg1004.sats[2].obs[0].flags.valid_cnr = 0;
+  msg1004.sats[2].obs[0].flags.fields.valid_cnr = 0;
   msg1004.sats[2].obs[1] = msg1004.sats[2].obs[0];
   msg1004.sats[2].obs[1].cnr = 54.2;
-  msg1004.sats[2].obs[1].flags.valid_cnr = 1;
+  msg1004.sats[2].obs[1].flags.fields.valid_cnr = 1;
 
   msg1004.sats[3].svId = 8;
   msg1004.sats[3].obs[0].code = 0;
   msg1004.sats[3].obs[0].pseudorange = 22000004.4;
   msg1004.sats[3].obs[0].carrier_phase = 115610703.4;
   msg1004.sats[3].obs[0].lock = 254;
-  msg1004.sats[3].obs[0].flags.valid_pr = 1;
-  msg1004.sats[3].obs[0].flags.valid_cp = 1;
-  msg1004.sats[3].obs[0].flags.valid_lock = 1;
+  msg1004.sats[3].obs[0].flags.fields.valid_pr = 1;
+  msg1004.sats[3].obs[0].flags.fields.valid_cp = 1;
+  msg1004.sats[3].obs[0].flags.fields.valid_lock = 1;
   msg1004.sats[3].obs[0].cnr = 50.2;
-  msg1004.sats[3].obs[0].flags.valid_cnr = 1;
+  msg1004.sats[3].obs[0].flags.fields.valid_cnr = 1;
   msg1004.sats[3].obs[0].cnr = 50.2;
-  msg1004.sats[3].obs[0].flags.valid_cnr = 1;
+  msg1004.sats[3].obs[0].flags.fields.valid_cnr = 1;
   /* L2 invalid */
   msg1004.sats[3].obs[1].flags.data = 0;
 
@@ -306,13 +306,13 @@ void test_rtcm_1004(void) {
   msg1004.sats[4].obs[0].pseudorange = 22000004.4;
   msg1004.sats[4].obs[0].carrier_phase = 125610703.4; /* divergent phase */
   msg1004.sats[4].obs[0].lock = 254;
-  msg1004.sats[4].obs[0].flags.valid_pr = 1;
-  msg1004.sats[4].obs[0].flags.valid_cp = 1;
-  msg1004.sats[4].obs[0].flags.valid_lock = 1;
+  msg1004.sats[4].obs[0].flags.fields.valid_pr = 1;
+  msg1004.sats[4].obs[0].flags.fields.valid_cp = 1;
+  msg1004.sats[4].obs[0].flags.fields.valid_lock = 1;
   msg1004.sats[4].obs[0].cnr = 50.2;
-  msg1004.sats[4].obs[0].flags.valid_cnr = 1;
+  msg1004.sats[4].obs[0].flags.fields.valid_cnr = 1;
   msg1004.sats[4].obs[0].cnr = 50.2;
-  msg1004.sats[4].obs[0].flags.valid_cnr = 1;
+  msg1004.sats[4].obs[0].flags.fields.valid_cnr = 1;
   msg1004.sats[4].obs[1] = msg1004.sats[4].obs[0];
   msg1004.sats[4].obs[1].pseudorange = 22000024.4;
   msg1004.sats[4].obs[1].carrier_phase = 80086422.236; /* divergent phase */
@@ -435,11 +435,11 @@ void test_rtcm_1010(void) {
   msg1010.sats[0].obs[0].pseudorange = 20000004.4;
   msg1010.sats[0].obs[0].carrier_phase = 106949010.6;
   msg1010.sats[0].obs[0].lock = 900;
-  msg1010.sats[0].obs[0].flags.valid_pr = 1;
-  msg1010.sats[0].obs[0].flags.valid_cp = 1;
-  msg1010.sats[0].obs[0].flags.valid_lock = 1;
+  msg1010.sats[0].obs[0].flags.fields.valid_pr = 1;
+  msg1010.sats[0].obs[0].flags.fields.valid_cp = 1;
+  msg1010.sats[0].obs[0].flags.fields.valid_lock = 1;
   msg1010.sats[0].obs[0].cnr = 3.4;
-  msg1010.sats[0].obs[0].flags.valid_cnr = 1;
+  msg1010.sats[0].obs[0].flags.fields.valid_cnr = 1;
 
   msg1010.sats[1].svId = 6;
   msg1010.sats[1].fcn = 0x03;
@@ -447,11 +447,11 @@ void test_rtcm_1010(void) {
   msg1010.sats[1].obs[0].pseudorange = 22000004.4;
   msg1010.sats[1].obs[0].carrier_phase = 117396240.5;
   msg1010.sats[1].obs[0].lock = 254;
-  msg1010.sats[1].obs[0].flags.valid_pr = 1;
-  msg1010.sats[1].obs[0].flags.valid_cp = 1;
-  msg1010.sats[1].obs[0].flags.valid_lock = 1;
+  msg1010.sats[1].obs[0].flags.fields.valid_pr = 1;
+  msg1010.sats[1].obs[0].flags.fields.valid_cp = 1;
+  msg1010.sats[1].obs[0].flags.fields.valid_lock = 1;
   msg1010.sats[1].obs[0].cnr = 50.2;
-  msg1010.sats[1].obs[0].flags.valid_cnr = 1;
+  msg1010.sats[1].obs[0].flags.fields.valid_cnr = 1;
 
   msg1010.sats[2].svId = 6;
   msg1010.sats[2].fcn = 5;
@@ -459,11 +459,11 @@ void test_rtcm_1010(void) {
   msg1010.sats[2].obs[0].pseudorange = 22000004.4;
   msg1010.sats[2].obs[0].carrier_phase = 117396248.1;
   msg1010.sats[2].obs[0].lock = 254;
-  msg1010.sats[2].obs[0].flags.valid_pr = 1;
-  msg1010.sats[2].obs[0].flags.valid_cp = 0;
-  msg1010.sats[2].obs[0].flags.valid_lock = 0;
+  msg1010.sats[2].obs[0].flags.fields.valid_pr = 1;
+  msg1010.sats[2].obs[0].flags.fields.valid_cp = 0;
+  msg1010.sats[2].obs[0].flags.fields.valid_lock = 0;
   msg1010.sats[2].obs[0].cnr = 50.2;
-  msg1010.sats[2].obs[0].flags.valid_cnr = 0;
+  msg1010.sats[2].obs[0].flags.fields.valid_cnr = 0;
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -494,11 +494,11 @@ void test_rtcm_1012(void) {
   msg1012.sats[0].obs[0].pseudorange = 20000004.4;
   msg1012.sats[0].obs[0].carrier_phase = 106874009.6;
   msg1012.sats[0].obs[0].lock = 900;
-  msg1012.sats[0].obs[0].flags.valid_pr = 1;
-  msg1012.sats[0].obs[0].flags.valid_cp = 1;
-  msg1012.sats[0].obs[0].flags.valid_lock = 1;
+  msg1012.sats[0].obs[0].flags.fields.valid_pr = 1;
+  msg1012.sats[0].obs[0].flags.fields.valid_cp = 1;
+  msg1012.sats[0].obs[0].flags.fields.valid_lock = 1;
   msg1012.sats[0].obs[0].cnr = 3.4;
-  msg1012.sats[0].obs[0].flags.valid_cnr = 1;
+  msg1012.sats[0].obs[0].flags.fields.valid_cnr = 1;
   msg1012.sats[0].obs[1] = msg1012.sats[0].obs[0];
   msg1012.sats[0].obs[1].pseudorange = 20000124.4;
   msg1012.sats[0].obs[1].carrier_phase = 83124100.9;
@@ -511,13 +511,13 @@ void test_rtcm_1012(void) {
   msg1012.sats[1].obs[0].pseudorange = 22000004.4;
   msg1012.sats[1].obs[0].carrier_phase = 117809044.6;
   msg1012.sats[1].obs[0].lock = 254;
-  msg1012.sats[1].obs[0].flags.valid_pr = 1;
-  msg1012.sats[1].obs[0].flags.valid_cp = 1;
-  msg1012.sats[1].obs[0].flags.valid_lock = 1;
+  msg1012.sats[1].obs[0].flags.fields.valid_pr = 1;
+  msg1012.sats[1].obs[0].flags.fields.valid_cp = 1;
+  msg1012.sats[1].obs[0].flags.fields.valid_lock = 1;
   msg1012.sats[1].obs[0].cnr = 50.2;
-  msg1012.sats[1].obs[0].flags.valid_cnr = 1;
+  msg1012.sats[1].obs[0].flags.fields.valid_cnr = 1;
   msg1012.sats[1].obs[0].cnr = 50.2;
-  msg1012.sats[1].obs[0].flags.valid_cnr = 1;
+  msg1012.sats[1].obs[0].flags.fields.valid_cnr = 1;
   msg1012.sats[1].obs[1] = msg1012.sats[1].obs[0];
   msg1012.sats[1].obs[1].pseudorange = 22000024.4;
   msg1012.sats[1].obs[1].carrier_phase = 91629341.2;
@@ -528,15 +528,15 @@ void test_rtcm_1012(void) {
   msg1012.sats[2].obs[0].pseudorange = 22000004.4;
   msg1012.sats[2].obs[0].carrier_phase = 117396239.7;
   msg1012.sats[2].obs[0].lock = 254;
-  msg1012.sats[2].obs[0].flags.valid_pr = 1;
-  msg1012.sats[2].obs[0].flags.valid_cp = 0;
-  msg1012.sats[2].obs[0].flags.valid_lock = 0;
+  msg1012.sats[2].obs[0].flags.fields.valid_pr = 1;
+  msg1012.sats[2].obs[0].flags.fields.valid_cp = 0;
+  msg1012.sats[2].obs[0].flags.fields.valid_lock = 0;
   msg1012.sats[2].obs[0].cnr = 50.2;
-  msg1012.sats[2].obs[0].flags.valid_cnr = 0;
+  msg1012.sats[2].obs[0].flags.fields.valid_cnr = 0;
   msg1012.sats[2].obs[0].cnr = 50.2;
-  msg1012.sats[2].obs[0].flags.valid_cnr = 0;
+  msg1012.sats[2].obs[0].flags.fields.valid_cnr = 0;
   msg1012.sats[2].obs[1].cnr = 54.2;
-  msg1012.sats[2].obs[1].flags.valid_cnr = 1;
+  msg1012.sats[2].obs[1].flags.fields.valid_cnr = 1;
 
   msg1012.sats[3].svId = 8;
   msg1012.sats[3].fcn = 7;
@@ -544,11 +544,11 @@ void test_rtcm_1012(void) {
   msg1012.sats[3].obs[0].pseudorange = 20000004.4;
   msg1012.sats[3].obs[0].carrier_phase = 106874009.6;
   msg1012.sats[3].obs[0].lock = 900;
-  msg1012.sats[3].obs[0].flags.valid_pr = 1;
-  msg1012.sats[3].obs[0].flags.valid_cp = 1;
-  msg1012.sats[3].obs[0].flags.valid_lock = 1;
+  msg1012.sats[3].obs[0].flags.fields.valid_pr = 1;
+  msg1012.sats[3].obs[0].flags.fields.valid_cp = 1;
+  msg1012.sats[3].obs[0].flags.fields.valid_lock = 1;
   msg1012.sats[3].obs[0].cnr = 3.4;
-  msg1012.sats[3].obs[0].flags.valid_cnr = 1;
+  msg1012.sats[3].obs[0].flags.fields.valid_cnr = 1;
   /* no L2 observation */
   msg1012.sats[3].obs[1].flags.data = 0;
 
@@ -711,7 +711,7 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_in->header.n_sat; i++) {
     flag_bf l1_flags = msg_in->sats[i].obs[L1_FREQ].flags;
-    if (l1_flags.valid_pr && l1_flags.valid_cp) {
+    if (l1_flags.fields.valid_pr && l1_flags.fields.valid_cp) {
       ++num_sats;
     }
   }
@@ -732,7 +732,7 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
   for (uint8_t in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat;
        ++in_sat_idx) {
     flag_bf l1_flags = msg_in->sats[in_sat_idx].obs[L1_FREQ].flags;
-    if (!l1_flags.valid_pr || !l1_flags.valid_cp) {
+    if (!l1_flags.fields.valid_pr || !l1_flags.fields.valid_cp) {
       continue;
     }
 
@@ -752,34 +752,35 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
       const rtcm_freq_data *in_freq = &msg_in->sats[in_sat_idx].obs[freq];
       const rtcm_freq_data *out_freq = &msg_out->sats[out_sat_idx].obs[freq];
 
-      if (in_freq->flags.valid_pr != out_freq->flags.valid_pr) {
+      if (in_freq->flags.fields.valid_pr != out_freq->flags.fields.valid_pr) {
         printf("msgobs valid_pr not equal\n");
         return false;
       }
 
-      if (in_freq->flags.valid_cp != out_freq->flags.valid_cp) {
+      if (in_freq->flags.fields.valid_cp != out_freq->flags.fields.valid_cp) {
         printf("msgobs valid_cp not equal: %u %u\n",
-               in_freq->flags.valid_cp,
-               out_freq->flags.valid_cp);
+               in_freq->flags.fields.valid_cp,
+               out_freq->flags.fields.valid_cp);
         return false;
       }
 
       if ((msg_in->header.msg_num == 1002 || msg_in->header.msg_num == 1004) &&
-          in_freq->flags.valid_cnr != out_freq->flags.valid_cnr) {
+          in_freq->flags.fields.valid_cnr != out_freq->flags.fields.valid_cnr) {
         printf("msgobs valid_cnr not equal\n");
         return false;
       }
 
-      if (in_freq->flags.valid_lock != out_freq->flags.valid_lock) {
+      if (in_freq->flags.fields.valid_lock !=
+          out_freq->flags.fields.valid_lock) {
         printf("msgobs valid_lock not equal for sat %u freq %u, %u vs %u\n",
                in_sat_idx,
                freq,
-               in_freq->flags.valid_lock,
-               out_freq->flags.valid_lock);
+               in_freq->flags.fields.valid_lock,
+               out_freq->flags.fields.valid_lock);
         return false;
       }
 
-      if (in_freq->flags.valid_pr) {
+      if (in_freq->flags.fields.valid_pr) {
         if (in_freq->code != out_freq->code ||
             fabs(in_freq->pseudorange - out_freq->pseudorange -
                  amb * PRUNIT_GPS) > 0.01) {
@@ -789,7 +790,7 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
           return false;
         }
       }
-      if (in_freq->flags.valid_cp) {
+      if (in_freq->flags.fields.valid_cp) {
         double frequency = freq == L1_FREQ ? GPS_L1_HZ : GPS_L2_HZ;
         double diff = in_freq->carrier_phase - out_freq->carrier_phase;
         double tol = 0.0005 / (GPS_C / frequency);
@@ -805,13 +806,13 @@ bool msgobs_equals(const rtcm_obs_message *msg_in,
           }
         }
       }
-      if (in_freq->flags.valid_cnr) {
+      if (in_freq->flags.fields.valid_cnr) {
         if (fabs(in_freq->cnr - out_freq->cnr) > 0.125) {
           printf("msgobs cnr not equal\n");
           return false;
         }
       }
-      if (in_freq->flags.valid_lock) {
+      if (in_freq->flags.fields.valid_lock) {
         if (in_freq->lock < 24) {
           if (out_freq->lock >= 24) {
             printf("msgobs lock not equal\n");
@@ -874,7 +875,7 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_in->header.n_sat; i++) {
     flag_bf l1_flags = msg_in->sats[i].obs[L1_FREQ].flags;
-    if (l1_flags.valid_pr && l1_flags.valid_cp) {
+    if (l1_flags.fields.valid_pr && l1_flags.fields.valid_cp) {
       ++num_sats;
     }
   }
@@ -892,7 +893,7 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
   for (uint8_t in_sat_idx = 0; in_sat_idx < msg_in->header.n_sat;
        ++in_sat_idx) {
     flag_bf l1_flags = msg_in->sats[in_sat_idx].obs[L1_FREQ].flags;
-    if (!l1_flags.valid_pr || !l1_flags.valid_cp) {
+    if (!l1_flags.fields.valid_pr || !l1_flags.fields.valid_cp) {
       continue;
     }
 
@@ -915,31 +916,32 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
       const rtcm_freq_data *in_freq = &msg_in->sats[in_sat_idx].obs[freq];
       const rtcm_freq_data *out_freq = &msg_out->sats[out_sat_idx].obs[freq];
 
-      if (in_freq->flags.valid_pr != out_freq->flags.valid_pr) {
+      if (in_freq->flags.fields.valid_pr != out_freq->flags.fields.valid_pr) {
         return false;
       }
 
-      if (in_freq->flags.valid_cp != out_freq->flags.valid_cp) {
+      if (in_freq->flags.fields.valid_cp != out_freq->flags.fields.valid_cp) {
         return false;
       }
 
       if ((msg_in->header.msg_num == 1010 || msg_in->header.msg_num == 1012) &&
-          in_freq->flags.valid_cnr != out_freq->flags.valid_cnr) {
+          in_freq->flags.fields.valid_cnr != out_freq->flags.fields.valid_cnr) {
         return false;
       }
 
-      if (in_freq->flags.valid_lock != out_freq->flags.valid_lock) {
+      if (in_freq->flags.fields.valid_lock !=
+          out_freq->flags.fields.valid_lock) {
         return false;
       }
 
-      if (in_freq->flags.valid_pr) {
+      if (in_freq->flags.fields.valid_pr) {
         if (in_freq->code != out_freq->code ||
             fabs(in_freq->pseudorange - out_freq->pseudorange -
                  amb * PRUNIT_GLO) > 0.01) {
           return false;
         }
       }
-      if (in_freq->flags.valid_cp) {
+      if (in_freq->flags.fields.valid_cp) {
         int fcn = msg_in->sats[in_sat_idx].fcn - 7;
         double frequency = freq == L1_FREQ ? GLO_L1_HZ + fcn * GLO_L1_DELTA_HZ
                                            : GLO_L1_HZ + fcn * GLO_L2_DELTA_HZ;
@@ -949,12 +951,12 @@ bool msgobs_glo_equals(const rtcm_obs_message *msg_in,
           return false;
         }
       }
-      if (in_freq->flags.valid_cnr) {
+      if (in_freq->flags.fields.valid_cnr) {
         if (fabs(in_freq->cnr - out_freq->cnr) > 0.125) {
           return false;
         }
       }
-      if (in_freq->flags.valid_lock) {
+      if (in_freq->flags.fields.valid_lock) {
         if (in_freq->lock < 24) {
           if (out_freq->lock >= 24) {
             return false;
@@ -1297,39 +1299,39 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
     const rtcm_msm_signal_data *in_data = &msg_in->signals[i];
     const rtcm_msm_signal_data *out_data = &msg_out->signals[i];
 
-    if (in_data->flags.valid_pr != out_data->flags.valid_pr) {
+    if (in_data->flags.fields.valid_pr != out_data->flags.fields.valid_pr) {
       printf("msm valid_pr[%d] not equal: %u %u\n",
              i,
-             in_data->flags.valid_pr,
-             out_data->flags.valid_pr);
+             in_data->flags.fields.valid_pr,
+             out_data->flags.fields.valid_pr);
 
       return false;
     }
 
-    if (in_data->flags.valid_cp != out_data->flags.valid_cp) {
+    if (in_data->flags.fields.valid_cp != out_data->flags.fields.valid_cp) {
       printf("msm valid_cp[%d] not equal: %u %u\n",
              i,
-             in_data->flags.valid_cp,
-             out_data->flags.valid_cp);
+             in_data->flags.fields.valid_cp,
+             out_data->flags.fields.valid_cp);
       return false;
     }
 
-    if (in_data->flags.valid_cnr != out_data->flags.valid_cnr) {
+    if (in_data->flags.fields.valid_cnr != out_data->flags.fields.valid_cnr) {
       printf("msm valid_cnr not equal\n");
       return false;
     }
 
-    if (in_data->flags.valid_lock != out_data->flags.valid_lock) {
+    if (in_data->flags.fields.valid_lock != out_data->flags.fields.valid_lock) {
       printf("msm valid_lock not equal\n");
       return false;
     }
 
-    if (in_data->flags.valid_dop != out_data->flags.valid_dop) {
+    if (in_data->flags.fields.valid_dop != out_data->flags.fields.valid_dop) {
       printf("msm valid_dop not equal\n");
       return false;
     }
 
-    if (in_data->flags.valid_pr) {
+    if (in_data->flags.fields.valid_pr) {
       if (fabs(in_data->pseudorange_ms - out_data->pseudorange_ms) > 1e-7) {
         printf("msm pseudorange[%u] not equal: %.2f %.2f\n",
                i,
@@ -1338,7 +1340,7 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
         return false;
       }
     }
-    if (in_data->flags.valid_cp) {
+    if (in_data->flags.fields.valid_cp) {
       if (fabs(in_data->carrier_phase_ms - out_data->carrier_phase_ms) > 1e-8) {
         printf("msm carrier_phase[%u] not equal: %.5f %.5f\n",
                i,
@@ -1356,7 +1358,7 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
         return false;
       }
     }
-    if (in_data->flags.valid_cnr) {
+    if (in_data->flags.fields.valid_cnr) {
       if (fabs(in_data->cnr - out_data->cnr) > 0.5) {
         printf(
             "msm cnr[%u] not equal: %f %f\n", i, in_data->cnr, out_data->cnr);
@@ -1364,7 +1366,7 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
       }
     }
 
-    if (in_data->flags.valid_lock) {
+    if (in_data->flags.fields.valid_lock) {
       if (rtcm3_encode_lock_time(in_data->lock_time_s) !=
           rtcm3_encode_lock_time(out_data->lock_time_s)) {
         printf("msm lock not equal: %.1f %.1f\n",
@@ -1382,7 +1384,7 @@ bool msg_msm_equals(const rtcm_msm_message *msg_in,
       }
     }
 
-    if (in_data->flags.valid_dop) {
+    if (in_data->flags.fields.valid_dop) {
       if (fabs(in_data->range_rate_m_s - out_data->range_rate_m_s) > 0.02) {
         printf("msm range_rate[%u] not equal: %f %f\n",
                i,
@@ -1435,11 +1437,11 @@ void test_rtcm_msm4(void) {
   msg_msm4.signals[0].pseudorange_ms = 20000004.4 / PRUNIT_GPS;
   msg_msm4.signals[0].carrier_phase_ms = msg_msm4.signals[0].pseudorange_ms;
   msg_msm4.signals[0].lock_time_s = 900;
-  msg_msm4.signals[0].flags.valid_pr = 1;
-  msg_msm4.signals[0].flags.valid_cp = 1;
-  msg_msm4.signals[0].flags.valid_lock = 1;
+  msg_msm4.signals[0].flags.fields.valid_pr = 1;
+  msg_msm4.signals[0].flags.fields.valid_cp = 1;
+  msg_msm4.signals[0].flags.fields.valid_lock = 1;
   msg_msm4.signals[0].cnr = 34;
-  msg_msm4.signals[0].flags.valid_cnr = 1;
+  msg_msm4.signals[0].flags.fields.valid_cnr = 1;
   msg_msm4.signals[1] = msg_msm4.signals[0];
   msg_msm4.signals[1].pseudorange_ms = 20000124.4 / PRUNIT_GPS;
   msg_msm4.signals[1].carrier_phase_ms = msg_msm4.signals[1].pseudorange_ms;
@@ -1450,11 +1452,11 @@ void test_rtcm_msm4(void) {
   msg_msm4.signals[2].pseudorange_ms = 22000004.4 / PRUNIT_GPS;
   msg_msm4.signals[2].carrier_phase_ms = msg_msm4.signals[2].pseudorange_ms;
   msg_msm4.signals[2].lock_time_s = 254;
-  msg_msm4.signals[2].flags.valid_pr = 1;
-  msg_msm4.signals[2].flags.valid_cp = 1;
-  msg_msm4.signals[2].flags.valid_lock = 1;
+  msg_msm4.signals[2].flags.fields.valid_pr = 1;
+  msg_msm4.signals[2].flags.fields.valid_cp = 1;
+  msg_msm4.signals[2].flags.fields.valid_lock = 1;
   msg_msm4.signals[2].cnr = 50.2;
-  msg_msm4.signals[2].flags.valid_cnr = 1;
+  msg_msm4.signals[2].flags.fields.valid_cnr = 1;
   msg_msm4.signals[3] = msg_msm4.signals[2];
   msg_msm4.signals[3].pseudorange_ms = 22000024.4 / PRUNIT_GPS;
   msg_msm4.signals[3].carrier_phase_ms = msg_msm4.signals[3].pseudorange_ms;
@@ -1464,14 +1466,14 @@ void test_rtcm_msm4(void) {
   msg_msm4.signals[4].pseudorange_ms = 22000004.55 / PRUNIT_GPS;
   msg_msm4.signals[4].carrier_phase_ms = msg_msm4.signals[4].pseudorange_ms;
   msg_msm4.signals[4].lock_time_s = 254;
-  msg_msm4.signals[4].flags.valid_pr = 1;
-  msg_msm4.signals[4].flags.valid_cp = 0;
-  msg_msm4.signals[4].flags.valid_lock = 1;
+  msg_msm4.signals[4].flags.fields.valid_pr = 1;
+  msg_msm4.signals[4].flags.fields.valid_cp = 0;
+  msg_msm4.signals[4].flags.fields.valid_lock = 1;
   msg_msm4.signals[4].cnr = 50.2;
-  msg_msm4.signals[4].flags.valid_cnr = 0;
+  msg_msm4.signals[4].flags.fields.valid_cnr = 0;
   msg_msm4.signals[5] = msg_msm4.signals[4];
   msg_msm4.signals[5].cnr = 54.2;
-  msg_msm4.signals[5].flags.valid_cnr = 1;
+  msg_msm4.signals[5].flags.fields.valid_cnr = 1;
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -1525,13 +1527,13 @@ void test_rtcm_msm5(void) {
   msg_msm5.signals[0].carrier_phase_ms = msg_msm5.signals[0].pseudorange_ms;
   msg_msm5.signals[0].range_rate_m_s = 1001.3;
   msg_msm5.signals[0].lock_time_s = 900;
-  msg_msm5.signals[0].flags.valid_pr = 1;
-  msg_msm5.signals[0].flags.valid_cp = 1;
-  msg_msm5.signals[0].flags.valid_lock = 1;
-  msg_msm5.signals[0].flags.valid_dop = 1;
+  msg_msm5.signals[0].flags.fields.valid_pr = 1;
+  msg_msm5.signals[0].flags.fields.valid_cp = 1;
+  msg_msm5.signals[0].flags.fields.valid_lock = 1;
+  msg_msm5.signals[0].flags.fields.valid_dop = 1;
   msg_msm5.signals[0].cnr = 34;
   msg_msm5.signals[0].hca_indicator = 1;
-  msg_msm5.signals[0].flags.valid_cnr = 1;
+  msg_msm5.signals[0].flags.fields.valid_cnr = 1;
   msg_msm5.signals[1] = msg_msm5.signals[0];
   msg_msm5.signals[1].pseudorange_ms = 20000124.4 / PRUNIT_GPS;
   msg_msm5.signals[1].carrier_phase_ms = msg_msm5.signals[1].pseudorange_ms;
@@ -1545,12 +1547,12 @@ void test_rtcm_msm5(void) {
   msg_msm5.signals[2].carrier_phase_ms = msg_msm5.signals[2].pseudorange_ms;
   msg_msm5.signals[2].range_rate_m_s = -1001.5;
   msg_msm5.signals[2].lock_time_s = 254;
-  msg_msm5.signals[2].flags.valid_pr = 1;
-  msg_msm5.signals[2].flags.valid_cp = 1;
-  msg_msm5.signals[2].flags.valid_lock = 1;
-  msg_msm5.signals[2].flags.valid_dop = 1;
+  msg_msm5.signals[2].flags.fields.valid_pr = 1;
+  msg_msm5.signals[2].flags.fields.valid_cp = 1;
+  msg_msm5.signals[2].flags.fields.valid_lock = 1;
+  msg_msm5.signals[2].flags.fields.valid_dop = 1;
   msg_msm5.signals[2].cnr = 50.2;
-  msg_msm5.signals[2].flags.valid_cnr = 1;
+  msg_msm5.signals[2].flags.fields.valid_cnr = 1;
   msg_msm5.signals[3] = msg_msm5.signals[2];
   msg_msm5.signals[3].pseudorange_ms = 22000024.4 / PRUNIT_GPS;
   msg_msm5.signals[3].carrier_phase_ms = msg_msm5.signals[3].pseudorange_ms;
@@ -1563,16 +1565,16 @@ void test_rtcm_msm5(void) {
   msg_msm5.signals[4].carrier_phase_ms = msg_msm5.signals[4].pseudorange_ms;
   msg_msm5.signals[4].range_rate_m_s = 555.2;
   msg_msm5.signals[4].lock_time_s = 254;
-  msg_msm5.signals[4].flags.valid_pr = 1;
-  msg_msm5.signals[4].flags.valid_cp = 0;
-  msg_msm5.signals[4].flags.valid_lock = 1;
-  msg_msm5.signals[4].flags.valid_dop = 1;
+  msg_msm5.signals[4].flags.fields.valid_pr = 1;
+  msg_msm5.signals[4].flags.fields.valid_cp = 0;
+  msg_msm5.signals[4].flags.fields.valid_lock = 1;
+  msg_msm5.signals[4].flags.fields.valid_dop = 1;
   msg_msm5.signals[4].cnr = 50.2;
-  msg_msm5.signals[4].flags.valid_cnr = 0;
+  msg_msm5.signals[4].flags.fields.valid_cnr = 0;
   msg_msm5.signals[5] = msg_msm5.signals[4];
   msg_msm5.signals[5].cnr = 54.2;
-  msg_msm5.signals[5].flags.valid_cnr = 1;
-  msg_msm5.signals[5].flags.valid_dop = 0;
+  msg_msm5.signals[5].flags.fields.valid_cnr = 1;
+  msg_msm5.signals[5].flags.fields.valid_dop = 0;
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -1627,13 +1629,13 @@ void test_rtcm_msm5_glo(void) {
   msg_msm5.signals[0].carrier_phase_ms = msg_msm5.signals[0].pseudorange_ms;
   msg_msm5.signals[0].range_rate_m_s = 1001.3;
   msg_msm5.signals[0].lock_time_s = 900;
-  msg_msm5.signals[0].flags.valid_pr = 1;
-  msg_msm5.signals[0].flags.valid_cp = 1;
-  msg_msm5.signals[0].flags.valid_lock = 1;
-  msg_msm5.signals[0].flags.valid_dop = 1;
+  msg_msm5.signals[0].flags.fields.valid_pr = 1;
+  msg_msm5.signals[0].flags.fields.valid_cp = 1;
+  msg_msm5.signals[0].flags.fields.valid_lock = 1;
+  msg_msm5.signals[0].flags.fields.valid_dop = 1;
   msg_msm5.signals[0].cnr = 34;
   msg_msm5.signals[0].hca_indicator = 1;
-  msg_msm5.signals[0].flags.valid_cnr = 1;
+  msg_msm5.signals[0].flags.fields.valid_cnr = 1;
   msg_msm5.signals[1] = msg_msm5.signals[0];
   msg_msm5.signals[1].pseudorange_ms = 20000124.4 / PRUNIT_GPS;
   msg_msm5.signals[1].carrier_phase_ms = msg_msm5.signals[1].pseudorange_ms;
@@ -1648,12 +1650,12 @@ void test_rtcm_msm5_glo(void) {
   msg_msm5.signals[2].carrier_phase_ms = msg_msm5.signals[2].pseudorange_ms;
   msg_msm5.signals[2].range_rate_m_s = -1001.5;
   msg_msm5.signals[2].lock_time_s = 254;
-  msg_msm5.signals[2].flags.valid_pr = 1;
-  msg_msm5.signals[2].flags.valid_cp = 1;
-  msg_msm5.signals[2].flags.valid_lock = 1;
-  msg_msm5.signals[2].flags.valid_dop = 1;
+  msg_msm5.signals[2].flags.fields.valid_pr = 1;
+  msg_msm5.signals[2].flags.fields.valid_cp = 1;
+  msg_msm5.signals[2].flags.fields.valid_lock = 1;
+  msg_msm5.signals[2].flags.fields.valid_dop = 1;
   msg_msm5.signals[2].cnr = 50.2;
-  msg_msm5.signals[2].flags.valid_cnr = 1;
+  msg_msm5.signals[2].flags.fields.valid_cnr = 1;
   msg_msm5.signals[3] = msg_msm5.signals[2];
   msg_msm5.signals[3].pseudorange_ms = 22000024.4 / PRUNIT_GPS;
   msg_msm5.signals[3].carrier_phase_ms = msg_msm5.signals[3].pseudorange_ms;
@@ -1667,16 +1669,16 @@ void test_rtcm_msm5_glo(void) {
   msg_msm5.signals[4].carrier_phase_ms = msg_msm5.signals[4].pseudorange_ms;
   msg_msm5.signals[4].range_rate_m_s = 555.2;
   msg_msm5.signals[4].lock_time_s = 254;
-  msg_msm5.signals[4].flags.valid_pr = 1;
-  msg_msm5.signals[4].flags.valid_cp = 0;
-  msg_msm5.signals[4].flags.valid_lock = 1;
-  msg_msm5.signals[4].flags.valid_dop = 1;
+  msg_msm5.signals[4].flags.fields.valid_pr = 1;
+  msg_msm5.signals[4].flags.fields.valid_cp = 0;
+  msg_msm5.signals[4].flags.fields.valid_lock = 1;
+  msg_msm5.signals[4].flags.fields.valid_dop = 1;
   msg_msm5.signals[4].cnr = 50.2;
-  msg_msm5.signals[4].flags.valid_cnr = 0;
+  msg_msm5.signals[4].flags.fields.valid_cnr = 0;
   msg_msm5.signals[5] = msg_msm5.signals[4];
   msg_msm5.signals[5].cnr = 54.2;
-  msg_msm5.signals[5].flags.valid_cnr = 1;
-  msg_msm5.signals[5].flags.valid_dop = 0;
+  msg_msm5.signals[5].flags.fields.valid_cnr = 1;
+  msg_msm5.signals[5].flags.fields.valid_dop = 0;
 
   uint8_t buff[1024];
   memset(buff, 0, 1024);
@@ -1850,41 +1852,41 @@ static rtcm_msg_eph get_example_keplerian_rtcm_eph(
     // toe is in 16 second increments
     ret.toe = 460800 / 16;
     // only one TGD
-    ret.kepler.tgd_gps_s = -3;
+    ret.data.kepler.tgd.gps_s = -3;
     // toc is in 16 second increments
-    ret.kepler.toc = 460800 / 16;
+    ret.data.kepler.toc = 460800 / 16;
     // iodc can be 0-1023
-    ret.kepler.iodc = 954;
+    ret.data.kepler.iodc = 954;
     // iodc can be 0-255
-    ret.kepler.iode = 250;
+    ret.data.kepler.iode = 250;
     // L2 data is only for GPS
-    ret.kepler.codeL2 = 1;
-    ret.kepler.L2_data_bit = true;
+    ret.data.kepler.codeL2 = 1;
+    ret.data.kepler.L2_data_bit = true;
   } else if (cons == RTCM_CONSTELLATION_GAL) {
     // wn is mod 4096
     ret.wn = 4000;
     // toe is in 60 second increments
     ret.toe = 460800 / 60;
     // TGDs can range from -511 to +512
-    ret.kepler.tgd_gal_s[0] = -450;
-    ret.kepler.tgd_gal_s[1] = 454;
+    ret.data.kepler.tgd.gal_s[0] = -450;
+    ret.data.kepler.tgd.gal_s[1] = 454;
     // toc is in 60 second increments
-    ret.kepler.toc = 460800 / 60;
+    ret.data.kepler.toc = 460800 / 60;
     // iode can be 0-1023
-    ret.kepler.iode = 1000;
+    ret.data.kepler.iode = 1000;
   } else if (cons == RTCM_CONSTELLATION_BDS) {
     // wn is mod 8192
     ret.wn = 8190;
     // toe is in 8 second increments
     ret.toe = 460800 / 8;
     // TGDs can range from -511 to +512
-    ret.kepler.tgd_bds_s[0] = -450;
-    ret.kepler.tgd_bds_s[1] = 454;
+    ret.data.kepler.tgd.bds_s[0] = -450;
+    ret.data.kepler.tgd.bds_s[1] = 454;
     // toc is in 8 second increments
-    ret.kepler.toc = 460800 / 8;
+    ret.data.kepler.toc = 460800 / 8;
     // iode/iodc can be 0-31
-    ret.kepler.iodc = 20;
-    ret.kepler.iode = 31;
+    ret.data.kepler.iodc = 20;
+    ret.data.kepler.iode = 31;
   } else {
     assert(false);
   }
@@ -1894,26 +1896,26 @@ static rtcm_msg_eph get_example_keplerian_rtcm_eph(
 
   // Scale the Keplerian values from their SI units to the values that are
   // encoded
-  ret.kepler.crc = 167.140625 * 64;
-  ret.kepler.crs = -18.828125 * 64;
-  ret.kepler.cuc = -9.0105459094047546e-07 * 65536 * 32768;
-  ret.kepler.cus = 9.4850547611713409e-06 * 65536 * 32768;
-  ret.kepler.cic = -4.0978193283081055e-08 * 65536 * 32768;
-  ret.kepler.cis = 1.0104849934577942e-07 * 65536 * 32768;
-  ret.kepler.dn = 3.9023054038264214e-09 * 65536 * 65536 * 2048 / 3.141592;
-  ret.kepler.m0 = 0.39869951815527438 * 65536 * 32768 / 3.141592;
-  ret.kepler.ecc = 0.00043709692545235157 * 65536 * 65536 * 2;
-  ret.kepler.sqrta = 5282.6194686889648 * 65536 * 8;
-  ret.kepler.omega0 = 2.2431156200949509 * 65536 * 32768 / 3.141592;
-  ret.kepler.omegadot =
+  ret.data.kepler.crc = 167.140625 * 64;
+  ret.data.kepler.crs = -18.828125 * 64;
+  ret.data.kepler.cuc = -9.0105459094047546e-07 * 65536 * 32768;
+  ret.data.kepler.cus = 9.4850547611713409e-06 * 65536 * 32768;
+  ret.data.kepler.cic = -4.0978193283081055e-08 * 65536 * 32768;
+  ret.data.kepler.cis = 1.0104849934577942e-07 * 65536 * 32768;
+  ret.data.kepler.dn = 3.9023054038264214e-09 * 65536 * 65536 * 2048 / 3.141592;
+  ret.data.kepler.m0 = 0.39869951815527438 * 65536 * 32768 / 3.141592;
+  ret.data.kepler.ecc = 0.00043709692545235157 * 65536 * 65536 * 2;
+  ret.data.kepler.sqrta = 5282.6194686889648 * 65536 * 8;
+  ret.data.kepler.omega0 = 2.2431156200949509 * 65536 * 32768 / 3.141592;
+  ret.data.kepler.omegadot =
       -6.6892072037584707e-09 * 65536 * 65536 * 2048 / 3.141592;
-  ret.kepler.w = 0.39590413040186828 * 65536 * 32768 / 3.141592;
-  ret.kepler.inc = 0.95448398903792575 * 65536 * 32768 / 3.141592;
-  ret.kepler.inc_dot =
+  ret.data.kepler.w = 0.39590413040186828 * 65536 * 32768 / 3.141592;
+  ret.data.kepler.inc = 0.95448398903792575 * 65536 * 32768 / 3.141592;
+  ret.data.kepler.inc_dot =
       -6.2716898124832475e-10 * 65536 * 65536 * 2048 / 3.141592;
-  ret.kepler.af0 = -0.00050763087347149849 * 65536 * 32768;
-  ret.kepler.af1 = -1.3019807454384136e-11 * 65536 * 65536 * 2048;
-  ret.kepler.af2 = 0.000000;
+  ret.data.kepler.af0 = -0.00050763087347149849 * 65536 * 32768;
+  ret.data.kepler.af1 = -1.3019807454384136e-11 * 65536 * 65536 * 2048;
+  ret.data.kepler.af2 = 0.000000;
   return ret;
 }
 
@@ -1930,44 +1932,44 @@ static void compare_keplerian_ephs(const rtcm_msg_eph *first,
   assert(first->health_bits == second->health_bits);
 
   if (first->constellation == RTCM_CONSTELLATION_GPS) {
-    assert(first->kepler.tgd_gps_s == second->kepler.tgd_gps_s);
+    assert(first->data.kepler.tgd.gps_s == second->data.kepler.tgd.gps_s);
   } else if (first->constellation == RTCM_CONSTELLATION_QZS) {
-    assert(first->kepler.tgd_qzss_s == second->kepler.tgd_qzss_s);
+    assert(first->data.kepler.tgd.qzss_s == second->data.kepler.tgd.qzss_s);
   } else if (first->constellation == RTCM_CONSTELLATION_GAL) {
-    assert(first->kepler.tgd_gal_s[0] == second->kepler.tgd_gal_s[0]);
-    assert(first->kepler.tgd_gal_s[1] == second->kepler.tgd_gal_s[1]);
+    assert(first->data.kepler.tgd.gal_s[0] == second->data.kepler.tgd.gal_s[0]);
+    assert(first->data.kepler.tgd.gal_s[1] == second->data.kepler.tgd.gal_s[1]);
   } else if (first->constellation == RTCM_CONSTELLATION_BDS) {
-    assert(first->kepler.tgd_bds_s[0] == second->kepler.tgd_bds_s[0]);
-    assert(first->kepler.tgd_bds_s[1] == second->kepler.tgd_bds_s[1]);
+    assert(first->data.kepler.tgd.bds_s[0] == second->data.kepler.tgd.bds_s[0]);
+    assert(first->data.kepler.tgd.bds_s[1] == second->data.kepler.tgd.bds_s[1]);
   } else {
     assert(false);
   }
-  assert(first->kepler.crc == second->kepler.crc);
-  assert(first->kepler.crs == second->kepler.crs);
-  assert(first->kepler.cuc == second->kepler.cuc);
-  assert(first->kepler.cus == second->kepler.cus);
-  assert(first->kepler.cic == second->kepler.cic);
-  assert(first->kepler.cis == second->kepler.cis);
-  assert(first->kepler.dn == second->kepler.dn);
-  assert(first->kepler.m0 == second->kepler.m0);
-  assert(first->kepler.ecc == second->kepler.ecc);
-  assert(first->kepler.sqrta == second->kepler.sqrta);
-  assert(first->kepler.omega0 == second->kepler.omega0);
-  assert(first->kepler.omegadot == second->kepler.omegadot);
-  assert(first->kepler.w == second->kepler.w);
-  assert(first->kepler.inc == second->kepler.inc);
-  assert(first->kepler.inc_dot == second->kepler.inc_dot);
-  assert(first->kepler.af0 == second->kepler.af0);
-  assert(first->kepler.af1 == second->kepler.af1);
-  assert(first->kepler.af2 == second->kepler.af2);
-  assert(first->kepler.toc == second->kepler.toc);
+  assert(first->data.kepler.crc == second->data.kepler.crc);
+  assert(first->data.kepler.crs == second->data.kepler.crs);
+  assert(first->data.kepler.cuc == second->data.kepler.cuc);
+  assert(first->data.kepler.cus == second->data.kepler.cus);
+  assert(first->data.kepler.cic == second->data.kepler.cic);
+  assert(first->data.kepler.cis == second->data.kepler.cis);
+  assert(first->data.kepler.dn == second->data.kepler.dn);
+  assert(first->data.kepler.m0 == second->data.kepler.m0);
+  assert(first->data.kepler.ecc == second->data.kepler.ecc);
+  assert(first->data.kepler.sqrta == second->data.kepler.sqrta);
+  assert(first->data.kepler.omega0 == second->data.kepler.omega0);
+  assert(first->data.kepler.omegadot == second->data.kepler.omegadot);
+  assert(first->data.kepler.w == second->data.kepler.w);
+  assert(first->data.kepler.inc == second->data.kepler.inc);
+  assert(first->data.kepler.inc_dot == second->data.kepler.inc_dot);
+  assert(first->data.kepler.af0 == second->data.kepler.af0);
+  assert(first->data.kepler.af1 == second->data.kepler.af1);
+  assert(first->data.kepler.af2 == second->data.kepler.af2);
+  assert(first->data.kepler.toc == second->data.kepler.toc);
   if (first->constellation != RTCM_CONSTELLATION_GAL) {
-    assert(first->kepler.iodc == second->kepler.iodc);
+    assert(first->data.kepler.iodc == second->data.kepler.iodc);
   }
-  assert(first->kepler.iode == second->kepler.iode);
+  assert(first->data.kepler.iode == second->data.kepler.iode);
   if (first->constellation == RTCM_CONSTELLATION_GPS) {
-    assert(first->kepler.codeL2 == second->kepler.codeL2);
-    assert(first->kepler.L2_data_bit == second->kepler.L2_data_bit);
+    assert(first->data.kepler.codeL2 == second->data.kepler.codeL2);
+    assert(first->data.kepler.L2_data_bit == second->data.kepler.L2_data_bit);
   }
 }
 
@@ -1982,21 +1984,21 @@ static rtcm_msg_eph get_example_glonass_rtcm_eph(const uint8_t t_b) {
   ret.fit_interval = 0;
   ret.health_bits = 0;
 
-  ret.glo.gamma = 123;
-  ret.glo.tau = 345;
-  ret.glo.d_tau = -12;
-  ret.glo.t_b = t_b;
-  ret.glo.pos[0] = -456767;
-  ret.glo.pos[1] = 4567367;
-  ret.glo.pos[2] = 4578437;
-  ret.glo.vel[0] = 247;
-  ret.glo.vel[1] = -8754;
-  ret.glo.vel[2] = 45790;
-  ret.glo.acc[0] = 3;
-  ret.glo.acc[1] = -6;
-  ret.glo.acc[2] = 7;
-  ret.glo.fcn = 19;
-  ret.glo.iod = 64;
+  ret.data.glo.gamma = 123;
+  ret.data.glo.tau = 345;
+  ret.data.glo.d_tau = -12;
+  ret.data.glo.t_b = t_b;
+  ret.data.glo.pos[0] = -456767;
+  ret.data.glo.pos[1] = 4567367;
+  ret.data.glo.pos[2] = 4578437;
+  ret.data.glo.vel[0] = 247;
+  ret.data.glo.vel[1] = -8754;
+  ret.data.glo.vel[2] = 45790;
+  ret.data.glo.acc[0] = 3;
+  ret.data.glo.acc[1] = -6;
+  ret.data.glo.acc[2] = 7;
+  ret.data.glo.fcn = 19;
+  ret.data.glo.iod = 64;
 
   return ret;
 }
@@ -2015,20 +2017,20 @@ static void compare_glonass_ephs(const rtcm_msg_eph *first,
   assert(first->fit_interval == second->fit_interval);
   assert(first->health_bits == second->health_bits);
 
-  assert(first->glo.gamma == second->glo.gamma);
-  assert(first->glo.tau == second->glo.tau);
-  assert(first->glo.d_tau == second->glo.d_tau);
-  assert(first->glo.t_b == second->glo.t_b);
-  assert(first->glo.pos[0] == second->glo.pos[0]);
-  assert(first->glo.pos[1] == second->glo.pos[1]);
-  assert(first->glo.pos[2] == second->glo.pos[2]);
-  assert(first->glo.vel[0] == second->glo.vel[0]);
-  assert(first->glo.vel[1] == second->glo.vel[1]);
-  assert(first->glo.vel[2] == second->glo.vel[2]);
-  assert(first->glo.acc[0] == second->glo.acc[0]);
-  assert(first->glo.acc[1] == second->glo.acc[1]);
-  assert(first->glo.acc[2] == second->glo.acc[2]);
-  assert(first->glo.fcn == second->glo.fcn);
+  assert(first->data.glo.gamma == second->data.glo.gamma);
+  assert(first->data.glo.tau == second->data.glo.tau);
+  assert(first->data.glo.d_tau == second->data.glo.d_tau);
+  assert(first->data.glo.t_b == second->data.glo.t_b);
+  assert(first->data.glo.pos[0] == second->data.glo.pos[0]);
+  assert(first->data.glo.pos[1] == second->data.glo.pos[1]);
+  assert(first->data.glo.pos[2] == second->data.glo.pos[2]);
+  assert(first->data.glo.vel[0] == second->data.glo.vel[0]);
+  assert(first->data.glo.vel[1] == second->data.glo.vel[1]);
+  assert(first->data.glo.vel[2] == second->data.glo.vel[2]);
+  assert(first->data.glo.acc[0] == second->data.glo.acc[0]);
+  assert(first->data.glo.acc[1] == second->data.glo.acc[1]);
+  assert(first->data.glo.acc[2] == second->data.glo.acc[2]);
+  assert(first->data.glo.fcn == second->data.glo.fcn);
   // GLO doesn't have an IODE in the traditional sense, t_b takes this task on
   //    assert( first->glo.iod == second->glo.iod );
 }
@@ -2076,7 +2078,7 @@ void test_rtcm_1045() {
 
   rtcm_msg_eph msg_1045_out;
   rtcm3_decode_gal_eph_fnav(&frame[0], &msg_1045_out);
-  msg_1045_out.kepler.tgd_gal_s[1] = msg_1045_in.kepler.tgd_gal_s[1];
+  msg_1045_out.data.kepler.tgd.gal_s[1] = msg_1045_in.data.kepler.tgd.gal_s[1];
   compare_keplerian_ephs(&msg_1045_in, &msg_1045_out);
 }
 

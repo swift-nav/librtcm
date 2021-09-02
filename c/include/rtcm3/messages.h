@@ -17,6 +17,10 @@
 #include <stdint.h>
 #include "rtcm3/constants.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum freq_e { L1_FREQ, L2_FREQ, NUM_FREQS } freq_t;
 
 typedef enum msm_type_e {
@@ -86,7 +90,7 @@ typedef union {
     uint8_t valid_cnr : 1;
     uint8_t valid_lock : 1;
     uint8_t valid_dop : 1;
-  };
+  } fields;
 } flag_bf;
 
 typedef struct {
@@ -211,11 +215,11 @@ typedef struct {
  */
 typedef struct {
   union {
-    int32_t tgd_gps_s;
-    int32_t tgd_qzss_s;
-    int32_t tgd_bds_s[2];
-    int32_t tgd_gal_s[2];
-  };
+    int32_t gps_s;
+    int32_t qzss_s;
+    int32_t bds_s[2];
+    int32_t gal_s[2];
+  } tgd;
   int32_t crc;
   int32_t crs;
   int32_t cuc;
@@ -277,7 +281,7 @@ typedef struct {
     ephemeris_kepler_raw_rtcm_t kepler;
     ephemeris_xyz_rtcm_t xyz;
     ephemeris_glo_raw_rtcm_t glo;
-  };
+  } data;
 } rtcm_msg_eph;
 
 #define MAX_SSR_SATELLITES 64
@@ -408,5 +412,9 @@ typedef struct {
   uint8_t frame_count; /* Frame Count uint8 6 */
   rtcm_ndf_frame frames[MAX_NDF_FRAMES];
 } rtcm_msg_ndf;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SWIFTNAV_RTCM3_MESSAGES_H */

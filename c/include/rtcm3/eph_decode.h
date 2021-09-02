@@ -17,6 +17,10 @@
 #include <swiftnav/bitstream.h>
 #define BEIDOU_GEOS_MAX_PRN 5
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 rtcm3_rc rtcm3_decode_gps_eph_bitstream(swiftnav_bitstream_t *buff,
                                         rtcm_msg_eph *msg_eph);
 rtcm3_rc rtcm3_decode_glo_eph_bitstream(swiftnav_bitstream_t *buff,
@@ -71,5 +75,9 @@ static inline rtcm3_rc rtcm3_decode_qzss_eph(const uint8_t buff[],
   swiftnav_bitstream_init(&bitstream, buff, UINT32_MAX);
   return rtcm3_decode_qzss_eph_bitstream(&bitstream, msg_eph);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* SWIFTNAV_RTCM3_EPH_DECODE_H */

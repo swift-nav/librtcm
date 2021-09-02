@@ -15,28 +15,26 @@ set(librtcm_HEADERS
   ${PROJECT_SOURCE_DIR}/include/rtcm3/logging.h
   )
 
-add_library(rtcm
-  decode.c
-  encode.c
-  msm_utils.c
-  eph_decode.c
-  eph_encode.c
-  ssr_decode.c
-  sta_decode.c
-  bits.c
-  logging.c
+swift_add_library(rtcm
+  SOURCES
+    decode.c
+    encode.c
+    msm_utils.c
+    eph_decode.c
+    eph_encode.c
+    ssr_decode.c
+    sta_decode.c
+    bits.c
+    logging.c
+  REMOVE_COMPILE_OPTIONS
+    -Wconversion -Wstack-protector
   )
-swift_set_language_standards(rtcm)
-swift_set_compile_options(rtcm ADD -pedantic REMOVE -Wconversion -Wstack-protector)
-
-target_include_directories(rtcm 
+add_library(swiftnav::rtcm ALIAS rtcm)
+target_include_directories(rtcm
   PUBLIC ${PROJECT_SOURCE_DIR}/include
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   )
-
-if (NOT CMAKE_C_COMPILER_ID MATCHES "ARMCC")
-  target_link_libraries(rtcm m swiftnav)
-endif()
+target_link_libraries(rtcm PUBLIC swiftnav)
 
 install(TARGETS rtcm DESTINATION ${CMAKE_INSTALL_FULL_LIBDIR})
 install(FILES ${librtcm_HEADERS} DESTINATION ${CMAKE_INSTALL_FULL_INCLUDEDIR}/rtcm3)

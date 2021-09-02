@@ -13,7 +13,6 @@
 #include "rtcm3/decode.h"
 
 #include <assert.h>
-#include <math.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -303,11 +302,11 @@ static rtcm3_rc get_cnr(rtcm_freq_data *freq_data, swiftnav_bitstream_t *buff) {
   uint32_t cnr;
   BITSTREAM_DECODE_U32(buff, cnr, 8);
   if (cnr == 0) {
-    freq_data->flags.valid_cnr = 0;
+    freq_data->flags.fields.valid_cnr = 0;
     return RC_OK;
   }
   freq_data->cnr = 0.25 * cnr;
-  freq_data->flags.valid_cnr = 1;
+  freq_data->flags.fields.valid_cnr = 1;
   return RC_OK;
 }
 
@@ -350,10 +349,11 @@ rtcm3_rc rtcm3_decode_1001_bitstream(swiftnav_bitstream_t *buff,
       return ret;
     }
 
-    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, 0);
-    l1_freq_data->flags.valid_cp =
+    l1_freq_data->flags.fields.valid_pr =
+        construct_L1_code(l1_freq_data, l1_pr, 0);
+    l1_freq_data->flags.fields.valid_cp =
         construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_HZ);
-    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
+    l1_freq_data->flags.fields.valid_lock = l1_freq_data->flags.fields.valid_cp;
   }
 
   return RC_OK;
@@ -404,11 +404,11 @@ rtcm3_rc rtcm3_decode_1002_bitstream(swiftnav_bitstream_t *buff,
     if (ret != RC_OK) {
       return ret;
     }
-    l1_freq_data->flags.valid_pr =
+    l1_freq_data->flags.fields.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
-    l1_freq_data->flags.valid_cp =
+    l1_freq_data->flags.fields.valid_cp =
         construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_HZ);
-    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
+    l1_freq_data->flags.fields.valid_lock = l1_freq_data->flags.fields.valid_cp;
   }
 
   return RC_OK;
@@ -454,10 +454,11 @@ rtcm3_rc rtcm3_decode_1003_bitstream(swiftnav_bitstream_t *buff,
       return ret;
     }
 
-    l1_freq_data->flags.valid_pr = construct_L1_code(l1_freq_data, l1_pr, 0);
-    l1_freq_data->flags.valid_cp =
+    l1_freq_data->flags.fields.valid_pr =
+        construct_L1_code(l1_freq_data, l1_pr, 0);
+    l1_freq_data->flags.fields.valid_cp =
         construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_HZ);
-    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
+    l1_freq_data->flags.fields.valid_lock = l1_freq_data->flags.fields.valid_cp;
 
     rtcm_freq_data *l2_freq_data = &msg_1003->sats[i].obs[L2_FREQ];
 
@@ -466,11 +467,11 @@ rtcm3_rc rtcm3_decode_1003_bitstream(swiftnav_bitstream_t *buff,
       return ret;
     }
 
-    l2_freq_data->flags.valid_pr =
+    l2_freq_data->flags.fields.valid_pr =
         construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
-    l2_freq_data->flags.valid_cp =
+    l2_freq_data->flags.fields.valid_cp =
         construct_L2_phase(l2_freq_data, l1_freq_data, phr_pr_diff, GPS_L2_HZ);
-    l2_freq_data->flags.valid_lock = l2_freq_data->flags.valid_cp;
+    l2_freq_data->flags.fields.valid_lock = l2_freq_data->flags.fields.valid_cp;
   }
 
   return RC_OK;
@@ -523,11 +524,11 @@ rtcm3_rc rtcm3_decode_1004_bitstream(swiftnav_bitstream_t *buff,
     if (ret != RC_OK) {
       return ret;
     }
-    l1_freq_data->flags.valid_pr =
+    l1_freq_data->flags.fields.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GPS);
-    l1_freq_data->flags.valid_cp =
+    l1_freq_data->flags.fields.valid_cp =
         construct_L1_phase(l1_freq_data, phr_pr_diff, GPS_L1_HZ);
-    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
+    l1_freq_data->flags.fields.valid_lock = l1_freq_data->flags.fields.valid_cp;
 
     rtcm_freq_data *l2_freq_data = &msg_1004->sats[i].obs[L2_FREQ];
 
@@ -540,11 +541,11 @@ rtcm3_rc rtcm3_decode_1004_bitstream(swiftnav_bitstream_t *buff,
     if (ret != RC_OK) {
       return ret;
     }
-    l2_freq_data->flags.valid_pr =
+    l2_freq_data->flags.fields.valid_pr =
         construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
-    l2_freq_data->flags.valid_cp =
+    l2_freq_data->flags.fields.valid_cp =
         construct_L2_phase(l2_freq_data, l1_freq_data, phr_pr_diff, GPS_L2_HZ);
-    l2_freq_data->flags.valid_lock = l2_freq_data->flags.valid_cp;
+    l2_freq_data->flags.fields.valid_lock = l2_freq_data->flags.fields.valid_cp;
   }
 
   return RC_OK;
@@ -738,13 +739,13 @@ rtcm3_rc rtcm3_decode_1010_bitstream(swiftnav_bitstream_t *buff,
     }
 
     int8_t glo_fcn = msg_1010->sats[i].fcn - MT1012_GLO_FCN_OFFSET;
-    l1_freq_data->flags.valid_pr =
+    l1_freq_data->flags.fields.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, PRUNIT_GLO * amb);
-    l1_freq_data->flags.valid_cp =
+    l1_freq_data->flags.fields.valid_cp =
         (msg_1010->sats[i].fcn <= MT1012_GLO_MAX_FCN) &&
         construct_L1_phase(
             l1_freq_data, phr_pr_diff, GLO_L1_HZ + glo_fcn * GLO_L1_DELTA_HZ);
-    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
+    l1_freq_data->flags.fields.valid_lock = l1_freq_data->flags.fields.valid_cp;
   }
 
   return RC_OK;
@@ -798,13 +799,13 @@ rtcm3_rc rtcm3_decode_1012_bitstream(swiftnav_bitstream_t *buff,
     if (ret != RC_OK) {
       return ret;
     }
-    l1_freq_data->flags.valid_pr =
+    l1_freq_data->flags.fields.valid_pr =
         construct_L1_code(l1_freq_data, l1_pr, amb * PRUNIT_GLO);
-    l1_freq_data->flags.valid_cp =
+    l1_freq_data->flags.fields.valid_cp =
         (msg_1012->sats[i].fcn <= MT1012_GLO_MAX_FCN) &&
         construct_L1_phase(
             l1_freq_data, phr_pr_diff, GLO_L1_HZ + glo_fcn * GLO_L1_DELTA_HZ);
-    l1_freq_data->flags.valid_lock = l1_freq_data->flags.valid_cp;
+    l1_freq_data->flags.fields.valid_lock = l1_freq_data->flags.fields.valid_cp;
 
     rtcm_freq_data *l2_freq_data = &msg_1012->sats[i].obs[L2_FREQ];
 
@@ -817,14 +818,14 @@ rtcm3_rc rtcm3_decode_1012_bitstream(swiftnav_bitstream_t *buff,
     if (ret != RC_OK) {
       return ret;
     }
-    l2_freq_data->flags.valid_pr =
+    l2_freq_data->flags.fields.valid_pr =
         construct_L2_code(l2_freq_data, l1_freq_data, l2_pr);
-    l2_freq_data->flags.valid_cp =
+    l2_freq_data->flags.fields.valid_cp =
         construct_L2_phase(l2_freq_data,
                            l1_freq_data,
                            phr_pr_diff,
                            GLO_L2_HZ + glo_fcn * GLO_L2_DELTA_HZ);
-    l2_freq_data->flags.valid_lock = l2_freq_data->flags.valid_cp;
+    l2_freq_data->flags.fields.valid_lock = l2_freq_data->flags.fields.valid_cp;
   }
 
   return RC_OK;
@@ -1036,7 +1037,7 @@ static rtcm3_rc decode_msm_fine_pseudoranges(swiftnav_bitstream_t *buff,
   for (uint16_t i = 0; i < num_cells; i++) {
     int16_t decoded;
     BITSTREAM_DECODE_S16(buff, decoded, 15);
-    flags[i].valid_pr = (decoded != MSM_PR_INVALID);
+    flags[i].fields.valid_pr = (decoded != MSM_PR_INVALID);
     fine_pr_ms[i] = (double)decoded * C_1_2P24;
   }
   return RC_OK;
@@ -1051,7 +1052,7 @@ static rtcm3_rc decode_msm_fine_pseudoranges_extended(
   for (uint16_t i = 0; i < num_cells; i++) {
     int32_t decoded;
     BITSTREAM_DECODE_S32(buff, decoded, 20);
-    flags[i].valid_pr = (decoded != MSM_PR_EXT_INVALID);
+    flags[i].fields.valid_pr = (decoded != MSM_PR_EXT_INVALID);
     fine_pr_ms[i] = (double)decoded * C_1_2P29;
   }
   return RC_OK;
@@ -1065,7 +1066,7 @@ static rtcm3_rc decode_msm_fine_phaseranges(swiftnav_bitstream_t *buff,
   for (uint16_t i = 0; i < num_cells; i++) {
     int32_t decoded;
     BITSTREAM_DECODE_S32(buff, decoded, 22);
-    flags[i].valid_cp = (decoded != MSM_CP_INVALID);
+    flags[i].fields.valid_cp = (decoded != MSM_CP_INVALID);
     fine_cp_ms[i] = (double)decoded * C_1_2P29;
   }
   return RC_OK;
@@ -1079,7 +1080,7 @@ static rtcm3_rc decode_msm_fine_phaseranges_extended(swiftnav_bitstream_t *buff,
   for (uint16_t i = 0; i < num_cells; i++) {
     int32_t decoded;
     BITSTREAM_DECODE_S32(buff, decoded, 24);
-    flags[i].valid_cp = (decoded != MSM_CP_EXT_INVALID);
+    flags[i].fields.valid_cp = (decoded != MSM_CP_EXT_INVALID);
     fine_cp_ms[i] = (double)decoded * C_1_2P31;
   }
   return RC_OK;
@@ -1094,7 +1095,7 @@ static rtcm3_rc decode_msm_lock_times(swiftnav_bitstream_t *buff,
     uint32_t lock_ind;
     BITSTREAM_DECODE_U32(buff, lock_ind, 4);
     lock_time[i] = rtcm3_decode_lock_time(lock_ind);
-    flags[i].valid_lock = 1;
+    flags[i].fields.valid_lock = 1;
   }
   return RC_OK;
 }
@@ -1108,7 +1109,7 @@ static rtcm3_rc decode_msm_lock_times_extended(swiftnav_bitstream_t *buff,
     uint16_t lock_ind;
     BITSTREAM_DECODE_U16(buff, lock_ind, 10);
     lock_time[i] = (double)from_msm_lock_ind_ext(lock_ind) / 1000;
-    flags[i].valid_lock = 1;
+    flags[i].fields.valid_lock = 1;
   }
   return RC_OK;
 }
@@ -1131,7 +1132,7 @@ static rtcm3_rc decode_msm_cnrs(swiftnav_bitstream_t *buff,
   for (uint16_t i = 0; i < num_cells; i++) {
     uint32_t decoded;
     BITSTREAM_DECODE_U32(buff, decoded, 6);
-    flags[i].valid_cnr = (decoded != 0);
+    flags[i].fields.valid_cnr = (decoded != 0);
     cnr[i] = (double)decoded;
   }
   return RC_OK;
@@ -1145,7 +1146,7 @@ static rtcm3_rc decode_msm_cnrs_extended(swiftnav_bitstream_t *buff,
   for (uint16_t i = 0; i < num_cells; i++) {
     uint32_t decoded;
     BITSTREAM_DECODE_U32(buff, decoded, 10);
-    flags[i].valid_cnr = (decoded != 0);
+    flags[i].fields.valid_cnr = (decoded != 0);
     cnr[i] = (double)decoded * C_1_2P4;
   }
   return RC_OK;
@@ -1160,7 +1161,7 @@ static rtcm3_rc decode_msm_fine_phaserangerates(swiftnav_bitstream_t *buff,
     int32_t decoded;
     BITSTREAM_DECODE_S32(buff, decoded, 15);
     fine_range_rate_m_s[i] = (double)decoded * 0.0001;
-    flags[i].valid_dop = (decoded != MSM_DOP_INVALID);
+    flags[i].fields.valid_dop = (decoded != MSM_DOP_INVALID);
   }
   return RC_OK;
 }
@@ -1342,33 +1343,33 @@ static rtcm3_rc rtcm3_decode_msm_internal(swiftnav_bitstream_t *buff,
 
     for (uint8_t sig = 0; sig < num_sigs; sig++) {
       if (msg->header.cell_mask[sat * num_sigs + sig]) {
-        if (rough_range_valid[sat] && flags[i].valid_pr) {
+        if (rough_range_valid[sat] && flags[i].fields.valid_pr) {
           msg->signals[i].pseudorange_ms = rough_range_ms[sat] + fine_pr_ms[i];
         } else {
           msg->signals[i].pseudorange_ms = 0;
-          flags[i].valid_pr = false;
+          flags[i].fields.valid_pr = false;
         }
-        if (rough_range_valid[sat] && flags[i].valid_cp) {
+        if (rough_range_valid[sat] && flags[i].fields.valid_cp) {
           msg->signals[i].carrier_phase_ms =
               rough_range_ms[sat] + fine_cp_ms[i];
         } else {
           msg->signals[i].carrier_phase_ms = 0;
-          flags[i].valid_cp = false;
+          flags[i].fields.valid_cp = false;
         }
         msg->signals[i].lock_time_s = lock_time[i];
         msg->signals[i].hca_indicator = hca_indicator[i];
-        if (flags[i].valid_cnr) {
+        if (flags[i].fields.valid_cnr) {
           msg->signals[i].cnr = cnr[i];
         } else {
           msg->signals[i].cnr = 0;
         }
-        if (rough_rate_valid[sat] && flags[i].valid_dop) {
+        if (rough_rate_valid[sat] && flags[i].fields.valid_dop) {
           /* convert Doppler into Hz */
           msg->signals[i].range_rate_m_s =
               rough_rate_m_s[sat] + fine_range_rate_m_s[i];
         } else {
           msg->signals[i].range_rate_m_s = 0;
-          flags[i].valid_dop = 0;
+          flags[i].fields.valid_dop = 0;
         }
         msg->signals[i].flags = flags[i];
         i++;

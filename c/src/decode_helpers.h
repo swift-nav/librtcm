@@ -44,7 +44,7 @@
   do {                                                                         \
     u32 decode_u32_temp;                                                       \
     char __decode_assert_1[(sizeof(field) == sizeof(u32)) ? 1 : -1];           \
-    char                                                                       \
+    char /* NOLINTNEXTLINE(clang-analyzer-core.VLASize) */                     \
         __decode_assert_2[((size_t)(n_bits) <= (sizeof(field) * 8)) ? 1 : -1]; \
     (void)__decode_assert_1;                                                   \
     (void)__decode_assert_2;                                                   \

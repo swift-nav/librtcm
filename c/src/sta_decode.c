@@ -13,7 +13,6 @@
 #include "rtcm3/sta_decode.h"
 
 #include <assert.h>
-#include <math.h>
 #include <stdio.h>
 #include <string.h>
 

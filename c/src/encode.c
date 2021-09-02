@@ -152,7 +152,7 @@ static void encode_basic_freq_data(const rtcm_freq_data *freq_data,
     rtcm_setbitu(buff, *bit, 1, 0);
     *bit += 1;
     rtcm_setbitu(
-        buff, *bit, 24, freq_data->flags.valid_pr ? pr : PR_L1_INVALID);
+        buff, *bit, 24, freq_data->flags.fields.valid_pr ? pr : PR_L1_INVALID);
     *bit += 24;
   } else {
     freq = GPS_L2_HZ;
@@ -161,12 +161,13 @@ static void encode_basic_freq_data(const rtcm_freq_data *freq_data,
     rtcm_setbits(buff,
                  *bit,
                  14,
-                 freq_data->flags.valid_pr ? (int32_t)pr - (int32_t)calc_l1_pr
-                                           : (int32_t)PR_L2_INVALID);
+                 freq_data->flags.fields.valid_pr
+                     ? (int32_t)pr - (int32_t)calc_l1_pr
+                     : (int32_t)PR_L2_INVALID);
     *bit += 14;
   }
 
-  if (freq_data->flags.valid_cp) {
+  if (freq_data->flags.fields.valid_cp) {
     /* phaserange - L1 pseudorange */
     double cp_pr = freq_data->carrier_phase - l1_prc / (GPS_C / freq);
     /* encode PhaseRange – L1 Pseudorange (DF012/DF018) and roll over if
@@ -177,10 +178,11 @@ static void encode_basic_freq_data(const rtcm_freq_data *freq_data,
     rtcm_setbits(buff, *bit, 20, CP_INVALID);
   }
   *bit += 20;
-  rtcm_setbitu(buff,
-               *bit,
-               7,
-               freq_data->flags.valid_lock ? to_lock_ind(freq_data->lock) : 0);
+  rtcm_setbitu(
+      buff,
+      *bit,
+      7,
+      freq_data->flags.fields.valid_lock ? to_lock_ind(freq_data->lock) : 0);
   *bit += 7;
 }
 
@@ -211,7 +213,7 @@ static void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data,
     rtcm_setbitu(buff, *bit, 5, fcn);
     *bit += 5;
     rtcm_setbitu(
-        buff, *bit, 25, freq_data->flags.valid_pr ? pr : PR_L1_INVALID);
+        buff, *bit, 25, freq_data->flags.fields.valid_pr ? pr : PR_L1_INVALID);
     *bit += 25;
   } else {
     glo_freq = GLO_L2_HZ + (fcn - MT1012_GLO_FCN_OFFSET) * GLO_L2_DELTA_HZ;
@@ -221,12 +223,13 @@ static void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data,
     rtcm_setbits(buff,
                  *bit,
                  14,
-                 freq_data->flags.valid_pr ? (int32_t)pr - (int32_t)calc_l1_pr
-                                           : (int32_t)PR_L2_INVALID);
+                 freq_data->flags.fields.valid_pr
+                     ? (int32_t)pr - (int32_t)calc_l1_pr
+                     : (int32_t)PR_L2_INVALID);
     *bit += 14;
   }
 
-  if (freq_data->flags.valid_cp) {
+  if (freq_data->flags.fields.valid_cp) {
     /* phaserange - L1 pseudorange */
     double cp_pr = freq_data->carrier_phase - l1_prc / (GPS_C / glo_freq);
 
@@ -238,10 +241,11 @@ static void encode_basic_glo_freq_data(const rtcm_freq_data *freq_data,
     rtcm_setbits(buff, *bit, 20, CP_INVALID);
   }
   *bit += 20;
-  rtcm_setbitu(buff,
-               *bit,
-               7,
-               freq_data->flags.valid_lock ? to_lock_ind(freq_data->lock) : 0);
+  rtcm_setbitu(
+      buff,
+      *bit,
+      7,
+      freq_data->flags.fields.valid_lock ? to_lock_ind(freq_data->lock) : 0);
   *bit += 7;
 }
 
@@ -371,8 +375,8 @@ uint16_t rtcm3_encode_1001(const rtcm_obs_message *msg_1001, uint8_t buff[]) {
 
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_1001->header.n_sat; i++) {
-    if (msg_1001->sats[i].obs[L1_FREQ].flags.valid_pr &&
-        msg_1001->sats[i].obs[L1_FREQ].flags.valid_cp) {
+    if (msg_1001->sats[i].obs[L1_FREQ].flags.fields.valid_pr &&
+        msg_1001->sats[i].obs[L1_FREQ].flags.fields.valid_cp) {
       rtcm_setbitu(buff, bit, 6, msg_1001->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1001->sats[i].obs[L1_FREQ],
@@ -413,8 +417,8 @@ uint16_t rtcm3_encode_1002(const rtcm_obs_message *msg_1002, uint8_t buff[]) {
 
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_1002->header.n_sat; i++) {
-    if (msg_1002->sats[i].obs[L1_FREQ].flags.valid_pr &&
-        msg_1002->sats[i].obs[L1_FREQ].flags.valid_cp) {
+    if (msg_1002->sats[i].obs[L1_FREQ].flags.fields.valid_pr &&
+        msg_1002->sats[i].obs[L1_FREQ].flags.fields.valid_cp) {
       rtcm_setbitu(buff, bit, 6, msg_1002->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1002->sats[i].obs[L1_FREQ],
@@ -456,8 +460,8 @@ uint16_t rtcm3_encode_1003(const rtcm_obs_message *msg_1003, uint8_t buff[]) {
   for (uint8_t i = 0; i < msg_1003->header.n_sat; i++) {
     flag_bf l1_flags = msg_1003->sats[i].obs[L1_FREQ].flags;
     flag_bf l2_flags = msg_1003->sats[i].obs[L2_FREQ].flags;
-    if (l1_flags.valid_pr && l1_flags.valid_cp && l2_flags.valid_pr &&
-        l2_flags.valid_cp) {
+    if (l1_flags.fields.valid_pr && l1_flags.fields.valid_cp &&
+        l2_flags.fields.valid_pr && l2_flags.fields.valid_cp) {
       rtcm_setbitu(buff, bit, 6, msg_1003->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1003->sats[i].obs[L1_FREQ],
@@ -491,7 +495,7 @@ uint16_t rtcm3_encode_1004(const rtcm_obs_message *msg_1004, uint8_t buff[]) {
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_1004->header.n_sat; i++) {
     flag_bf l1_flags = msg_1004->sats[i].obs[L1_FREQ].flags;
-    if (l1_flags.valid_pr && l1_flags.valid_cp) {
+    if (l1_flags.fields.valid_pr && l1_flags.fields.valid_cp) {
       rtcm_setbitu(buff, bit, 6, msg_1004->sats[i].svId);
       bit += 6;
       encode_basic_freq_data(&msg_1004->sats[i].obs[L1_FREQ],
@@ -644,8 +648,8 @@ uint16_t rtcm3_encode_1010(const rtcm_obs_message *msg_1010, uint8_t buff[]) {
 
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_1010->header.n_sat; i++) {
-    if (msg_1010->sats[i].obs[L1_FREQ].flags.valid_pr &&
-        msg_1010->sats[i].obs[L1_FREQ].flags.valid_cp) {
+    if (msg_1010->sats[i].obs[L1_FREQ].flags.fields.valid_pr &&
+        msg_1010->sats[i].obs[L1_FREQ].flags.fields.valid_cp) {
       const rtcm_sat_data *sat_obs = &msg_1010->sats[i];
       rtcm_setbitu(buff, bit, 6, sat_obs->svId);
       bit += 6;
@@ -685,7 +689,7 @@ uint16_t rtcm3_encode_1012(const rtcm_obs_message *msg_1012, uint8_t buff[]) {
   uint8_t num_sats = 0;
   for (uint8_t i = 0; i < msg_1012->header.n_sat; i++) {
     flag_bf l1_flags = msg_1012->sats[i].obs[L1_FREQ].flags;
-    if (l1_flags.valid_pr && l1_flags.valid_cp) {
+    if (l1_flags.fields.valid_pr && l1_flags.fields.valid_cp) {
       const rtcm_sat_data *sat_obs = &msg_1012->sats[i];
       rtcm_setbitu(buff, bit, 6, sat_obs->svId);
       bit += 6;
@@ -956,7 +960,7 @@ static void encode_msm_fine_pseudoranges(const uint8_t num_cells,
                                          uint16_t *bit) {
   /* DF400 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    if (flags[i].valid_pr && fabs(fine_pr_ms[i]) < C_1_2P10) {
+    if (flags[i].fields.valid_pr && fabs(fine_pr_ms[i]) < C_1_2P10) {
       rtcm_setbits(buff, *bit, 15, (int16_t)round(fine_pr_ms[i] / C_1_2P24));
     } else {
       rtcm_setbits(buff, *bit, 15, MSM_PR_INVALID);
@@ -972,7 +976,7 @@ static void encode_msm_fine_phaseranges(const uint8_t num_cells,
                                         uint16_t *bit) {
   /* DF401 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    if (flags[i].valid_cp && fabs(fine_cp_ms[i]) < C_1_2P8) {
+    if (flags[i].fields.valid_cp && fabs(fine_cp_ms[i]) < C_1_2P8) {
       rtcm_setbits(buff, *bit, 22, (int32_t)round(fine_cp_ms[i] / C_1_2P29));
     } else {
       rtcm_setbits(buff, *bit, 22, MSM_CP_INVALID);
@@ -988,7 +992,7 @@ static void encode_msm_lock_times(const uint8_t num_cells,
                                   uint16_t *bit) {
   /* DF402 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    if (flags[i].valid_lock) {
+    if (flags[i].fields.valid_lock) {
       rtcm_setbitu(buff, *bit, 4, rtcm3_encode_lock_time(lock_time[i]));
     } else {
       rtcm_setbitu(buff, *bit, 4, 0);
@@ -1015,7 +1019,7 @@ static void encode_msm_cnrs(const uint8_t num_cells,
                             uint16_t *bit) {
   /* DF403 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    if (flags[i].valid_cnr) {
+    if (flags[i].fields.valid_cnr) {
       rtcm_setbitu(buff, *bit, 6, (uint8_t)round(cnr[i]));
     } else {
       rtcm_setbitu(buff, *bit, 6, 0);
@@ -1031,7 +1035,8 @@ static void encode_msm_fine_phaserangerates(const uint8_t num_cells,
                                             uint16_t *bit) {
   /* DF404 */
   for (uint16_t i = 0; i < num_cells; i++) {
-    if (flags[i].valid_dop && fabs(fine_range_rate_m_s[i]) < 0.0001 * C_2P14) {
+    if (flags[i].fields.valid_dop &&
+        fabs(fine_range_rate_m_s[i]) < 0.0001 * C_2P14) {
       rtcm_setbits(
           buff, *bit, 15, (int16_t)round(fine_range_rate_m_s[i] / 0.0001));
     } else {
@@ -1113,23 +1118,23 @@ static uint16_t rtcm3_encode_msm_internal(const rtcm_msm_message *msg,
     for (uint8_t sig = 0; sig < num_sigs; sig++) {
       if (header->cell_mask[sat * num_sigs + sig]) {
         flags[i] = msg->signals[i].flags;
-        if (flags[i].valid_pr) {
+        if (flags[i].fields.valid_pr) {
           fine_pr_ms[i] = msg->signals[i].pseudorange_ms - rough_range_ms[sat];
         }
-        if (flags[i].valid_cp) {
+        if (flags[i].fields.valid_cp) {
           fine_cp_ms[i] =
               msg->signals[i].carrier_phase_ms - rough_range_ms[sat];
         }
-        if (flags[i].valid_lock) {
+        if (flags[i].fields.valid_lock) {
           lock_time[i] = msg->signals[i].lock_time_s;
         }
         hca_indicator[i] = msg->signals[i].hca_indicator;
-        if (flags[i].valid_cnr) {
+        if (flags[i].fields.valid_cnr) {
           cnr[i] = msg->signals[i].cnr;
         } else {
           cnr[i] = 0;
         }
-        if (MSM5 == msm_type && flags[i].valid_dop) {
+        if (MSM5 == msm_type && flags[i].fields.valid_dop) {
           fine_range_rate_m_s[i] =
               msg->signals[i].range_rate_m_s - rough_rate_m_s[sat];
         }

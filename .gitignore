@@ -6,3 +6,4 @@ cmake-build-debug/
 /.cproject
 /.project
 *.swp
+.clang-tidy
